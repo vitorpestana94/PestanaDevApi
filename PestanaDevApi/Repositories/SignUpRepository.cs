@@ -5,7 +5,7 @@ using PestanaDevApi.Models;
 
 namespace PestanaDevApi.Repositories
 {
-    public class SignUpRepository: GenericRepository, ISignUpRepository
+    public class SignUpRepository: DefaultRepository, ISignUpRepository
     {
         public readonly IDbConnection _dbConnection;
 

@@ -14,8 +14,8 @@ namespace PestanaDevApi.AppConfig
             string fileName = devEnvironments.Contains(environment) ? $"config.{environment}.properties" : "config.properties";
 
             Dictionary<string, string> allConfigs = new();
-            TxtFileHelper.ReadPropertyFile(ref allConfigs, "app", fileName);
-            TxtFileHelper.ReadPropertyFile(ref allConfigs, "app-secret", fileName);
+            TxtReader.ReadConfigFile(ref allConfigs, "app", fileName);
+            TxtReader.ReadConfigFile(ref allConfigs, "app-secret", fileName);
 
             config.AddInMemoryCollection(allConfigs.Select(kvp => new KeyValuePair<string, string?>(kvp.Key, kvp.Value)));
         }

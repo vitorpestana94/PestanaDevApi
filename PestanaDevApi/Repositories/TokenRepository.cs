@@ -4,7 +4,7 @@ using PestanaDevApi.Interfaces.Repositories;
 
 namespace PestanaDevApi.Repositories
 {
-    public class TokenRepository : GenericRepository, ITokenRepository
+    public class TokenRepository : DefaultRepository, ITokenRepository
     {
         private readonly IDbConnection _dbConnection;
 

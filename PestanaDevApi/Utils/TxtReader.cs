@@ -1,6 +1,6 @@
 ﻿namespace PestanaDevApi.Utils
 {
-    public class TxtFileHelper
+    public class TxtReader
     {
         /// <summary>
         /// Reads a property file (.txt) and loads its key-value pairs into the provided dictionary.
@@ -15,7 +15,7 @@
         /// <param name="fileName">
         /// Name of the file to read.
         /// </param>
-        public static void ReadPropertyFile(ref Dictionary<string, string> data, string subfolder, string fileName)
+        public static void ReadConfigFile(ref Dictionary<string, string> data, string subfolder, string fileName)
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Config", subfolder, fileName);
 

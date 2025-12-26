@@ -2,11 +2,11 @@
 
 namespace PestanaDevApi.Repositories
 {
-    public class GenericRepository
+    public class DefaultRepository
     {
         protected readonly IDbConnection _db;
 
-        public GenericRepository(IDbConnection dbConnection)
+        public DefaultRepository(IDbConnection dbConnection)
         {
             _db = dbConnection;
 
