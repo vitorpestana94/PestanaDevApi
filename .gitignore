@@ -1,1 +1,20 @@
-.vs/ 
+# Configs locais / segredos
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+config.*.properties
+config.local.properties
+config.properties
+bin/
+obj/
+
+# Secrets do .NET
+secrets.json
+
+# Certificados
+*.pfx
+*.pem
+*.key
+
+# Visual Studio
+.vs

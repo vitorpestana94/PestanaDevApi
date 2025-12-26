@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "GDTkIkBH8zaEodszfNZvgbBJB2gRlW0qK4pDp7JKc6U=",
+  "Source": "PestanaDevApi",
+  "BasePath": "_content/PestanaDevApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

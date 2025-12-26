@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Users\\Vitor Pestana\\estudos\\PestanaDevApi\\PestanaDevApi\\PestanaDevApi\\PestanaDevApi.csproj": {
-      "version": "1.0.0",
+      "version": "0.1.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\Vitor Pestana\\estudos\\PestanaDevApi\\PestanaDevApi\\PestanaDevApi\\PestanaDevApi.csproj",
         "projectName": "PestanaDevApi",
@@ -50,9 +50,25 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.66, )"
+            },
+            "MySqlConnector": {
+              "target": "Package",
+              "version": "[2.5.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.15.0, )"
             }
           },
           "imports": [
