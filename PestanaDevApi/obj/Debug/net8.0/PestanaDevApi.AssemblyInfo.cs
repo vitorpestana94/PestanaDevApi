@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PestanaDevApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+e389e0798a2203f76228beb4eb615073ca8cacdc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0+689834452f3e933dbf376703c6c7a583f6a6eba7")]
 [assembly: System.Reflection.AssemblyProductAttribute("PestanaDevApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PestanaDevApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.0.0")]

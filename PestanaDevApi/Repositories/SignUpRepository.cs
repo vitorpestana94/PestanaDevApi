@@ -14,14 +14,15 @@ namespace PestanaDevApi.Repositories
             _dbConnection = dbConnection;
         }
 
-        public async Task InsertUser(User user)
+        public async Task<Guid> InsertUser(User user)
         {
-            await _dbConnection.ExecuteAsync(@"
+            return await _dbConnection.ExecuteScalarAsync<Guid>(@"
             INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password, user_picture)
-            VALUES (@Nome, @Email, @Password, @Picture)", 
+            VALUES (@Name, @Email, @Password, @Picture)
+            RETURNING id;", 
             new
             {
-                Nome = user.UserName,
+                Name = user.UserName,
                 Email = user.UserEmail,
                 Password = user.UserPassword,
                 Picture = user.UserPicture // Depois o controller precisa receber IFormData e o arquivo como File e preciso subir em alguma CDN para ser consumido.

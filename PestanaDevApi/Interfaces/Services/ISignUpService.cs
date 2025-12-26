@@ -1,9 +1,10 @@
 ﻿using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Models;
 
 namespace PestanaDevApi.Interfaces.Services
 {
     public interface ISignUpService
     {
-        Task SignUp(SignUpRequestDto request);
+        Task<ApiToken> SignUp(SignUpRequestDto request);
     }
 }

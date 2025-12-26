@@ -74,7 +74,7 @@
         "required": [
           "deviceId",
           "email",
-          "senha"
+          "password"
         ],
         "type": "object",
         "properties": {
@@ -82,7 +82,7 @@
             "type": "string",
             "nullable": true
           },
-          "senha": {
+          "password": {
             "type": "string",
             "nullable": true
           },
@@ -95,9 +95,10 @@
       },
       "SignUpRequestDto": {
         "required": [
+          "deviceId",
           "email",
-          "nome",
-          "senha"
+          "name",
+          "password"
         ],
         "type": "object",
         "properties": {
@@ -105,11 +106,15 @@
             "type": "string",
             "nullable": true
           },
-          "nome": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "senha": {
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviceId": {
             "type": "string",
             "nullable": true
           },

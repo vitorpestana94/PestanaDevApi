@@ -8,15 +8,17 @@ namespace PestanaDevApi.Services
     public class SignUpService : ISignUpService
     {
         private readonly ISignUpRepository _signUpRepository;
+        private readonly ITokenService _tokenService;
 
-        public SignUpService(ISignUpRepository signUpRepository)
+        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService)
         {
             _signUpRepository = signUpRepository;
+            _tokenService = tokenService;
         }
 
-        public async Task SignUp(SignUpRequestDto request)
+        public async Task<ApiToken> SignUp(SignUpRequestDto request)
         {
-            await _signUpRepository.InsertUser(new User(request));
+            return await _tokenService.GenerateApiTokens(await _signUpRepository.InsertUser(new User(request)), request.DeviceId);
         }
     }
 }

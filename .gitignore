@@ -5,6 +5,8 @@ appsettings.Production.json
 config.*.properties
 config.local.properties
 config.properties
+bin/
+obj/
 
 # Secrets do .NET
 secrets.json

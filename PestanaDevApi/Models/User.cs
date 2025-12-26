@@ -21,9 +21,9 @@ namespace PestanaDevApi.Models
 
         public User(SignUpRequestDto dto)
         {
-            UserName = dto.Nome;
+            UserName = dto.Name;
             UserEmail = ApiLib.IsEmailValid(dto.Email);
-            UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
+            UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             UserPicture = dto.Picture;
         }
     }

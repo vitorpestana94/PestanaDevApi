@@ -25,5 +25,36 @@ namespace PestanaDevApi.Utils
 
             return email;
         }
+
+        /// <summary>
+        /// Returns the error status code via the thrown exception.
+        /// <param name="error">The thrown error</param>
+        /// <returns>
+        /// Error status code
+        /// </returns>
+        /// </summary>
+        public static int GetErrorStatusCode(Exception? error)
+        {
+            return error switch
+            {
+                NotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedException => StatusCodes.Status403Forbidden,
+                BadRequestException => StatusCodes.Status400BadRequest,
+                _ => StatusCodes.Status500InternalServerError
+            };
+        }
+
+        /// <summary>
+        /// Returns the error message by the thrown error and it status code.
+        /// <param name="error">The thrown error</param>
+        /// <param name="statusCode">The thrown error status code</param>
+        /// <returns>
+        /// Error message
+        /// </returns>
+        /// </summary>
+        public static string GetErrorMessage(int statusCode, Exception? error)
+        {
+            return statusCode == 500 ? "Internal Server Error!" : error?.Message ?? "error!";
+        }
     }
 }

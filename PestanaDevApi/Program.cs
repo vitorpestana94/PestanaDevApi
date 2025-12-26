@@ -5,6 +5,7 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Repositories;
 using PestanaDevApi.Services;
+using PestanaDevApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,17 +56,11 @@ app.UseExceptionHandler(builder =>
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        context.Response.StatusCode = error switch
-        {
-            NotFoundException => StatusCodes.Status404NotFound,
-            UnauthorizedException => StatusCodes.Status403Forbidden,
-            BadRequestException => StatusCodes.Status400BadRequest,
-            _ => StatusCodes.Status500InternalServerError
-        };
+        context.Response.StatusCode = ApiLib.GetErrorStatusCode(error);
 
         await context.Response.WriteAsJsonAsync(new
         {
-            message = error?.Message
+            message = ApiLib.GetErrorMessage(context.Response.StatusCode, error)
         });
     });
 });

@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "PestanaDevApi/1.0.0": {
+      "PestanaDevApi/0.1.0": {
         "dependencies": {
           "BCrypt.Net-Next": "4.0.3",
           "Dapper": "2.1.66",
@@ -169,7 +169,7 @@
     }
   },
   "libraries": {
-    "PestanaDevApi/1.0.0": {
+    "PestanaDevApi/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

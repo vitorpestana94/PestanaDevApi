@@ -28,7 +28,7 @@ namespace PestanaDevApi.Services
         {
             User user = await GetUserByEmail(request.Email);
 
-            if (IsPasswordNotValid(request.Senha, user.UserPassword))
+            if (IsPasswordNotValid(request.Password, user.UserPassword))
                 throw new UnauthorizedException("Invalid Credentials");
 
             return await _tokenService.GenerateApiTokens(user.Id, request.DeviceId);
