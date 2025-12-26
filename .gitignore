@@ -5,8 +5,18 @@ appsettings.Production.json
 config.*.properties
 config.local.properties
 config.properties
+
+# Build
 bin/
 obj/
+
+# IDE
+*.user
+*.tmp
+*.Backup.tmp
+
+# Config local
+appsettings.Development.json
 
 # Secrets do .NET
 secrets.json
