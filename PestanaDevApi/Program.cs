@@ -1,11 +1,42 @@
+using Microsoft.AspNetCore.Diagnostics;
+using PestanaDevApi.AppConfig;
+using PestanaDevApi.Exceptions;
+using PestanaDevApi.Interfaces.Repositories;
+using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Repositories;
+using PestanaDevApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// This allows Dapper to match any column containing an underscore. Therefore, 'user_name' will be processed as 'UserName'.
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
+// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Setup secrets.
+LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Configuration);
+
+// Setup Database connection
+DbConfig.Setup(builder.Configuration, builder.Services);
+
+#region Services
+
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<ISignUpService, SignUpService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+#endregion
+
+#region Repositories
+
+builder.Services.AddScoped<ISignUpRepository, SignUpRepository>();
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+#endregion
 
 var app = builder.Build();
 
@@ -15,6 +46,30 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler(builder =>
+{
+    builder.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+
+        Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        context.Response.StatusCode = error switch
+        {
+            NotFoundException => StatusCodes.Status404NotFound,
+            UnauthorizedException => StatusCodes.Status403Forbidden,
+            BadRequestException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = error?.Message
+        });
+    });
+});
+
 
 app.UseHttpsRedirection();
 
