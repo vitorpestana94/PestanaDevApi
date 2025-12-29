@@ -4,6 +4,6 @@ namespace PestanaDevApi.Interfaces.Services
 {
     public interface ITokenService
     {
-        Task<ApiToken> GenerateApiTokens(Guid userId, string deviceId);
+        Task<ApiToken> GenerateApiTokens(User user, string deviceId);
     }
 }

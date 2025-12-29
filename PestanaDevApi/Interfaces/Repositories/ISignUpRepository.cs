@@ -4,6 +4,6 @@ namespace PestanaDevApi.Interfaces.Repositories
 {
     public interface ISignUpRepository
     {
-        Task<Guid> InsertUser(User user);
+        Task<User> InsertUser(User user);
     }
 }

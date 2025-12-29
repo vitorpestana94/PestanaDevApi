@@ -5,6 +5,6 @@ namespace PestanaDevApi.Interfaces.Services
 {
     public interface ISignUpService
     {
-        Task<ApiToken> SignUp(SignUpRequestDto request);
+        Task<ApiToken?> SignUp(SignUpRequestDto request);
     }
 }

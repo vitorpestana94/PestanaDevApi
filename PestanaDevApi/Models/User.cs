@@ -1,5 +1,4 @@
 ﻿using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Utils;
 
 namespace PestanaDevApi.Models
 {
@@ -22,7 +21,7 @@ namespace PestanaDevApi.Models
         public User(SignUpRequestDto dto)
         {
             UserName = dto.Name;
-            UserEmail = ApiLib.IsEmailValid(dto.Email);
+            UserEmail = dto.Email;
             UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             UserPicture = dto.Picture;
         }

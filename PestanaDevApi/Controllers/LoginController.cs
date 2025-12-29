@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Models;
 
 namespace PestanaDevApi.Controllers
 {
@@ -21,6 +22,10 @@ namespace PestanaDevApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
+            ApiToken? apiToken = await _loginService.Login(request);
+
+            if (apiToken == null)
+                return Unauthorized("Invalid Credentials");
 
             return Ok(await _loginService.Login(request));
         }

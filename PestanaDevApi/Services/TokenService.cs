@@ -25,9 +25,9 @@ namespace PestanaDevApi.Services
         /// It returns an object that contains both the JWT token and the refresh token.
         /// </summary>
         /// <returns>A Base64-encoded string representing the refresh token.</returns>
-        public async Task<ApiToken> GenerateApiTokens(Guid userId, string deviceId)
+        public async Task<ApiToken> GenerateApiTokens(User user, string deviceId)
         {
-            return new ApiToken(CreateJwtToken(userId), await CreatetRefreshToken(userId, deviceId));
+            return new ApiToken(CreateJwtToken(user), await CreatetRefreshToken(user.Id, deviceId));
         }
 
         #region Private Methods
@@ -64,10 +64,10 @@ namespace PestanaDevApi.Services
         /// <param name="userId">The unique identifier of the user.</param>
         /// <returns>A JWT token as a string.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
-        private string CreateJwtToken(Guid userId)
+        private string CreateJwtToken(User user)
         {
 
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(userId)));
+            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user)));
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace PestanaDevApi.Services
         /// <param name="userId">The unique identifier of the user.</param>
         /// <returns>A JWT claims.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
-        private List<Claim> GetTokenClaims(Guid userId)
+        private List<Claim> GetTokenClaims(User user)
         {
             if (string.IsNullOrEmpty(_config["jwt.issuer"]))
                 throw new InvalidOperationException("Issuer not configured! ");
@@ -85,7 +85,10 @@ namespace PestanaDevApi.Services
             [
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
-                new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+                new(JwtRegisteredClaimNames.Email, user.UserEmail),
+                new(JwtRegisteredClaimNames.Name, user.UserName),
+                new("picture", user.UserPicture ?? ""),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             ];
         }
 
