@@ -5,6 +5,6 @@ namespace PestanaDevApi.Interfaces.Services
 {
     public interface ILoginService
     {
-        Task<ApiToken> Login(LoginRequestDto request);
+        Task<ApiToken?> Login(LoginRequestDto request);
     }
 }

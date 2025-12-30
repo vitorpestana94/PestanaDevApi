@@ -1,5 +1,4 @@
 ﻿using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Exceptions;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
@@ -24,14 +23,14 @@ namespace PestanaDevApi.Services
         /// <returns>Both JWT token and refresh token.</returns>
         /// <exception cref="UnauthorizedException">Thrown when the provided password and the stored hash do not match.</exception>
         /// </summary>
-        public async Task<ApiToken> Login(LoginRequestDto request)
+        public async Task<ApiToken?> Login(LoginRequestDto request)
         {
-            User user = await GetUserByEmail(request.Email);
+            User? user = await GetUserByEmail(request.Email);
 
-            if (IsPasswordNotValid(request.Password, user.UserPassword))
-                throw new UnauthorizedException("Invalid Credentials");
+            if (user == null || IsPasswordNotValid(request.Password, user.UserPassword))
+                return null;
 
-            return await _tokenService.GenerateApiTokens(user.Id, request.DeviceId);
+            return await _tokenService.GenerateApiTokens(user, request.DeviceId);
         }
 
         #region Private Methods
@@ -41,11 +40,11 @@ namespace PestanaDevApi.Services
         /// <returns>Both JWT token and refresh token.</returns>
         /// <exception cref="UnauthorizedException">Thrown if there's no registered user with the provided email.</exception>
         /// </summary>
-        private async Task<User> GetUserByEmail(string email)
+        private async Task<User?> GetUserByEmail(string email)
         {
             ApiLib.IsEmailValid(email);
 
-            return await _loginRepository.GetUserDataByEmail(email) ?? throw new UnauthorizedException();
+            return await _loginRepository.GetUserDataByEmail(email);
         }
 
         /// <summary>

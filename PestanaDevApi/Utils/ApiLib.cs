@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using PestanaDevApi.Exceptions;
 
 namespace PestanaDevApi.Utils
 {
@@ -13,17 +12,14 @@ namespace PestanaDevApi.Utils
         /// </returns>
         /// <exception cref="BadRequestException">Thrown if the provided email is empty somehow or if the format does not correspond with the correct format.</exception>
         /// </summary>
-        public static string IsEmailValid(string email)
+        public static bool IsEmailValid(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new BadRequestException();
+                return false;
 
             Regex emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
 
-            if(!emailRegex.IsMatch(email))
-                throw new BadRequestException();
-
-            return email;
+            return emailRegex.IsMatch(email);
         }
 
         /// <summary>
@@ -37,9 +33,6 @@ namespace PestanaDevApi.Utils
         {
             return error switch
             {
-                NotFoundException => StatusCodes.Status404NotFound,
-                UnauthorizedException => StatusCodes.Status403Forbidden,
-                BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
         }

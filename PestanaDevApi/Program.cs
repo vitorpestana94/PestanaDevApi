@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
 using PestanaDevApi.AppConfig;
-using PestanaDevApi.Exceptions;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Repositories;

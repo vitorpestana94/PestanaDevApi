@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Models;
 using PestanaDevApi.Services;
 
 namespace PestanaDevApi.Controllers
@@ -22,7 +23,12 @@ namespace PestanaDevApi.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequestDto request)
         {
-            return Ok(await _signUpService.SignUp(request));
+            ApiToken? apiToken = await _signUpService.SignUp(request);
+
+            if (apiToken == null)
+                return BadRequest("Email format is invalid.");
+
+            return Ok(apiToken);
         }
     }
 }
