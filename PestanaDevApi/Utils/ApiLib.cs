@@ -23,21 +23,6 @@ namespace PestanaDevApi.Utils
         }
 
         /// <summary>
-        /// Returns the error status code via the thrown exception.
-        /// <param name="error">The thrown error</param>
-        /// <returns>
-        /// Error status code
-        /// </returns>
-        /// </summary>
-        public static int GetErrorStatusCode(Exception? error)
-        {
-            return error switch
-            {
-                _ => StatusCodes.Status500InternalServerError
-            };
-        }
-
-        /// <summary>
         /// Returns the error message by the thrown error and it status code.
         /// <param name="error">The thrown error</param>
         /// <param name="statusCode">The thrown error status code</param>

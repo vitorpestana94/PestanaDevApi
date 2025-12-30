@@ -20,7 +20,8 @@ namespace PestanaDevApi.Repositories
         {
             return await _dbConnection.QueryFirstOrDefaultAsync<User?>(@"
             SELECT
-                  id, user_name, user_email, user_password, user_picture
+                  id, user_name, user_email, user_password, 
+                  user_picture, user_signup_platform
             FROM
                   USERS_PROFILE_DATA
             WHERE

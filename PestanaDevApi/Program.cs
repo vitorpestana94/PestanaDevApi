@@ -27,7 +27,7 @@ DbConfig.Setup(builder.Configuration, builder.Services);
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-
+builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 #endregion
 
 #region Repositories
@@ -55,7 +55,7 @@ app.UseExceptionHandler(builder =>
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        context.Response.StatusCode = ApiLib.GetErrorStatusCode(error);
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         await context.Response.WriteAsJsonAsync(new
         {

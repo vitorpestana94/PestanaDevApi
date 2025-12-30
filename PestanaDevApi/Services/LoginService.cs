@@ -1,36 +1,59 @@
 ﻿using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
 using PestanaDevApi.Utils;
+using PestanaDevApi.Constants;
+using PestanaDevApi.Models.Enums;
+using System.Net;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PestanaDevApi.Services
 {
     public class LoginService : ILoginService
     {
         private readonly ILoginRepository _loginRepository;
+        private readonly ISignUpRepository _signUpRepository;
         private readonly ITokenService _tokenService;
+        private readonly IPlatformAuthService _platformAuthService;
 
-        public LoginService(ILoginRepository loginRepository, ITokenService tokenService)
+        public LoginService(ILoginRepository loginRepository, ITokenService tokenService, ISignUpRepository signUpRepository, IPlatformAuthService platformAuthService)
         {
             _loginRepository = loginRepository;
             _tokenService = tokenService;
+            _signUpRepository = signUpRepository;
+            _platformAuthService = platformAuthService;
         }
 
         /// <summary>
-        /// Inserts a new refresh token.
-        /// <param name="request">The login request contains the user's email, password and device ID (a UUID used to generate a refresh token for each device).</param>
+        /// Login flow.
+        /// <param name="request">The login request.</param>
         /// <returns>Both JWT token and refresh token.</returns>
-        /// <exception cref="UnauthorizedException">Thrown when the provided password and the stored hash do not match.</exception>
         /// </summary>
-        public async Task<ApiToken?> Login(LoginRequestDto request)
+        public async Task<LoginResponseDto> Login(LoginRequestDto request)
         {
             User? user = await GetUserByEmail(request.Email);
 
             if (user == null || IsPasswordNotValid(request.Password, user.UserPassword))
-                return null;
+                return new(ErrorMessages.InvalidCredentials);
 
-            return await _tokenService.GenerateApiTokens(user, request.DeviceId);
+            return new (await _tokenService.GenerateApiTokens(user, request.DeviceId));
+        }
+
+        /// <summary>
+        /// Login flow with platforms, like Google.
+        /// <param name="request">The login request.</param>
+        /// <returns>Both JWT token and refresh token.</returns>
+        /// </summary>
+        public async Task<LoginResponseDto> LoginWithProvider(LoginWithPlatformRequestDto request)
+        {
+            User? user = await GetUserByIdToken(request.IdToken, request.Platform);
+
+            if(user == null)
+                return new(HttpStatusCode.Unauthorized);
+
+            return new (await _tokenService.GenerateApiTokens(user, request.DeviceId));
         }
 
         #region Private Methods
@@ -42,9 +65,19 @@ namespace PestanaDevApi.Services
         /// </summary>
         private async Task<User?> GetUserByEmail(string email)
         {
-            ApiLib.IsEmailValid(email);
+            if (!ApiLib.IsEmailValid(email))
+                return null;
 
             return await _loginRepository.GetUserDataByEmail(email);
+        }
+
+        private async Task<User?> GetUserByIdToken(string idToken, Platform platform)
+        {
+            return platform switch
+            {
+                Platform.Google => await _platformAuthService.HandleGoogleIdToken(idToken),
+                _ => null
+            };
         }
 
         /// <summary>

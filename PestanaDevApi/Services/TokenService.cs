@@ -19,6 +19,12 @@ namespace PestanaDevApi.Services
         {
             _tokenRepository = tokenRepository;
             _config = config;
+
+            if (string.IsNullOrEmpty(_config["jwt.issuer"]))
+                throw new InvalidOperationException("Issuer not configured! ");
+
+            if (string.IsNullOrEmpty(_config["jwt.key"]))
+                throw new InvalidOperationException("JWT key not configured!");
         }
 
         /// <summary>
@@ -78,9 +84,6 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
         private List<Claim> GetTokenClaims(User user)
         {
-            if (string.IsNullOrEmpty(_config["jwt.issuer"]))
-                throw new InvalidOperationException("Issuer not configured! ");
-
             return 
             [
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -100,9 +103,6 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT Key is not configured.</exception>
         private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims)
         {
-            if (string.IsNullOrEmpty(_config["jwt.key"]))
-                throw new InvalidOperationException("JWT key not configured!");
-
             return new()
             {
                 Subject = new ClaimsIdentity(claims),

@@ -1,4 +1,6 @@
-﻿using PestanaDevApi.Dtos.Requests;
+﻿using PestanaDevApi.Constants;
+using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
@@ -17,12 +19,15 @@ namespace PestanaDevApi.Services
             _tokenService = tokenService;
         }
 
-        public async Task<ApiToken?> SignUp(SignUpRequestDto request)
+        public async Task<SignUpResponseDto> SignUp(SignUpRequestDto request)
         {
             if (!ApiLib.IsEmailValid(request.Email))
-                return null;
-    
-            return await _tokenService.GenerateApiTokens(await _signUpRepository.InsertUser(new User(request)), request.DeviceId);
+                return new(ErrorMessages.InvalidEmailFormat);
+
+            if(!await _signUpRepository.IsEmailBeingUsed(request.Email))
+                return new(ErrorMessages.EmailAlreadyBeingUsed);
+
+            return new(await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
         }
     }
 }

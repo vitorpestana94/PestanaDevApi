@@ -1,4 +1,6 @@
-﻿using PestanaDevApi.Dtos.Requests;
+﻿using Google.Apis.Auth;
+using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Models
 {
@@ -9,6 +11,7 @@ namespace PestanaDevApi.Models
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
         public string? UserPicture { get; set; }
+        public Platform? UserSignUpPlatform { get; set; }
 
         public User() 
         {
@@ -24,6 +27,15 @@ namespace PestanaDevApi.Models
             UserEmail = dto.Email;
             UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             UserPicture = dto.Picture;
+        }
+
+        public User(GoogleJsonWebSignature.Payload googlePayload)
+        {
+            UserName = googlePayload.Name;
+            UserEmail = googlePayload.Email;
+            UserPassword = "";
+            UserPicture = googlePayload.Picture;
+            UserSignUpPlatform = Platform.Google;
         }
     }
 }
