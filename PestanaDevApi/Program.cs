@@ -28,6 +28,12 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
+builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["api.baseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+}));
 #endregion
 
 #region Repositories

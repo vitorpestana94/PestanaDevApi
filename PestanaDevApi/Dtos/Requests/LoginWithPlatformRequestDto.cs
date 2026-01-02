@@ -6,6 +6,6 @@ namespace PestanaDevApi.Dtos.Requests
     {
         public required Platform Platform { get; set; }
         public required string DeviceId { get; set; }
-        public required string IdToken { get; set; }
+        public required string Token { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace PestanaDevApi.Services
         /// </summary>
         public async Task<LoginResponseDto> LoginWithProvider(LoginWithPlatformRequestDto request)
         {
-            User? user = await GetUserByIdToken(request.IdToken, request.Platform);
+            User? user = await GetUserByIToken(request.Token, request.Platform);
 
             if(user == null)
                 return new(HttpStatusCode.Unauthorized);
@@ -71,11 +71,12 @@ namespace PestanaDevApi.Services
             return await _loginRepository.GetUserDataByEmail(email);
         }
 
-        private async Task<User?> GetUserByIdToken(string idToken, Platform platform)
+        private async Task<User?> GetUserByIToken(string token, Platform platform)
         {
             return platform switch
             {
-                Platform.Google => await _platformAuthService.HandleGoogleIdToken(idToken),
+                Platform.Google => await _platformAuthService.HandleGoogleIdToken(token),
+                Platform.Github => await _platformAuthService.HandleGitHubAcessToken(token),
                 _ => null
             };
         }

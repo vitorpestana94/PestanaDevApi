@@ -12,11 +12,13 @@ namespace PestanaDevApi.Services
     {
         private readonly ISignUpRepository _signUpRepository;
         private readonly ITokenService _tokenService;
+        private readonly IPlatformAuthService _platformAuthService;
 
-        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService)
+        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService, IPlatformAuthService platformAuthService)
         {
             _signUpRepository = signUpRepository;
             _tokenService = tokenService;
+            _platformAuthService = platformAuthService;
         }
 
         public async Task<SignUpResponseDto> SignUp(SignUpRequestDto request)
@@ -29,5 +31,10 @@ namespace PestanaDevApi.Services
 
             return new(await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
         }
+
+        //public async Task<SignUpResponseDto> SignUpWithPlatform(SignUpWithPlatformRequestDto request)
+        //{
+        //    return new(await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
+        //}
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth;
 using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Models
@@ -36,6 +37,15 @@ namespace PestanaDevApi.Models
             UserPassword = "";
             UserPicture = googlePayload.Picture;
             UserSignUpPlatform = Platform.Google;
+        }
+
+        public User(GithubResponseDto responseDto, string userEmail)
+        {
+            UserName = responseDto.Username;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = responseDto.AvatarUrl;
+            UserSignUpPlatform = Platform.Github;
         }
     }
 }
