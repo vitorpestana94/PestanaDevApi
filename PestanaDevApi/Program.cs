@@ -5,6 +5,7 @@ using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Repositories;
 using PestanaDevApi.Services;
 using PestanaDevApi.Utils;
+using PestanaDevApi.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,11 +62,22 @@ app.UseExceptionHandler(builder =>
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        int statusCode = error switch
+        {
+            ApiException apiEx => apiEx.StatusCode,
+            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
 
         await context.Response.WriteAsJsonAsync(new
         {
-            message = ApiLib.GetErrorMessage(context.Response.StatusCode, error)
+            status = statusCode,
+            message = ApiLib.GetErrorMessage(statusCode, error, app.Environment.IsDevelopment()),
+            stackTrace = app.Environment.IsDevelopment() ? error?.StackTrace : null
         });
     });
 });

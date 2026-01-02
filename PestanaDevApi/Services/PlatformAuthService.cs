@@ -3,6 +3,7 @@ using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
+using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Services
 {
@@ -47,12 +48,14 @@ namespace PestanaDevApi.Services
         /// <returns>Existing user data or create new data after registering.</returns>
         public async Task<User?> HandleGoogleIdToken(string idToken)
         {
-            GoogleJsonWebSignature.Payload? googlePayload = await ValidateGoogleToken(idToken);
+            GoogleJsonWebSignature.Payload? response = await ValidateGoogleToken(idToken);
 
-            if (googlePayload == null)
+            if (response == null)
                 return null;
 
-            return await _loginRepository.GetUserDataByEmail(googlePayload.Email) ?? await _signUpRepository.RegisterUserByPlatform(new User(googlePayload));
+            Guid userId = await GetUserIdByPlatformOrEmail(Platform.Google, response.Subject, response.Email);
+
+            return userId != Guid.Empty ? new User(response, userId) : await _signUpRepository.RegisterUserByPlatform(new User(response));
         }
 
         /// <summary>
@@ -64,25 +67,42 @@ namespace PestanaDevApi.Services
         /// <returns>Existing user data or create new data after registering.</returns>
         public async Task<User?> HandleGitHubAcessToken(string accessToken)
         {
-            string? userEmail;
-            Dictionary<string, string> headers = new Dictionary<string, string>{{ "Authorization", $"Bearer {accessToken}" },{ "User-Agent", _githubAppName } };
+            Dictionary<string, string> headers = new() { { "Authorization", $"Bearer {accessToken}" }, { "User-Agent", _githubAppName } };
+            GithubResponseDto? response = await ValidateGitHubAccessToken(accessToken, headers);
 
-            GithubResponseDto? userResponse = await ValidateGitHubAccessToken(accessToken, headers);
+            if (response == null)
+                return null;
+           
+            string? userEmail = await HandleMissingGitHubEmail(response, accessToken, headers);
 
-            if (userResponse == null)
+            if (userEmail == null)
                 return null;
 
-            if (string.IsNullOrEmpty(userResponse.Email)) // Most users do not allow their email address to be public. So, it's necessary to make another call.
+            Guid userId = await GetUserIdByPlatformOrEmail(Platform.GitHub, response.Id.ToString(), userEmail);
+
+            return userId != Guid.Empty ? new User(response, userId, userEmail) : await _signUpRepository.RegisterUserByPlatform(new User(response, userEmail));
+        }
+
+        /// <summary>
+        /// Returns the user id by platform and platformid or from userEmail
+        /// </summary>
+        /// <param name="platform">Auth platform</param>
+        /// <param name="platformId">Auth platform id</param>
+        /// <param name="userEmail">User email returned by platform auth.</param>
+        /// <returns>User Id on database or Guid.Empty.</returns>
+        private async Task<Guid> GetUserIdByPlatformOrEmail(Platform platform,string platformId, string userEmail)
+        {
+            Guid userId = await _loginRepository.GetUserIdByPlatformId(platform, platformId);
+
+            if (userId == Guid.Empty)
             {
-                userEmail = await GetGithubUserEmail(accessToken, headers);
+                userId = await _loginRepository.GetUserIdEmail(userEmail);
 
-                if (userEmail == null)
-                    return null;
+                if(userId != Guid.Empty)
+                    await _signUpRepository.InsertUserPlatformData(userId, platform, platformId);
             }
-            else
-                userEmail = userResponse.Email;
 
-            return await _loginRepository.GetUserDataByEmail(userEmail) ?? await _signUpRepository.RegisterUserByPlatform(new User(userResponse, userEmail));
+            return userId;
         }
 
         /// <summary>
@@ -147,6 +167,18 @@ namespace PestanaDevApi.Services
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Handle the missing user email
+        /// </summary>
+        /// <param name="accessToken">The Github acess_token to validate.</param>
+        /// <param name="headers">The Github request headers</param>
+        /// <param name="response">The Github user response</param>
+        /// <returns>User email on GitHub.</returns>
+        private async Task<string?> HandleMissingGitHubEmail(GithubResponseDto response, string accessToken, Dictionary<string, string> headers)
+        {
+            return string.IsNullOrEmpty(response.Email) ? await GetGithubUserEmail(accessToken, headers) : response.Email;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace PestanaDevApi.Utils
 {
@@ -30,9 +31,12 @@ namespace PestanaDevApi.Utils
         /// Error message
         /// </returns>
         /// </summary>
-        public static string GetErrorMessage(int statusCode, Exception? error)
+        public static string GetErrorMessage(int statusCode, Exception? error, bool isDevMode)
         {
-            return statusCode == 500 ? "Internal Server Error!" : error?.Message ?? "error!";
+            if (statusCode == 500 && !isDevMode)
+                return "Ocorreu um erro interno inesperado. Tente novamente mais tarde.";
+
+            return error?.Message ?? "Erro desconhecido.";
         }
     }
 }

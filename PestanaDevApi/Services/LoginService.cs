@@ -50,7 +50,7 @@ namespace PestanaDevApi.Services
         {
             User? user = await GetUserByIToken(request.Token, request.Platform);
 
-            if(user == null)
+            if(user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
                 return new(HttpStatusCode.Unauthorized);
 
             return new (await _tokenService.GenerateApiTokens(user, request.DeviceId));
@@ -76,7 +76,7 @@ namespace PestanaDevApi.Services
             return platform switch
             {
                 Platform.Google => await _platformAuthService.HandleGoogleIdToken(token),
-                Platform.Github => await _platformAuthService.HandleGitHubAcessToken(token),
+                Platform.GitHub => await _platformAuthService.HandleGitHubAcessToken(token),
                 _ => null
             };
         }

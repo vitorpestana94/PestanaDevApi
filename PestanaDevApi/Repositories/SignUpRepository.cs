@@ -2,6 +2,7 @@
 using Dapper;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Models;
+using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Repositories
 {
@@ -38,19 +39,32 @@ namespace PestanaDevApi.Repositories
             User newUser = user;
 
             newUser.Id = await _dbConnection.ExecuteScalarAsync<Guid>(@"
-            INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password, user_picture, user_signup_platform)
-            VALUES (@Name, @Email, @Password, @Picture, @Platform)
+            INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password)
+            VALUES (@Name, @Email, @Password)
             RETURNING id;",
             new
             {
                 Name = user.UserName,
                 Email = user.UserEmail,
                 Password = user.UserPassword,
-                Picture = user.UserPicture,
-                Platform = user.UserSignUpPlatform.ToString()
             });
 
+            await InsertUserPlatformData(newUser.Id, (Platform)user.UserSignUpPlatform!, user.UserPlatformId!);
+
             return newUser;
+        }
+
+        public async Task InsertUserPlatformData(Guid userId, Platform platform, string platformId)
+        {
+            await _dbConnection.ExecuteScalarAsync<Guid>(@"
+            INSERT INTO USERS_PROFILE_PLATFORM_DATA (user_id, user_signup_platform, user_platform_id)
+            VALUES (@UserId, @Platform, @PlatformId);",
+            new
+            {
+                UserId = userId,
+                Platform = platform.ToString(),
+                PlatformId = platformId,
+            });
         }
 
         public async Task<bool> IsEmailBeingUsed(string email)

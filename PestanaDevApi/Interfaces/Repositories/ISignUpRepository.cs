@@ -8,5 +8,6 @@ namespace PestanaDevApi.Interfaces.Repositories
         Task<User> RegisterUser(User user);
         Task<bool> IsEmailBeingUsed(string email);
         Task<User> RegisterUserByPlatform(User user);
+        Task InsertUserPlatformData(Guid userId, Platform platform, string platformId);
     }
 }
