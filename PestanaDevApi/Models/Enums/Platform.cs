@@ -3,6 +3,7 @@
     public enum Platform
     {
         Google,
-        GitHub
+        GitHub,
+        Linkedin
     }
 }

@@ -8,6 +8,7 @@ using PestanaDevApi.Constants;
 using PestanaDevApi.Models.Enums;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
+using PestanaDevApi.Interfaces.Services.Auth;
 
 namespace PestanaDevApi.Services
 {
@@ -77,6 +78,7 @@ namespace PestanaDevApi.Services
             {
                 Platform.Google => await _platformAuthService.HandleGoogleIdToken(token),
                 Platform.GitHub => await _platformAuthService.HandleGitHubAcessToken(token),
+                Platform.Linkedin => await _platformAuthService.HandleLinkedinIdToken(token),
                 _ => null
             };
         }

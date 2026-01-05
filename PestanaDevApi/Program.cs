@@ -6,6 +6,8 @@ using PestanaDevApi.Repositories;
 using PestanaDevApi.Services;
 using PestanaDevApi.Utils;
 using PestanaDevApi.Exceptions;
+using PestanaDevApi.Services.Auth;
+using PestanaDevApi.Interfaces.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,10 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
+builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
+
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["api.baseUrl"]!);

@@ -1,7 +1,9 @@
 ﻿using Google.Apis.Auth;
+using Newtonsoft.Json.Linq;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Models.Enums;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Models
 {
@@ -69,6 +71,26 @@ namespace PestanaDevApi.Models
             UserPassword = "";
             UserPicture = responseDto.AvatarUrl;
             UserSignUpPlatform = Platform.GitHub;
+        }
+
+        public User(JwtSecurityToken jwt, Guid userId, string userEmail)
+        {
+            Id = userId;
+            UserName = jwt.Claims.First(c => c.Type == "name").Value;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
+            UserSignUpPlatform = Platform.Linkedin;
+        }
+
+        public User(JwtSecurityToken jwt, string userId, string userEmail)
+        {
+            UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
+            UserSignUpPlatform = Platform.Linkedin;
+            UserPlatformId = userId;
         }
     }
 }

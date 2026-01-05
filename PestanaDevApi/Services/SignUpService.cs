@@ -3,6 +3,7 @@ using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Interfaces.Services.Auth;
 using PestanaDevApi.Models;
 using PestanaDevApi.Utils;
 
