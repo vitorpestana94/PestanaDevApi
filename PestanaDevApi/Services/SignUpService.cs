@@ -13,6 +13,7 @@ namespace PestanaDevApi.Services
         private readonly ISignUpRepository _signUpRepository;
         private readonly ITokenService _tokenService;
         private readonly ILoginService _loginService;
+
         public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService, ILoginService loginService)
         {
             _signUpRepository = signUpRepository;
