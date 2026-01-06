@@ -30,6 +30,7 @@ DbConfig.Setup(builder.Configuration, builder.Services);
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();

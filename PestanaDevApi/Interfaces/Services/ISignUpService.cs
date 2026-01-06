@@ -7,5 +7,6 @@ namespace PestanaDevApi.Interfaces.Services
     {
         Task<SignUpResponseDto> SignUp(SignUpRequestDto request);
         Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email);
+        Task<SignUpWithPlatformResponseDto> SignUpWithPlatform(SignUpWithPlatformRequestDto request);
     }
 }

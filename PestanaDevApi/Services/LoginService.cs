@@ -5,9 +5,7 @@ using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
 using PestanaDevApi.Utils;
 using PestanaDevApi.Constants;
-using PestanaDevApi.Models.Enums;
 using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using PestanaDevApi.Interfaces.Services.Auth;
 
 namespace PestanaDevApi.Services
@@ -43,13 +41,13 @@ namespace PestanaDevApi.Services
         }
 
         /// <summary>
-        /// Login flow with platforms, like Google.
+        /// Login flow with platforms, like Google. It will login user if already registered or register user otherwise
         /// <param name="request">The login request.</param>
         /// <returns>Both JWT token and refresh token.</returns>
         /// </summary>
-        public async Task<LoginResponseDto> LoginWithProvider(LoginWithPlatformRequestDto request)
+        public async Task<LoginResponseDto> LoginOrSignUpWithProvider(LoginWithPlatformRequestDto request)
         {
-            User? user = await GetUserByIToken(request.Token, request.Platform);
+            User? user = await _platformAuthService.GetUserByIToken(request.Token, request.Platform);
 
             if(user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
                 return new(HttpStatusCode.Unauthorized);
@@ -70,17 +68,6 @@ namespace PestanaDevApi.Services
                 return null;
 
             return await _loginRepository.GetUserDataByEmail(email);
-        }
-
-        private async Task<User?> GetUserByIToken(string token, Platform platform)
-        {
-            return platform switch
-            {
-                Platform.Google => await _platformAuthService.HandleGoogleIdToken(token),
-                Platform.GitHub => await _platformAuthService.HandleGitHubAcessToken(token),
-                Platform.Linkedin => await _platformAuthService.HandleLinkedinIdToken(token),
-                _ => null
-            };
         }
 
         /// <summary>

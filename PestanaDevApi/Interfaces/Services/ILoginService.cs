@@ -6,6 +6,6 @@ namespace PestanaDevApi.Interfaces.Services
     public interface ILoginService
     {
         Task<LoginResponseDto> Login(LoginRequestDto request);
-        Task<LoginResponseDto> LoginWithProvider(LoginWithPlatformRequestDto request);
+        Task<LoginResponseDto> LoginOrSignUpWithProvider(LoginWithPlatformRequestDto request);
     }
 }

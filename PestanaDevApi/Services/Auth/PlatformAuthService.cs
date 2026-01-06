@@ -26,6 +26,18 @@ namespace PestanaDevApi.Services.Auth
             _linkedinAuthService = linkedinAuthService;
         }
 
+        public async Task<User?> GetUserByIToken(string token, Platform platform)
+        {
+            return platform switch
+            {
+                Platform.Google => await HandleGoogleIdToken(token),
+                Platform.GitHub => await HandleGitHubAcessToken(token),
+                Platform.Linkedin => await HandleLinkedinIdToken(token),
+                _ => null
+            };
+        }
+
+        #region Private Methods
         /// <summary>
         /// Validates the provided idToken.If valid, it can return an existing user via Google's payload email 
         /// or create a new one if no user is found. 
@@ -33,7 +45,7 @@ namespace PestanaDevApi.Services.Auth
         /// </summary>
         /// <param name="idToken">The Google's ID toke.</param>
         /// <returns>Existing user data or create new data after registering.</returns>
-        public async Task<User?> HandleGoogleIdToken(string idToken)
+        private async Task<User?> HandleGoogleIdToken(string idToken)
         {
             GoogleJsonWebSignature.Payload? response = await _googleAuthService.ValidateGoogleToken(idToken);
 
@@ -52,7 +64,7 @@ namespace PestanaDevApi.Services.Auth
         /// </summary>
         /// <param name="accessToken">The Github's acess_token.</param>
         /// <returns>Existing user data or create new data after registering.</returns>
-        public async Task<User?> HandleGitHubAcessToken(string accessToken)
+        private async Task<User?> HandleGitHubAcessToken(string accessToken)
         {
             (GithubResponseDto gitHubResponse, string userEmail)? response = await _gitHubAuthService.ValidateGitHubAcessToken(accessToken);
 
@@ -73,7 +85,7 @@ namespace PestanaDevApi.Services.Auth
         /// </summary>
         /// <param name="idToken">The Linkedin's acess_token.</param>
         /// <returns>Existing user data or create new data after registering.</returns>
-        public async Task<User?> HandleLinkedinIdToken(string idToken)
+        private async Task<User?> HandleLinkedinIdToken(string idToken)
         {
             JwtSecurityToken? jwtResponse = await _linkedinAuthService.ValidateLinkedinIdToken(idToken);
 
@@ -86,7 +98,6 @@ namespace PestanaDevApi.Services.Auth
             return userId.IsNotEmpty() ? User.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
         }
 
-        #region Private Methods
         /// <summary>
         /// Returns the user id by platform and platformid or from userEmail
         /// If the user id is found by email, it will insert a new user platform access on table USERS_PROFILE_PLATFORM_DATA

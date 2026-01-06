@@ -1,11 +1,10 @@
 ﻿using PestanaDevApi.Models;
+using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Interfaces.Services.Auth
 {
     public interface IPlatformAuthService
     {
-        Task<User?> HandleGoogleIdToken(string idToken);
-        Task<User?> HandleGitHubAcessToken(string acessToken);
-        Task<User?> HandleLinkedinIdToken(string idToken);
+        Task<User?> GetUserByIToken(string token, Platform platform);
     }
 }

@@ -25,11 +25,10 @@ namespace PestanaDevApi.Controllers
             return HandleLoginResponse(await _loginService.Login(request));
         }
 
-
         [HttpPost("platform")]
         public async Task<IActionResult> LoginWithPlatform([FromBody] LoginWithPlatformRequestDto request)
         {
-            return HandleLoginResponse(await _loginService.LoginWithProvider(request));
+            return HandleLoginResponse(await _loginService.LoginOrSignUpWithProvider(request));
         }
 
         #region Private Methods
