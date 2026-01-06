@@ -5,6 +5,7 @@ using PestanaDevApi.Models;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Interfaces.Services.Auth;
 using System.IdentityModel.Tokens.Jwt;
+using PestanaDevApi.Extensions;
 
 namespace PestanaDevApi.Services.Auth
 {
@@ -41,7 +42,7 @@ namespace PestanaDevApi.Services.Auth
 
             Guid userId = await GetUserIdByPlatformOrEmail(Platform.Google, response.Subject, response.Email);
 
-            return IsUserIdEmpty(userId) ? new User(response, userId) : await RegisterNewUser(new User(response));
+            return userId.IsNotEmpty() ? User.FromGoogleIdentity(response, userId) : await RegisterNewUser(new User(response));
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace PestanaDevApi.Services.Auth
 
             Guid userId = await GetUserIdByPlatformOrEmail(Platform.GitHub, gitHubResponse.Id.ToString(), userEmail);
 
-            return IsUserIdEmpty(userId) ? new User(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
+            return userId.IsNotEmpty() ? User.FromGitHubIdentity(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace PestanaDevApi.Services.Auth
             string userEmail = _linkedinAuthService.GetUserEmailFromJwt(jwtResponse);
             Guid userId = await GetUserIdByPlatformOrEmail(Platform.Linkedin, jwtResponse.Subject, userEmail);
             
-            return IsUserIdEmpty(userId) ? new User(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
+            return userId.IsNotEmpty() ? User.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
         }
 
         #region Private Methods
@@ -98,25 +99,15 @@ namespace PestanaDevApi.Services.Auth
         {
             Guid userId = await _loginRepository.GetUserIdByPlatformId(platform, platformId);
 
-            if (userId == Guid.Empty)
+            if (userId.IsEmpty())
             {
-                userId = await _loginRepository.GetUserIdEmail(userEmail);
+                userId = await _loginRepository.GetUserIdByEmail(userEmail);
 
-                if (userId != Guid.Empty)
+                if (userId.IsNotEmpty())
                     await _signUpRepository.InsertUserPlatformData(userId, platform, platformId);
             }
 
             return userId;
-        }
-
-        /// <summary>
-        /// Returns True if Guid is not empty and false otherwise
-        /// </summary>
-        /// <param name="userId">User Id</param>
-        /// <returns>True if Guid is not empty and false otherwise.</returns>
-        private static bool IsUserIdEmpty(Guid userId)
-        {
-            return userId != Guid.Empty;
         }
 
         /// <summary>

@@ -7,6 +7,6 @@ namespace PestanaDevApi.Interfaces.Repositories
     {
         Task<User?> GetUserDataByEmail(string email);
         Task<Guid> GetUserIdByPlatformId(Platform platform, string platformId);
-        Task<Guid> GetUserIdEmail(string email);
+        Task<Guid> GetUserIdByEmail(string email);
     }
 }

@@ -22,12 +22,12 @@ namespace PestanaDevApi.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequestDto request)
         {
-            SignUpResponseDto respoonse = await _signUpService.SignUp(request);
+            SignUpResponseDto response = await _signUpService.SignUp(request);
 
-            if (!respoonse.IsSuccess)
-                return BadRequest(respoonse.ErrorMessage);
+            if (!response.IsSuccess)
+                return BadRequest(response.ErrorMessage);
 
-            return Ok(respoonse.ApiTokens);
+            return Ok(response.ApiTokens);
         }
     }
 }

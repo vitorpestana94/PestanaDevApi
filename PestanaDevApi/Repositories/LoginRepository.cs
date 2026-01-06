@@ -27,7 +27,7 @@ namespace PestanaDevApi.Repositories
             new { Email = email});
         }
 
-        public async Task<Guid> GetUserIdEmail(string email)
+        public async Task<Guid> GetUserIdByEmail(string email)
         {
             return await _dbConnection.QueryFirstOrDefaultAsync<Guid>(@"
             SELECT
