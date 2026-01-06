@@ -29,5 +29,16 @@ namespace PestanaDevApi.Controllers
 
             return Ok(response.ApiTokens);
         }
+
+        [HttpGet("isEmailRegistered/{email}")]
+        public async Task<IActionResult> IsEmailRegistered([FromRoute] string email)
+        {
+            IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);
+
+            if (!response.IsSuccess)
+                return BadRequest(response.ErrorMessage);
+
+            return Ok(response.IsRegistered);
+        }
     }
 }

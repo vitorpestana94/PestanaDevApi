@@ -27,10 +27,18 @@ namespace PestanaDevApi.Services
             if (!ApiLib.IsEmailValid(request.Email))
                 return new(ErrorMessages.InvalidEmailFormat);
 
-            if(!await _signUpRepository.IsEmailBeingUsed(request.Email))
+            if(await _signUpRepository.IsEmailBeingUsed(request.Email))
                 return new(ErrorMessages.EmailAlreadyBeingUsed);
 
             return new(await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
+        }
+
+        public async Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email)
+        {
+            if (!ApiLib.IsEmailValid(email))
+                return new(ErrorMessages.InvalidEmailFormat);
+
+            return new(await _signUpRepository.IsEmailBeingUsed(email));
         }
 
         //public async Task<SignUpResponseDto> SignUpWithPlatform(SignUpWithPlatformRequestDto request)

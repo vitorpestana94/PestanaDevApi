@@ -81,7 +81,7 @@ namespace PestanaDevApi.Repositories
                 Email = email,
             });
 
-            return userId == Guid.Empty;
+            return userId != Guid.Empty;
         }
     }
 }
