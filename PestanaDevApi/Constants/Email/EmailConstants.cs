@@ -1,4 +1,4 @@
-﻿namespace PestanaDevApi.Constants
+﻿namespace PestanaDevApi.Constants.Email
 {
     public class EmailConstants
     {
@@ -8,5 +8,9 @@
         public const string ClientEmailVariable = "{{ClientEmail}}";
         public const string ClientNameVariable = "{{ClientName}}";
         public const string ClientMessageVariable = "{{ClientMessage}}";
+        public const string Title = "{{Title}}";
+        public const string Paragraph = "{{Paragraph}}";
+        public const string Copyright = "{{Copyright}}";
+        public const string Subcopyright = "{{Subcopyright}}";
     }
 }

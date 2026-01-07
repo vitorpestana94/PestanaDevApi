@@ -41,12 +41,11 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<EmailResponse> SendContactEmail(ContactEmailRequestDto request)
         {
-            if (ApiLib.IsEmailValid(request.ClientEmail))
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
-            using MailMessage mail = new ApiEmailMessage(_emailAddress, await _emailTemplateService.GetEmailTemplate(request), EmailConstants.ContactEmailSubject);
-
-            await SendEmail(mail);
+            await SendContactEmailToAdmin(request);
+            await SendContactEmailToClient(request);
 
             return new();
         }
@@ -72,6 +71,20 @@ namespace PestanaDevApi.Services.Email
 
                 throw new ApiException(ErrorMessages.EmailUnespectedError, 500, ex);
             }
+        }
+
+        private async Task SendContactEmailToAdmin(ContactEmailRequestDto request)
+        {
+            using MailMessage mail = new ApiEmailMessage(_emailAddress, await _emailTemplateService.GetEmailTemplate(request));
+
+            await SendEmail(mail);
+        }
+
+        private async Task SendContactEmailToClient(ContactEmailRequestDto request)
+        {
+            using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, isContactConfirmation: true));
+
+            await SendEmail(mail);
         }
         #endregion
     }

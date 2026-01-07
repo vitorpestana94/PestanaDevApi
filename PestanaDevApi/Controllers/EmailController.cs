@@ -27,7 +27,7 @@ namespace PestanaDevApi.Controllers
             if (!response.IsSuccess)
                 return BadRequest(response.ErrorMessage);
 
-            return Ok();
+            return Ok(response);
         }
     }
 }

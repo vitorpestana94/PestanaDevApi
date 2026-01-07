@@ -27,6 +27,7 @@
         .content {
             width: 100%;
             max-width: 600px;
+            color: #000000;
             margin: 0 auto;
             margin-top: 5%;
             border-radius: 8px;
@@ -38,7 +39,7 @@
             background-color: #38b6ff;
             padding: 40px;
             text-align: center;
-            color: #000000;
+            color: #ffffff;
         }
 
         .body-content {
@@ -54,23 +55,21 @@
             color: #000000;
             font-size: 12px;
         }
-    </style>
 
+    </style>
 </head>
 <body>
     <center>
         <table class="content" role="presentation">
             <tr>
                 <td class="header">
-                    <h1 style="margin: 0; font-size: 24px;">{{Subject}}</h1>
+                    <h1 style="margin: 0; font-size: 24px;">{{Title}}</h1>
                 </td>
             </tr>
 
             <tr>
                 <td class="body-content">
-                    <p>Name: {{ClientName}}</p>
-                    <p>Email: {{ClientEmail}}.</p>
-                    <p>Message: {{ClientMessage}}.</p>
+                    <p>{{Paragraph}}</p>
                     <br>
                 </td>
             </tr>

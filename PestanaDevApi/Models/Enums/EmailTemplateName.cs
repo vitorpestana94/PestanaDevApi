@@ -3,6 +3,7 @@
     public enum EmailTemplateName
     {
         ContactEmail,
+        ContactEmailClientConfirmation,
         EmailConfirmation,
         UserRegistered
     }

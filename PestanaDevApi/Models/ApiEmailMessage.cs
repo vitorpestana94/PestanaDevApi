@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
+using PestanaDevApi.Constants.Email;
 using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Constants;
 
 namespace PestanaDevApi.Models
 {
@@ -10,11 +10,20 @@ namespace PestanaDevApi.Models
         { 
         }
 
-        public ApiEmailMessage(string emailAddress, string body, string subject)
+        public ApiEmailMessage(string fromEmaillAddress, string body)
         {
-            From = new MailAddress(emailAddress);
-            To.Add(emailAddress);
-            Subject = subject;
+            From = new MailAddress(fromEmaillAddress);
+            To.Add(fromEmaillAddress);
+            Subject = EmailConstants.ContactEmailSubject;
+            Body = body;
+            IsBodyHtml = true;
+        }
+
+        public ApiEmailMessage(ContactEmailRequestDto request, string fromEmaillAddress, string body)
+        {
+            From = new MailAddress(fromEmaillAddress);
+            To.Add(request.ClientEmail);
+            Subject = EmailConstants.ContactEmailSubject;
             Body = body;
             IsBodyHtml = true;
         }
