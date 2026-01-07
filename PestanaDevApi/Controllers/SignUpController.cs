@@ -30,18 +30,6 @@ namespace PestanaDevApi.Controllers
             return Ok(response.ApiTokens);
         }
 
-        [HttpPost("platform")]
-        [HttpPost]
-        public async Task<IActionResult> SignUpWithPlatform([FromBody] SignUpWithPlatformRequestDto request)
-        {
-            SignUpWithPlatformResponseDto response = await _signUpService.SignUpWithPlatform(request);
-
-            if (!response.IsSuccess)
-                return Unauthorized(response.ErrorMessage);
-
-            return Ok(response.ApiTokens);
-        }
-
         [HttpGet("isEmailRegistered/{email}")]
         public async Task<IActionResult> IsEmailRegistered([FromRoute] string email)
         {

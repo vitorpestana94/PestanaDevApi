@@ -5,10 +5,10 @@ namespace PestanaDevApi.Dtos.Responses
 {
     /// <summary>
     /// Specialized response for platform-based registration.
-    /// Inherits from <see cref="LoginResponseDto"/> to provide a semantic distinction
+    /// Inherits from <see cref="AuthResponseDto"/> to provide a semantic distinction
     /// while maintaining the same authentication structure.
     /// </summary>
-    public class SignUpWithPlatformResponseDto : LoginResponseDto
+    public class SignUpWithPlatformResponseDto : AuthResponseDto
     {
         public SignUpWithPlatformResponseDto() : base()
         {
@@ -18,7 +18,7 @@ namespace PestanaDevApi.Dtos.Responses
         {
         }
 
-        public SignUpWithPlatformResponseDto(LoginResponseDto response)
+        public SignUpWithPlatformResponseDto(AuthResponseDto response)
         {
             IsSuccess = response.IsSuccess;
             StatusCode = response.StatusCode;

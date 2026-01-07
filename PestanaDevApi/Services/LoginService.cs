@@ -30,7 +30,7 @@ namespace PestanaDevApi.Services
         /// <param name="request">The login request.</param>
         /// <returns>Both JWT token and refresh token.</returns>
         /// </summary>
-        public async Task<LoginResponseDto> Login(LoginRequestDto request)
+        public async Task<AuthResponseDto> Login(LoginRequestDto request)
         {
             User? user = await GetUserByEmail(request.Email);
 
@@ -41,13 +41,15 @@ namespace PestanaDevApi.Services
         }
 
         /// <summary>
-        /// Login flow with platforms, like Google. It will login user if already registered or register user otherwise
-        /// <param name="request">The login request.</param>
-        /// <returns>Both JWT token and refresh token.</returns>
+        /// Authenticates or registers a user via an external provider. 
+        /// If the user does not exist in the local database, a new record is created (Sign-Up).
+        /// If the user already exists, the session is initialized (Log-In).
         /// </summary>
-        public async Task<LoginResponseDto> LoginOrSignUpWithProvider(LoginWithPlatformRequestDto request)
+        /// <param name="request">The request data containing the provider's token and a enum that indicates the provider.</param>
+        /// <returns>A task representing the operation, yielding the authentication tokens.</returns>
+        public async Task<AuthResponseDto> LoginOrSignUpWithProvider(LoginOrSignUpWithPlatformRequestDto request)
         {
-            User? user = await _platformAuthService.GetUserByIToken(request.Token, request.Platform);
+            User? user = await _platformAuthService.GetUserByIoken(request.Token, request.Platform);
 
             if(user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
                 return new(HttpStatusCode.Unauthorized);

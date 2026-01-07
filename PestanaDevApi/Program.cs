@@ -8,6 +8,8 @@ using PestanaDevApi.Utils;
 using PestanaDevApi.Exceptions;
 using PestanaDevApi.Services.Auth;
 using PestanaDevApi.Interfaces.Services.Auth;
+using PestanaDevApi.Services.Email;
+using PestanaDevApi.Interfaces.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,8 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();

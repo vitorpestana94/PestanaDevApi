@@ -5,6 +5,6 @@ namespace PestanaDevApi.Interfaces.Services.Auth
 {
     public interface IPlatformAuthService
     {
-        Task<User?> GetUserByIToken(string token, Platform platform);
+        Task<User?> GetUserByIoken(string token, Platform platform);
     }
 }

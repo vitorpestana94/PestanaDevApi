@@ -22,23 +22,11 @@ namespace PestanaDevApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-            return HandleLoginResponse(await _loginService.Login(request));
-        }
-
-        [HttpPost("platform")]
-        public async Task<IActionResult> LoginWithPlatform([FromBody] LoginWithPlatformRequestDto request)
-        {
-            return HandleLoginResponse(await _loginService.LoginOrSignUpWithProvider(request));
-        }
-
-        #region Private Methods
-        private IActionResult HandleLoginResponse(LoginResponseDto response)
-        {
+            AuthResponseDto response = await _loginService.Login(request);
             if (!response.IsSuccess)
                 return Unauthorized(response.ErrorMessage);
 
             return Ok(response.ApiTokens);
         }
-        #endregion
     }
 }

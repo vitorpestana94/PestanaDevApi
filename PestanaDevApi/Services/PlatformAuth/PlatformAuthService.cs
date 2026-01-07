@@ -26,7 +26,7 @@ namespace PestanaDevApi.Services.Auth
             _linkedinAuthService = linkedinAuthService;
         }
 
-        public async Task<User?> GetUserByIToken(string token, Platform platform)
+        public async Task<User?> GetUserByIoken(string token, Platform platform)
         {
             return platform switch
             {

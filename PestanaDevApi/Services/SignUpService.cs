@@ -12,13 +12,11 @@ namespace PestanaDevApi.Services
     {
         private readonly ISignUpRepository _signUpRepository;
         private readonly ITokenService _tokenService;
-        private readonly ILoginService _loginService;
 
-        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService, ILoginService loginService)
+        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService)
         {
             _signUpRepository = signUpRepository;
             _tokenService = tokenService;
-            _loginService = loginService;
         }
 
         public async Task<SignUpResponseDto> SignUp(SignUpRequestDto request)
@@ -38,18 +36,6 @@ namespace PestanaDevApi.Services
                 return new(ErrorMessages.InvalidEmailFormat);
 
             return new(await _signUpRepository.IsEmailBeingUsed(email));
-        }
-
-        /// <summary>
-        /// Authenticates or registers a user via an external provider. 
-        /// If the user does not exist in the local database, a new record is created (Sign-Up).
-        /// If the user already exists, the session is initialized (Log-In).
-        /// </summary>
-        /// <param name="request">The request data containing the provider's token and a enum that indicates the provider.</param>
-        /// <returns>A task representing the operation, yielding the authentication tokens.</returns>
-        public async Task<SignUpWithPlatformResponseDto> SignUpWithPlatform(SignUpWithPlatformRequestDto request)
-        {
-            return new SignUpWithPlatformResponseDto(await _loginService.LoginOrSignUpWithProvider(request));
         }
     }
 }
