@@ -3,9 +3,8 @@ using PestanaDevApi.Dtos.Responses;
 
 namespace PestanaDevApi.Interfaces.Services
 {
-    public interface ILoginService
+    public interface IPlatformService
     {
-        Task<AuthResponseDto> Login(LoginRequestDto request);
         Task<AuthResponseDto> LoginOrSignUpWithProvider(LoginOrSignUpWithPlatformRequestDto request);
     }
 }

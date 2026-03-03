@@ -1,10 +1,11 @@
 ﻿using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Models;
+using PestanaDevApi.Dtos.Responses;
 
 namespace PestanaDevApi.Interfaces.Services
 {
     public interface ISignUpService
     {
-        Task<ApiToken?> SignUp(SignUpRequestDto request);
+        Task<SignUpResponseDto> SignUp(SignUpRequestDto request);
+        Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email);
     }
 }

@@ -1,4 +1,9 @@
-﻿using PestanaDevApi.Dtos.Requests;
+﻿using Google.Apis.Auth;
+using Newtonsoft.Json.Linq;
+using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Models.Enums;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Models
 {
@@ -9,21 +14,139 @@ namespace PestanaDevApi.Models
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
         public string? UserPicture { get; set; }
+        public string? UserPlatformId { get; set; }
+        public Platform? UserSignUpPlatform { get; set; }
 
         public User() 
         {
+            Id = Guid.Empty;
             UserName = string.Empty;
             UserEmail = string.Empty;
             UserPassword = string.Empty;
             UserPicture = string.Empty;
         }
 
+        /// <summary>
+        /// Creates an instance of a user who is not registered in the system
+        /// based on data sended by the user on website form.
+        /// </summary>
         public User(SignUpRequestDto dto)
         {
             UserName = dto.Name;
             UserEmail = dto.Email;
             UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             UserPicture = dto.Picture;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is not registered in the system
+        /// based on data returned by Google.
+        /// </summary>
+        public User(GoogleJsonWebSignature.Payload googlePayload)
+        {
+            UserName = googlePayload.Name;
+            UserEmail = googlePayload.Email;
+            UserPassword = "";
+            UserPicture = googlePayload.Picture;
+            UserSignUpPlatform = Platform.Google;
+            UserPlatformId = googlePayload.Subject;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by Google.
+        /// </summary>
+        public User(GoogleJsonWebSignature.Payload googlePayload, Guid userId)
+        {
+            Id = userId;
+            UserName = googlePayload.Name;
+            UserEmail = googlePayload.Email;
+            UserPassword = "";
+            UserPicture = googlePayload.Picture;
+            UserSignUpPlatform = Platform.Google;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is not registered in the system
+        /// based on data returned by GitHub.
+        /// </summary>
+        public User(GithubResponseDto responseDto, string userEmail)
+        {
+            UserName = responseDto.Username;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = responseDto.AvatarUrl;
+            UserSignUpPlatform = Platform.GitHub;
+            UserPlatformId = responseDto.Id.ToString();
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by GitHub.
+        /// </summary>
+        public User(GithubResponseDto responseDto, Guid userId, string userEmail)
+        {
+            Id= userId;
+            UserName = responseDto.Username;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = responseDto.AvatarUrl;
+            UserSignUpPlatform = Platform.GitHub;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by Linkedin.
+        /// </summary>
+        public User(JwtSecurityToken jwt, Guid userId, string userEmail)
+        {
+            Id = userId;
+            UserName = jwt.Claims.First(c => c.Type == "name").Value;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
+            UserSignUpPlatform = Platform.Linkedin;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is not registered in the system
+        /// based on data returned by Linkedin.
+        /// </summary>
+        public User(JwtSecurityToken jwt, string userId, string userEmail)
+        {
+            UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
+            UserEmail = userEmail;
+            UserPassword = "";
+            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
+            UserSignUpPlatform = Platform.Linkedin;
+            UserPlatformId = userId;
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by Google.
+        /// </summary>
+        public static User FromGoogleIdentity(GoogleJsonWebSignature.Payload googlePayload, Guid userId)
+        {
+            return new User(googlePayload, userId);
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by GitHub.
+        /// </summary>
+        public static User FromGitHubIdentity(GithubResponseDto responseDto, Guid userId, string userEmail)
+        {
+            return new User(responseDto, userId, userEmail);
+        }
+
+        /// <summary>
+        /// Creates an instance of a user who is already registered in the system
+        /// based on data returned by Linkedin.
+        /// </summary>
+        public static User FromLinkedinIdentity(JwtSecurityToken jwt, Guid userId, string userEmail)
+        {
+            return new User(jwt, userId, userEmail);
         }
     }
 }

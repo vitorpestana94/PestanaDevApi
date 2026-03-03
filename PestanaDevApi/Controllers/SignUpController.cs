@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
-using PestanaDevApi.Models;
-using PestanaDevApi.Services;
 
 namespace PestanaDevApi.Controllers
 {
@@ -23,12 +22,23 @@ namespace PestanaDevApi.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequestDto request)
         {
-            ApiToken? apiToken = await _signUpService.SignUp(request);
+            SignUpResponseDto response = await _signUpService.SignUp(request);
 
-            if (apiToken == null)
-                return BadRequest("Email format is invalid.");
+            if (!response.IsSuccess)
+                return BadRequest(response.ErrorMessage);
 
-            return Ok(apiToken);
+            return Ok(response.ApiTokens);
+        }
+
+        [HttpGet("isEmailRegistered/{email}")]
+        public async Task<IActionResult> IsEmailRegistered([FromRoute] string email)
+        {
+            IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);
+
+            if (!response.IsSuccess)
+                return BadRequest(response.ErrorMessage);
+
+            return Ok(response.IsRegistered);
         }
     }
 }

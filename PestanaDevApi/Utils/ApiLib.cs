@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace PestanaDevApi.Utils
 {
@@ -23,21 +24,6 @@ namespace PestanaDevApi.Utils
         }
 
         /// <summary>
-        /// Returns the error status code via the thrown exception.
-        /// <param name="error">The thrown error</param>
-        /// <returns>
-        /// Error status code
-        /// </returns>
-        /// </summary>
-        public static int GetErrorStatusCode(Exception? error)
-        {
-            return error switch
-            {
-                _ => StatusCodes.Status500InternalServerError
-            };
-        }
-
-        /// <summary>
         /// Returns the error message by the thrown error and it status code.
         /// <param name="error">The thrown error</param>
         /// <param name="statusCode">The thrown error status code</param>
@@ -45,9 +31,12 @@ namespace PestanaDevApi.Utils
         /// Error message
         /// </returns>
         /// </summary>
-        public static string GetErrorMessage(int statusCode, Exception? error)
+        public static string GetErrorMessage(int statusCode, Exception? error, bool isDevMode)
         {
-            return statusCode == 500 ? "Internal Server Error!" : error?.Message ?? "error!";
+            if (statusCode == 500 && !isDevMode)
+                return "Ocorreu um erro interno inesperado. Tente novamente mais tarde.";
+
+            return error?.Message ?? "Erro desconhecido.";
         }
     }
 }

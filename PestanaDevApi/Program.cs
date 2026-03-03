@@ -5,6 +5,11 @@ using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Repositories;
 using PestanaDevApi.Services;
 using PestanaDevApi.Utils;
+using PestanaDevApi.Exceptions;
+using PestanaDevApi.Services.Auth;
+using PestanaDevApi.Interfaces.Services.Auth;
+using PestanaDevApi.Services.Email;
+using PestanaDevApi.Interfaces.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +32,20 @@ DbConfig.Setup(builder.Configuration, builder.Services);
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IPlatformService, PlatformService>();
+builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
+builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
 
+builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["api.baseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+}));
 #endregion
 
 #region Repositories
@@ -55,11 +73,22 @@ app.UseExceptionHandler(builder =>
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        context.Response.StatusCode = ApiLib.GetErrorStatusCode(error);
+        int statusCode = error switch
+        {
+            ApiException apiEx => apiEx.StatusCode,
+            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
 
         await context.Response.WriteAsJsonAsync(new
         {
-            message = ApiLib.GetErrorMessage(context.Response.StatusCode, error)
+            status = statusCode,
+            message = ApiLib.GetErrorMessage(statusCode, error, app.Environment.IsDevelopment()),
+            stackTrace = app.Environment.IsDevelopment() ? error?.StackTrace : null
         });
     });
 });
