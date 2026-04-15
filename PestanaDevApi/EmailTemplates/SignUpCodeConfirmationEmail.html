@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000;
+        }
+
+        table {
+            border-spacing: 0;
+        }
+
+        td {
+            padding: 0;
+        }
+
+        img {
+            border: 0;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 600px;
+            color: #000000;
+            margin: 0 auto;
+            margin-top: 5%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #F5F5F7;
+        }
+
+        .header {
+            background-color: #38b6ff;
+            padding: 40px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .body-content {
+            padding: 40px;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background-color: #D3D3D3;
+            padding: 20px;
+            text-align: center;
+            color: #000000;
+            font-size: 12px;
+        }
+
+        .codesDivWrapper {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .codeSpan{
+            padding: 15px;
+            border: solid 2px black;
+            border-radius: 5px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table class="content" role="presentation">
+            <tr>
+                <td class="header">
+                    <h1 style="margin: 0; font-size: 24px;">{{Title}}</h1>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="body-content">
+                    <p>{{Paragraph}}</p>
+                    <br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="body-content">
+                    <div class="codesDivWrapper">
+                        <span class="codeSpan">{{CodeOne}}</span>
+                        <span class="codeSpan">{{CodeTwo}}</span>
+                        <span class="codeSpan">{{CodeThree}}</span>
+                        <span class="codeSpan">{{CodeFour}}</span>
+                    </div>
+                    <br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="footer">
+                    <p style="margin: 0;">&copy; {{Copyright}}</p>
+                    <p style="margin: 5px 0 0 0;">{{Subcopyright}}</p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

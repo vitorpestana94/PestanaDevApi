@@ -2,7 +2,7 @@
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Constants.Email;
-using PestanaDevApi.Utils;
+using Replace = PestanaDevApi.Utils.ReplaceEmailVariables;
 
 namespace PestanaDevApi.Services.Email
 {
@@ -22,6 +22,13 @@ namespace PestanaDevApi.Services.Email
             return ReplaceEmailVariables(request, isContactEmailClientConfirmation,  emailTemplate);
         }
 
+        public async Task<string> GetEmailTemplate(ConfirmationCodeEmailRequestDto request, IEnumerable<int> confirmationCodes)
+        {
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateName.SignUpCodeConfirmationEmail);
+
+            return ReplaceEmailVariables(request, emailTemplate, confirmationCodes);
+        }
+
         #region Private Methods
         private async Task<string> GetEmailTemplateString(EmailTemplateName templateName)
         {
@@ -31,8 +38,13 @@ namespace PestanaDevApi.Services.Email
         private static string ReplaceEmailVariables(ContactEmailRequestDto requestDto, bool isContactEmailClientConfirmation, string emailTemplate)
         {
             return isContactEmailClientConfirmation ?
-                Utils.ReplaceEmailVariables.ReplaceVariables(requestDto, emailTemplate):
-                Utils.ReplaceEmailVariables.ReplaceAdminEmailContactVariables(requestDto, emailTemplate); 
+                Replace.ReplaceClientContactVariables(requestDto, emailTemplate):
+                Replace.ReplaceAdminEmailContactVariables(requestDto, emailTemplate); 
+        }
+
+        private static string ReplaceEmailVariables(ConfirmationCodeEmailRequestDto requestDto, string emailTemplate, IEnumerable<int> confirmationCodes)
+        {
+            return Replace.ReplaceConfirmationCodetVariables(requestDto, emailTemplate, confirmationCodes);
         }
         #endregion
     }

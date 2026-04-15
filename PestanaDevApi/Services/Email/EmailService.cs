@@ -44,8 +44,24 @@ namespace PestanaDevApi.Services.Email
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
-            await SendContactEmailToAdmin(request);
-            await SendContactEmailToClient(request);
+            await Task.WhenAll(
+            SendContactEmailToAdmin(request),
+            SendContactEmailToClient(request));
+
+            return new();
+        }
+
+        public async Task<EmailResponse> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
+        {
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
+                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            // aqui chamarei a service para gerar o código que será enviado no email
+            // essa service vai também fazer um insert do código, para ser verificado depois.
+            // aproveitando, é preciso esclarecer se  _logger.LogError(ex, ErrorMessages.EmailSendingError); é perigoso
+            // se mostra algo no console q n deveria e se a forma q eu trato erros está ok (quase certeza q s); isso pode ser visto depois.
+            // depois preciso lembrar de me livrar de qualquer menção no codigo e na database acerca de foto de perfil do usuario por causa da lgpd
+            await SendSignUpCodeEmail(request, [123131]);
 
             return new();
         }
@@ -83,6 +99,13 @@ namespace PestanaDevApi.Services.Email
         private async Task SendContactEmailToClient(ContactEmailRequestDto request)
         {
             using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, isContactConfirmation: true));
+
+            await SendEmail(mail);
+        }
+
+        private async Task SendSignUpCodeEmail(ConfirmationCodeEmailRequestDto request, IEnumerable<int> confirmationCodes)
+        {
+            using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, confirmationCodes));
 
             await SendEmail(mail);
         }

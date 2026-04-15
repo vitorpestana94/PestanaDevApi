@@ -12,5 +12,9 @@
         public const string Paragraph = "{{Paragraph}}";
         public const string Copyright = "{{Copyright}}";
         public const string Subcopyright = "{{Subcopyright}}";
+        public const string CodeOne = "{{CodeOne}}";
+        public const string CodeTwo = "{{CodeTwo}}";
+        public const string CodeThree = "{{CodeThree}}";
+        public const string CodeFour = "{{CodeFour}}";
     }
 }

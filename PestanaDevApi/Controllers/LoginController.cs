@@ -23,6 +23,7 @@ namespace PestanaDevApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             AuthResponseDto response = await _loginService.Login(request);
+
             if (!response.IsSuccess)
                 return Unauthorized(response.ErrorMessage);
 

@@ -5,6 +5,7 @@
         ContactEmail,
         ContactEmailClientConfirmation,
         EmailConfirmation,
-        UserRegistered
+        UserRegistered,
+        SignUpCodeConfirmationEmail
     }
 }

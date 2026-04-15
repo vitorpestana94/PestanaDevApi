@@ -1,8 +1,13 @@
-﻿namespace PestanaDevApi.Dtos.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PestanaDevApi.Dtos.Requests
 {
     public class ContactEmailRequestDto : EmailRequest
     {
-        public required string ClientName { get; set; }
-        public required string ClientMessage { get; set; }
+        [Required]
+        public string ClientName { get; set; } = string.Empty;
+
+        [Required]
+        public string ClientMessage { get; set; } = string.Empty;
     }
 }

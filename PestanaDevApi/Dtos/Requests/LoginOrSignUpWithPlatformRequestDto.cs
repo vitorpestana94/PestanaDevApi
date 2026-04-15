@@ -1,11 +1,17 @@
-﻿using PestanaDevApi.Models.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using PestanaDevApi.Models.Enums;
 
 namespace PestanaDevApi.Dtos.Requests
 {
     public class LoginOrSignUpWithPlatformRequestDto
     {
-        public required Platform Platform { get; set; }
-        public required string DeviceId { get; set; }
-        public required string Token { get; set; }
+        [Required]
+        public Platform Platform { get; set; }
+
+        [Required]
+        public string DeviceId { get; set; } = string.Empty;
+
+        [Required]
+        public string Token { get; set; } = string.Empty;
     }
 }
