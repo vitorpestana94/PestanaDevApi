@@ -22,7 +22,7 @@ namespace PestanaDevApi.Dtos.Responses
         {
             IsSuccess = response.IsSuccess;
             StatusCode = response.StatusCode;
-            ErrorMessage = response.ErrorMessage;
+            Message = response.Message;
             ApiTokens = response.ApiTokens;
         }
 

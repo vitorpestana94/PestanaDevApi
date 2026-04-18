@@ -11,12 +11,13 @@
         
         public const string CopyRightEnglish = " Pestana Dev. All rights reserved.";
         public const string SubCopyRightContactConfirmationEnglish = "You received this email because you requested contact on my website.";
+        public const string SubCopyRightConfirmationCodeEnglish = "You received this email because you requested a sign up on my website.";
 
         #endregion
 
         #region Confirmation Code
         public const string ConfirmationCodeTitleEnglish = "Hello! Here it's your confirmation code.";
-        public const string ConfirmationCodeTitleParagraphEnglish = @"Copy each number and paste it into the input field.";
+        public const string ConfirmationCodeTitleParagraphEnglish = @"Copy each element and paste it into the input field.";
         #endregion
 
         #region Portuguese
@@ -28,11 +29,12 @@
 
         #region Confirmation Code
         public const string ConfirmationCodeTitlePortuguese = "Olá! Aqui está o seu código de confirmação.";
-        public const string ConfirmationCodeTitleParagraphPortuguese = @"Copie cada número e cole campo de confirmação.";
+        public const string ConfirmationCodeTitleParagraphPortuguese = @"Copie cada elemento e cole campo de confirmação.";
         #endregion
 
 
         public const string SubCopyRightContactConfirmationPortuguese = "Você recebeu este e-mail porque requisitou contato no meu site.";
+        public const string SubCopyRightConfirmationCidePortuguese = "Você recebeu este e-mail porque requisitou um cadastro no meu site.";
         public const string ContactConfirmationEmailParagraphPortuguese = @"Recebi seu email e agradeço o contato.<br>Retornarei o mais breve possível";
         
         #endregion

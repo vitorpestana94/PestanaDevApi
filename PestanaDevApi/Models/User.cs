@@ -1,5 +1,4 @@
 ﻿using Google.Apis.Auth;
-using Newtonsoft.Json.Linq;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Models.Enums;
@@ -13,7 +12,6 @@ namespace PestanaDevApi.Models
         public string UserName { get; set; }
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
-        public string? UserPicture { get; set; }
         public string? UserPlatformId { get; set; }
         public Platform? UserSignUpPlatform { get; set; }
 
@@ -23,7 +21,6 @@ namespace PestanaDevApi.Models
             UserName = string.Empty;
             UserEmail = string.Empty;
             UserPassword = string.Empty;
-            UserPicture = string.Empty;
         }
 
         /// <summary>
@@ -35,7 +32,6 @@ namespace PestanaDevApi.Models
             UserName = dto.Name;
             UserEmail = dto.Email;
             UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-            UserPicture = dto.Picture;
         }
 
         /// <summary>
@@ -47,7 +43,6 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserPicture = googlePayload.Picture;
             UserSignUpPlatform = Platform.Google;
             UserPlatformId = googlePayload.Subject;
         }
@@ -62,7 +57,6 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserPicture = googlePayload.Picture;
             UserSignUpPlatform = Platform.Google;
         }
 
@@ -75,7 +69,6 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = responseDto.AvatarUrl;
             UserSignUpPlatform = Platform.GitHub;
             UserPlatformId = responseDto.Id.ToString();
         }
@@ -90,7 +83,6 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = responseDto.AvatarUrl;
             UserSignUpPlatform = Platform.GitHub;
         }
 
@@ -104,7 +96,6 @@ namespace PestanaDevApi.Models
             UserName = jwt.Claims.First(c => c.Type == "name").Value;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
             UserSignUpPlatform = Platform.Linkedin;
         }
 
@@ -117,7 +108,6 @@ namespace PestanaDevApi.Models
             UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
             UserSignUpPlatform = Platform.Linkedin;
             UserPlatformId = userId;
         }

@@ -7,24 +7,26 @@ using PestanaDevApi.Exceptions;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Utils;
 using System.Net;
+using PestanaDevApi.Interfaces.Services;
 
 namespace PestanaDevApi.Services.Email
 {
     public class EmailService : IEmailService
     {
-        private readonly ILogger<EmailService> _logger;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IConfiguration _config;
+        private readonly IConfirmationCodeService _confirmationCodeGenerationService;
+
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, ILogger<EmailService> logger)
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
-            _logger = logger;
-            
+            _confirmationCodeGenerationService = codeGenerationService;
+
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
 
@@ -56,14 +58,14 @@ namespace PestanaDevApi.Services.Email
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
-            // aqui chamarei a service para gerar o código que será enviado no email
-            // essa service vai também fazer um insert do código, para ser verificado depois.
-            // aproveitando, é preciso esclarecer se  _logger.LogError(ex, ErrorMessages.EmailSendingError); é perigoso
-            // se mostra algo no console q n deveria e se a forma q eu trato erros está ok (quase certeza q s); isso pode ser visto depois.
-            // depois preciso lembrar de me livrar de qualquer menção no codigo e na database acerca de foto de perfil do usuario por causa da lgpd
-            await SendSignUpCodeEmail(request, [123131]);
+            if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
+                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
 
-            return new();
+            string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
+
+            await SendSignUpCodeEmail(request, code);
+
+            return new ();
         }
 
         #region Private Methods
@@ -77,14 +79,10 @@ namespace PestanaDevApi.Services.Email
             }
             catch (SmtpException ex)
             {
-                _logger.LogError(ex, ErrorMessages.EmailSendingError);
-
                 throw new ApiException(ErrorMessages.EmailSendingError, 500, ex);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ErrorMessages.EmailUnespectedError);
-
                 throw new ApiException(ErrorMessages.EmailUnespectedError, 500, ex);
             }
         }
@@ -103,7 +101,7 @@ namespace PestanaDevApi.Services.Email
             await SendEmail(mail);
         }
 
-        private async Task SendSignUpCodeEmail(ConfirmationCodeEmailRequestDto request, IEnumerable<int> confirmationCodes)
+        private async Task SendSignUpCodeEmail(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
             using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, confirmationCodes));
 

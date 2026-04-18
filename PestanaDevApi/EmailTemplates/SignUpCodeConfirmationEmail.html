@@ -54,50 +54,103 @@
             text-align: center;
             color: #000000;
             font-size: 12px;
+            margin-top: 200px;
         }
 
         .codesDivWrapper {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: center;
+            text-align: center;
+        }
+
+        .codeSpan {
+            display: inline-block;
+            padding: 16px;
+            border: 2px solid black;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 24px;
             padding: 20px;
         }
 
-        .codeSpan{
-            padding: 15px;
-            border: solid 2px black;
-            border-radius: 5px;
-            color: black;
+        .paragraph {
+            font-size: 18px;
+            padding: 20px;
+        }
+
+        .codeTdPadding {
+            padding: 5px;
         }
     </style>
 </head>
 <body>
     <center>
-        <table class="content" role="presentation">
+        <table role="presentation" align="center" cellpadding="0" cellspacing="0">
             <tr>
                 <td class="header">
-                    <h1 style="margin: 0; font-size: 24px;">{{Title}}</h1>
+                    <h1 class="title">{{Title}}</h1>
                 </td>
             </tr>
-
             <tr>
-                <td class="body-content">
-                    <p>{{Paragraph}}</p>
+                <td align="center">
+                    <p class="paragraph">{{Paragraph}}</p>
                     <br>
                 </td>
             </tr>
 
             <tr>
-                <td class="body-content">
-                    <div class="codesDivWrapper">
-                        <span class="codeSpan">{{CodeOne}}</span>
-                        <span class="codeSpan">{{CodeTwo}}</span>
-                        <span class="codeSpan">{{CodeThree}}</span>
-                        <span class="codeSpan">{{CodeFour}}</span>
-                    </div>
-                    <br>
+                <td align="center">
+                    <table role="presentation" cellpadding="0" cellspacing="0">
+                        <tr class="codeRow">
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeOne}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeTwo}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeThree}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeFour}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeFive}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeSix}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeSeven}}
+                                </span>
+                            </td>
+                            <td class="codeTdPadding">
+                                <span class="codeSpan">
+                                    {{CodeEight}}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
+            </tr>
+
+            <tr>
+                <td height="60"></td>
             </tr>
 
             <tr>

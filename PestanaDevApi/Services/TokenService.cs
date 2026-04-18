@@ -90,7 +90,6 @@ namespace PestanaDevApi.Services
                 new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
                 new(JwtRegisteredClaimNames.Email, user.UserEmail),
                 new(JwtRegisteredClaimNames.Name, user.UserName),
-                new("picture", user.UserPicture ?? ""),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             ];
         }

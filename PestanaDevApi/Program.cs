@@ -39,6 +39,7 @@ builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
 builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
+builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
@@ -49,11 +50,10 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 #endregion
 
 #region Repositories
-
 builder.Services.AddScoped<ISignUpRepository, SignUpRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-
+builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();
 #endregion
 
 var app = builder.Build();
@@ -69,7 +69,7 @@ app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>
     {
-        context.Response.ContentType = "application/json";
+        ILogger logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
@@ -84,12 +84,15 @@ app.UseExceptionHandler(builder =>
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
 
-        await context.Response.WriteAsJsonAsync(new
+        logger.LogError(error, "Unhandled exception");
+
+        var response = new
         {
             status = statusCode,
-            message = ApiLib.GetErrorMessage(statusCode, error, app.Environment.IsDevelopment()),
-            stackTrace = app.Environment.IsDevelopment() ? error?.StackTrace : null
-        });
+            message = GetHttpMessage.Get(statusCode),
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
     });
 });
 

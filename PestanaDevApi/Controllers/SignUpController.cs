@@ -25,7 +25,7 @@ namespace PestanaDevApi.Controllers
             SignUpResponseDto response = await _signUpService.SignUp(request);
 
             if (!response.IsSuccess)
-                return BadRequest(response.ErrorMessage);
+                return BadRequest(response);
 
             return Ok(response.ApiTokens);
         }
@@ -36,7 +36,7 @@ namespace PestanaDevApi.Controllers
             IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);
 
             if (!response.IsSuccess)
-                return BadRequest(response.ErrorMessage);
+                return BadRequest(response);
 
             return Ok(response.IsRegistered);
         }

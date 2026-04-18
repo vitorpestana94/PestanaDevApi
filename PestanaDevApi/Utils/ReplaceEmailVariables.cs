@@ -6,7 +6,8 @@ namespace PestanaDevApi.Utils
 {
     public static class ReplaceEmailVariables
     {
-        private static readonly string[] _confirmationCodesVariables = [EmailConstants.CodeOne, EmailConstants.CodeTwo, EmailConstants.CodeThree, EmailConstants.CodeFour];
+        private static readonly string[] _confirmationCodesVariables = [EmailConstants.CodeOne, EmailConstants.CodeTwo, EmailConstants.CodeThree, 
+        EmailConstants.CodeFour, EmailConstants.CodeFive, EmailConstants.CodeSix, EmailConstants.CodeSeven, EmailConstants.CodeEight];
         private static readonly string _copyRight = $"{GetCurrentYear()}{EmailContent.CopyRightEnglish}";
 
         #region Contact Email
@@ -32,7 +33,7 @@ namespace PestanaDevApi.Utils
         #endregion
 
         #region Confirmation Code
-        public static string ReplaceConfirmationCodetVariables(ConfirmationCodeEmailRequestDto requestDto, string emailTemplate, IEnumerable<int> confirmationCodes)
+        public static string ReplaceConfirmationCodetVariables(ConfirmationCodeEmailRequestDto requestDto, string emailTemplate, string confirmationCodes)
         {
             return requestDto.ClientLocale switch
             {
@@ -64,7 +65,7 @@ namespace PestanaDevApi.Utils
         #endregion
         
         #region Confirmation Code
-        private static string EnglishReplace(string emailTemplate, IEnumerable<int> confirmationCodes)
+        private static string EnglishReplace(string emailTemplate, string confirmationCodes)
         {
             emailTemplate = GetEmailTemplateWithCodes(emailTemplate, confirmationCodes);
 
@@ -74,7 +75,7 @@ namespace PestanaDevApi.Utils
                                 .Replace(EmailConstants.Subcopyright, EmailContent.SubCopyRightContactConfirmationEnglish);
         }
 
-        private static string PortugueseReplace(string emailTemplate, IEnumerable<int> confirmationCodes)
+        private static string PortugueseReplace(string emailTemplate, string confirmationCodes)
         {
             emailTemplate = GetEmailTemplateWithCodes(emailTemplate, confirmationCodes);
 
@@ -85,12 +86,12 @@ namespace PestanaDevApi.Utils
         }
 
         #endregion
-        private static string GetEmailTemplateWithCodes(string emailTemplate, IEnumerable<int> confirmationCodes)
+
+        private static string GetEmailTemplateWithCodes(string emailTemplate, string confirmationCodes)
         {
-            IEnumerable<(string codeVariable, int codeValue)> codesVariablesWithValues = _confirmationCodesVariables.Zip(confirmationCodes);
+            IEnumerable<(string codeVariable, char codeValue)> codesVariablesWithValues = _confirmationCodesVariables.Zip(confirmationCodes);
 
-
-            foreach ((string codeVariable, int codeValue) in codesVariablesWithValues)
+            foreach ((string codeVariable, char codeValue) in codesVariablesWithValues)
             {
                 emailTemplate = emailTemplate.Replace(codeVariable, codeValue.ToString());
             }

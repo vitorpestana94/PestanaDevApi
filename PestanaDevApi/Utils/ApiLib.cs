@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net;
+using System.Text.RegularExpressions;
+using ErrorMessage = PestanaDevApi.Constants.ErrorMessages;
 
 namespace PestanaDevApi.Utils
 {
@@ -22,20 +24,9 @@ namespace PestanaDevApi.Utils
             return emailRegex.IsMatch(email);
         }
 
-        /// <summary>
-        /// Returns the error message by the thrown error and it status code.
-        /// <param name="error">The thrown error</param>
-        /// <param name="statusCode">The thrown error status code</param>
-        /// <returns>
-        /// Error message
-        /// </returns>
-        /// </summary>
-        public static string GetErrorMessage(int statusCode, Exception? error, bool isDevMode)
+        public static string GenerateRandomCode(int codeLenght = 8)
         {
-            if (statusCode == 500 && !isDevMode)
-                return "Ocorreu um erro interno inesperado. Tente novamente mais tarde.";
-
-            return error?.Message ?? "Erro desconhecido.";
+            return Guid.NewGuid().ToString().Replace("-", "")[..codeLenght];
         }
     }
 }

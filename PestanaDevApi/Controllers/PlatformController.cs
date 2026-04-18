@@ -25,7 +25,7 @@ namespace PestanaDevApi.Controllers
             AuthResponseDto response = await _platformService.LoginOrSignUpWithProvider(request);
 
             if (!response.IsSuccess)
-                return Unauthorized(response.ErrorMessage);
+                return Unauthorized(response);
 
             return Ok(response.ApiTokens);
         }
