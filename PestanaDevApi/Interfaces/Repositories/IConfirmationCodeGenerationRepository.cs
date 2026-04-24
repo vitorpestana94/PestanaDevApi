@@ -84,5 +84,7 @@
         Task DeleteUnfreshConfirmationCodes();
 
         Task UpdateConfirmationCode(string email, string code);
+
+        Task<bool> CheckCreatedAt(string email);
     }
 }

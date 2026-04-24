@@ -14,7 +14,6 @@ using PestanaDevApi.Interfaces.Factories;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using PestanaDevApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,10 +75,6 @@ builder.Services.AddAuthentication(options =>
 
 #region Factories
 builder.Services.AddScoped<IDbConnectionFactory, MySqlConnectionFactory>();
-#endregion
-
-#region Filters
-builder.Services.AddScoped<ResendConfirmationCodeFilter>();
 #endregion
 
 #region Services

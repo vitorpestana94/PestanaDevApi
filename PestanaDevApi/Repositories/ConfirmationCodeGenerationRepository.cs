@@ -65,5 +65,14 @@ namespace PestanaDevApi.Repositories
 
             await db.ExecuteAsync(Sql.DeleteUnfreshConfirmationCodes);
         }
+
+        public async Task<bool> CheckCreatedAt(string email)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            int rowsAffected = await db.ExecuteAsync(Sql.UpdateConfirmationCodeCreatedAtIfValid, Params.ToUserEmail(email));
+
+            return rowsAffected > 0;
+        }
     }
 }

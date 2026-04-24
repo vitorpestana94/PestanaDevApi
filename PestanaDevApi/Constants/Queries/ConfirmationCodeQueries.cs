@@ -49,5 +49,15 @@
         DELETE FROM CONFIRMATION_CODE
         WHERE
 	         UTC_TIMESTAMP() >= DATE_ADD(created_at, INTERVAL 10 MINUTE);";
+
+        public const string UpdateConfirmationCodeCreatedAtIfValid = @"
+        UPDATE 
+            CONFIRMATION_CODE
+        SET 
+            created_at = current_timestamp()
+        WHERE
+            user_email = @UserEmail
+        AND
+            UTC_TIMESTAMP() >= DATE_ADD(created_at, INTERVAL 30 SECOND);";
     }
 }

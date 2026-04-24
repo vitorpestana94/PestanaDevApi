@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services.Email;
-using PestanaDevApi.Constants;
-using PestanaDevApi.Utils;
-using PestanaDevApi.Filters;
 
 namespace PestanaDevApi.Controllers
 {
@@ -46,8 +43,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("confirmation/resend")]
-        [ServiceFilter(typeof(ResendConfirmationCodeFilter))]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> ResendConfirmationCodeEmail([FromBody] ConfirmationCodeEmailRequestDto requestDto)
         {
             SendConfirmationCodeEmailResponseDto response = await _emailService.ResendConfirmationCodeEmail(requestDto);

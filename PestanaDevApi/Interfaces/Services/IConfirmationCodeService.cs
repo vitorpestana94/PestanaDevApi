@@ -68,5 +68,7 @@ namespace PestanaDevApi.Interfaces.Services
         /// Intended for periodic cleanup (e.g., via scheduled job).
         /// </remarks>
         Task DeleteUnfreshConfirmationCodes();
+
+        Task<bool> CheckCreatedAt(string email);
     }
 }

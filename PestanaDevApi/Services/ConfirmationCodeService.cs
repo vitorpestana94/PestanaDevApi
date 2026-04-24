@@ -60,6 +60,11 @@ namespace PestanaDevApi.Services
             return new();
         }
 
+        public async Task<bool> CheckCreatedAt(string email)
+        {
+            return await _repository.CheckCreatedAt(email);
+        }
+
         public async Task DeleteUnfreshConfirmationCodes()
         {
             await _repository.DeleteUnfreshConfirmationCodes();

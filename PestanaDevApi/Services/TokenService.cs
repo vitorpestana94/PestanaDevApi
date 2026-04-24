@@ -128,7 +128,6 @@ namespace PestanaDevApi.Services
                 new(JwtRegisteredClaimNames.Email, dto.ClientEmail),
                 new(JwtRegisteredClaimNames.Locale, dto.ClientLocale),
                 new(JwtRegisteredClaimNames.Sub, dto.ClientEmail),
-                new(JwtRegisteredClaimNames.Iat, now.ToString(), ClaimValueTypes.Integer64),
                 new(Consts.Code, code),
                 new(Consts.Purpose, Consts.EmailConfirmation)
             ];

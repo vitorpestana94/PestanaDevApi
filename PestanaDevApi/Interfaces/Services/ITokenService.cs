@@ -21,7 +21,5 @@ namespace PestanaDevApi.Interfaces.Services
         /// </para>
         /// </summary>
         Task DeleteExpiredRefreshTokens();
-
-        string GenerateResendConfirmationCodeJwt(ConfirmationCodeEmailRequestDto dto, string code);
     }
 }
