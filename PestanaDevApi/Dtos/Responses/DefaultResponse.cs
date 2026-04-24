@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using PestanaDevApi.Utils;
-using ResponseMessage = PestanaDevApi.Constants.SuccessMessages;
+using ResponseMessage = PestanaDevApi.Constants.Messages.SuccessMessages;
 using System.Text.Json.Serialization;
 
 namespace PestanaDevApi.Dtos.Responses

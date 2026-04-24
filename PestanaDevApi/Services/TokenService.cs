@@ -6,7 +6,8 @@ using PestanaDevApi.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
-
+using PestanaDevApi.Dtos.Requests;
+using Consts = PestanaDevApi.Constants.ClaimsConstants;
 
 namespace PestanaDevApi.Services
 {
@@ -27,13 +28,19 @@ namespace PestanaDevApi.Services
                 throw new InvalidOperationException("JWT key not configured!");
         }
 
-        /// <summary>
-        /// It returns an object that contains both the JWT token and the refresh token.
-        /// </summary>
-        /// <returns>A Base64-encoded string representing the refresh token.</returns>
         public async Task<ApiToken> GenerateApiTokens(User user, string deviceId)
         {
             return new ApiToken(CreateJwtToken(user), await CreatetRefreshToken(user.Id, deviceId));
+        }
+
+        public async Task DeleteExpiredRefreshTokens()
+        {
+            await _tokenRepository.DeleteExpiredRefreshTokens();
+        }
+
+        public string GenerateResendConfirmationCodeJwt(ConfirmationCodeEmailRequestDto dto, string code)
+        {
+            return CreateJwtToken(dto, code);
         }
 
         #region Private Methods
@@ -54,7 +61,7 @@ namespace PestanaDevApi.Services
         /// Generates a secure random refresh token.
         /// </summary>
         /// <returns>A Base64-encoded string representing the refresh token.</returns>
-        private string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
             using RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
@@ -72,8 +79,18 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
         private string CreateJwtToken(User user)
         {
-
             return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user)));
+        }
+
+        /// <summary>
+        /// Generates a JWT access token for a specific user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user.</param>
+        /// <returns>A JWT token as a string.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
+        private string CreateJwtToken(ConfirmationCodeEmailRequestDto dto, string code)
+        {
+            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(dto, code), expires: DateTime.UtcNow.AddMinutes(3)));
         }
 
         /// <summary>
@@ -84,13 +101,36 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
         private List<Claim> GetTokenClaims(User user)
         {
-            return 
+            return
             [
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
                 new(JwtRegisteredClaimNames.Email, user.UserEmail),
                 new(JwtRegisteredClaimNames.Name, user.UserName),
-                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString())
+            ];
+        }
+
+        /// <summary>
+        /// Generates a JWT claims.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user.</param>
+        /// <returns>A JWT claims.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
+        private List<Claim> GetTokenClaims(ConfirmationCodeEmailRequestDto dto, string code)
+        {
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            return
+            [
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
+                new(JwtRegisteredClaimNames.Email, dto.ClientEmail),
+                new(JwtRegisteredClaimNames.Locale, dto.ClientLocale),
+                new(JwtRegisteredClaimNames.Sub, dto.ClientEmail),
+                new(JwtRegisteredClaimNames.Iat, now.ToString(), ClaimValueTypes.Integer64),
+                new(Consts.Code, code),
+                new(Consts.Purpose, Consts.EmailConfirmation)
             ];
         }
 
@@ -100,13 +140,13 @@ namespace PestanaDevApi.Services
         /// <param name="claims">The list of JWT'S claims.</param>
         /// <returns>A JWT token descriptor.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT Key is not configured.</exception>
-        private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims)
+        private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims, DateTime? expires = null)
         {
             return new()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(60),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Convert.FromBase64String(_config["jwt.key"]!)), SecurityAlgorithms.HmacSha256)
+                Expires = expires.HasValue ? expires : DateTime.UtcNow.AddMinutes(60),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Convert.FromBase64String(_config["jwt.key"]!)), SecurityAlgorithms.HmacSha256),
             };
         }
         #endregion

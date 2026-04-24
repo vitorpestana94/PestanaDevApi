@@ -16,16 +16,18 @@ namespace PestanaDevApi.Services.Email
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IConfiguration _config;
         private readonly IConfirmationCodeService _confirmationCodeGenerationService;
+        private readonly ITokenService _tokenService;
 
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService)
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService, ITokenService tokenService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
             _confirmationCodeGenerationService = codeGenerationService;
+            _tokenService = tokenService;
 
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
@@ -53,19 +55,34 @@ namespace PestanaDevApi.Services.Email
             return new();
         }
 
-        public async Task<EmailResponse> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
+        public async Task<SendConfirmationCodeEmailResponseDto> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
         {
             if (!ApiLib.IsEmailValid(request.ClientEmail))
-                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
             if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
-                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
 
             await SendSignUpCodeEmail(request, code);
 
-            return new ();
+            return new (resentJwt: _tokenService.GenerateResendConfirmationCodeJwt(request, code));
+        }
+
+        public async Task<SendConfirmationCodeEmailResponseDto> ResendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
+        {
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            if (!await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailNotSended);
+
+            string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail, isResend: true);
+
+            await SendSignUpCodeEmail(request, code);
+
+            return new(resentJwt: _tokenService.GenerateResendConfirmationCodeJwt(request, code));
         }
 
         #region Private Methods

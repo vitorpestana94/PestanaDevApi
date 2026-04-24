@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
-using ErrorMessage = PestanaDevApi.Constants.ErrorMessages;
+﻿using System.Text.RegularExpressions;
 
 namespace PestanaDevApi.Utils
 {
@@ -27,6 +25,16 @@ namespace PestanaDevApi.Utils
         public static string GenerateRandomCode(int codeLenght = 8)
         {
             return Guid.NewGuid().ToString().Replace("-", "")[..codeLenght];
+        }
+
+        public static bool IsInvalidSecondsGap(string issuedAt, int seconds = 30)
+        {
+            if (string.IsNullOrEmpty(issuedAt))
+                return true;
+
+            DateTime iat = DateTimeOffset.FromUnixTimeSeconds(long.Parse(issuedAt)).UtcDateTime;
+
+            return (DateTime.UtcNow - iat) <= TimeSpan.FromSeconds(seconds);
         }
     }
 }

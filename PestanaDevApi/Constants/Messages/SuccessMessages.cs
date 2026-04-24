@@ -1,4 +1,4 @@
-﻿namespace PestanaDevApi.Constants
+﻿namespace PestanaDevApi.Constants.Messages
 {
     public class SuccessMessages
     {

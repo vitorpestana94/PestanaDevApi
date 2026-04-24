@@ -8,7 +8,6 @@ namespace PestanaDevApi.Controllers
 {
     [Route("login")]
     [ApiController]
-    [AllowAnonymous]
 
     public class LoginController : Controller
     {
@@ -20,6 +19,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             AuthResponseDto response = await _loginService.Login(request);

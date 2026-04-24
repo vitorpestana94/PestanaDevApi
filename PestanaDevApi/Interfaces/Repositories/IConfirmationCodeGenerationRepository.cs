@@ -42,8 +42,47 @@
         /// </remarks>
         Task<string> SelectCodeByEmail(string email);
 
+        /// <summary>
+        /// Checks whether the confirmation code associated with the given email
+        /// is still valid (i.e., not expired).
+        /// </summary>
+        /// <param name="email">The email address used to validate the confirmation code.</param>
+        /// <returns>
+        /// A boolean indicating whether the confirmation code is still valid.
+        /// </returns>
+        /// <remarks>
+        /// Executes a query that determines if the stored confirmation code for the given email
+        /// is within its valid time window.
+        /// Uses QueryFirstOrDefaultAsync to safely handle cases where no record is found,
+        /// returning false by default.
+        /// </remarks>
         Task<bool> SelectOneIfCodeIsStillFresh(string email);
 
+        /// <summary>
+        /// Deletes the confirmation code associated with the specified email.
+        /// </summary>
+        /// <param name="email">The email address whose confirmation code will be removed.</param>
+        /// <returns>
+        /// A task representing the asynchronous delete operation.
+        /// </returns>
+        /// <remarks>
+        /// Executes a delete operation targeting the confirmation code linked to the provided email.
+        /// </remarks>
         Task DeleteConfirmationCode(string email);
+
+        /// <summary>
+        /// Deletes all expired (no longer valid) confirmation codes from the database.
+        /// </summary>
+        /// <returns>
+        /// A task representing the asynchronous cleanup operation.
+        /// </returns>
+        /// <remarks>
+        /// Executes a batch delete operation to remove all confirmation codes
+        /// that are outside their valid time window.
+        /// Intended for periodic cleanup (e.g., via scheduled job).
+        /// </remarks>
+        Task DeleteUnfreshConfirmationCodes();
+
+        Task UpdateConfirmationCode(string email, string code);
     }
 }

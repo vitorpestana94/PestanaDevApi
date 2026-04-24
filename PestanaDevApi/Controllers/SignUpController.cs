@@ -8,8 +8,6 @@ namespace PestanaDevApi.Controllers
 {
     [Route("sign-up")]
     [ApiController]
-    [AllowAnonymous]
-
     public class SignUpController : Controller
     {
         private readonly ISignUpService _signUpService;
@@ -20,6 +18,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequestDto request)
         {
             SignUpResponseDto response = await _signUpService.SignUp(request);
@@ -31,6 +30,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpGet("isEmailRegistered/{email}")]
+        [AllowAnonymous]
         public async Task<IActionResult> IsEmailRegistered([FromRoute] string email)
         {
             IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);

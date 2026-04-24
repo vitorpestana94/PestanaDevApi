@@ -27,11 +27,14 @@ namespace PestanaDevApi.Services
             _repository = repository;
         }
 
-        public async Task<string> GenerateConfirmationCode(string userEmail)
+        public async Task<string> GenerateConfirmationCode(string userEmail, bool isResend = false)
         {
             string randomCode = ApiLib.GenerateRandomCode();
 
-            await _repository.InsertConfirmationCode(userEmail, code: Hash.GenerateHmac(randomCode, _secretKey));
+            if (isResend)
+                await _repository.UpdateConfirmationCode(userEmail, code: Hash.GenerateHmac(randomCode, _secretKey));
+            else
+                await _repository.InsertConfirmationCode(userEmail, code: Hash.GenerateHmac(randomCode, _secretKey));
 
             return randomCode;
         }
@@ -40,7 +43,7 @@ namespace PestanaDevApi.Services
         {
             return await _repository.SelectOneIfTheresEmail(email);
         }
-        // tem q configurar o quartz e fazer todo necessário para ele deletar o refresh_code e o codigo de cadastro na hora de fazer o sign up.
+
         public async Task<CheckConfirmationCodeResponse> IsConfirmationCodeValid(CheckConfirmationCodeRequest request)
         {
             if (!await _repository.SelectOneIfTheresEmail(request.ClientEmail))
@@ -55,6 +58,11 @@ namespace PestanaDevApi.Services
             await _repository.DeleteConfirmationCode(request.ClientEmail);
 
             return new();
+        }
+
+        public async Task DeleteUnfreshConfirmationCodes()
+        {
+            await _repository.DeleteUnfreshConfirmationCodes();
         }
 
         #region Private Methods

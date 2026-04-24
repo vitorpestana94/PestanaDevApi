@@ -1,40 +1,45 @@
 ﻿using System.Data;
 using Dapper;
+using PestanaDevApi.Interfaces.Factories;
 using PestanaDevApi.Interfaces.Repositories;
+using PestanaDevApi.Extensions;
+using Sql = PestanaDevApi.Constants.Queries.TokenQueries;
+using Params = PestanaDevApi.Utils.DapperParams;
 
 namespace PestanaDevApi.Repositories
 {
-    public class TokenRepository : DefaultRepository, ITokenRepository
+    public class TokenRepository: ITokenRepository
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDbConnectionFactory _factory;
 
-        public  TokenRepository(IDbConnection dbConnection) : base(dbConnection)
+        public  TokenRepository(IDbConnectionFactory factory)
         {
-            _dbConnection = dbConnection;
+            _factory = factory;
         }
 
-        /// <summary>
-        /// It inserts a new refresh token if there's not an existing one or update it otherwise.
-        /// <param name="userId">The unique identifier of the user.</param>
-        /// <param name="deviceId">The unique identifier of the device. It's a UUID.</param>
-        /// <param name="refreshToken">The refresh token.</param>
-        /// </summary>
         public async Task InsertOrUpdateRefreshToken(Guid userId, string deviceId, string refreshToken)
         {
             bool isSuccess;
             Guid existingRefreshToken = await GetRefreshTokenId(userId, deviceId);
 
-            if (existingRefreshToken == Guid.Empty) 
+            if (existingRefreshToken.IsEmpty()) 
             {
                 isSuccess = await InsertRefreshToken(userId, deviceId, refreshToken);
             } 
             else 
             {
-                isSuccess = await UpdateRefreshToken(userId, deviceId, refreshToken); ;
+                isSuccess = await UpdateRefreshToken(userId, deviceId, refreshToken);
             }
 
             if (!isSuccess)
                 throw new Exception();
+        }
+
+        public async Task DeleteExpiredRefreshTokens()
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteExpiredRefreshTokens);
         }
 
         #region Private Methods
@@ -47,17 +52,9 @@ namespace PestanaDevApi.Repositories
         /// </summary>
         private async Task<bool> UpdateRefreshToken(Guid userId, string deviceId, string token)
         {
-            return  await _dbConnection.ExecuteAsync(@"
-            UPDATE 
-                  REFRESH_TOKEN 
-            SET    
-                  token = @Token, 
-                  expired_at = @ExpiredAt 
-            WHERE 
-                  user_profile_id = @userId 
-            AND 
-                  device_id = @deviceId", 
-            new { Token = token, ExpiredAt = DateTime.UtcNow.AddDays(2), UserId = userId, DeviceId = deviceId }) > 0;
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteAsync(Sql.UpdateRrefreshToken, Params.ToUpsertRefreshToken(userId, deviceId, token)) > 0;
         }
 
         /// <summary>
@@ -69,10 +66,9 @@ namespace PestanaDevApi.Repositories
         /// </summary>
         private async Task<bool> InsertRefreshToken(Guid userId, string deviceId, string token)
         {
-            return await _dbConnection.ExecuteAsync(@"
-            INSERT INTO REFRESH_TOKEN (user_profile_id, device_id, token, expired_at) 
-            VALUES (@UserId, @DeviceId, @Token, @ExpiredAt)", 
-            new { UserId = userId, DeviceId = deviceId, Token = token, ExpiredAt = DateTime.UtcNow.AddDays(2) }) > 0;
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteAsync(Sql.InserRefreshToken,Params.ToUpsertRefreshToken(userId, deviceId, token)) > 0;
         }
 
         /// <summary>
@@ -83,16 +79,14 @@ namespace PestanaDevApi.Repositories
         /// </summary>
         private async Task<Guid> GetRefreshTokenId(Guid userId, string deviceId)
         {
-            return await _dbConnection.QueryFirstOrDefaultAsync<Guid>(@"
-            SELECT 
-                  id 
-            FROM 
-                   REFRESH_TOKEN 
-            WHERE 
-                   user_profile_id = @UserId 
-            AND 
-                   device_id = @DeviceId", 
-            new { UserId = userId, DeviceId = deviceId });
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<Guid>(Sql.SelectRefreshToken, 
+            new 
+            { 
+                UserId = userId, 
+                DeviceId = deviceId 
+            });
         }
         #endregion
     }

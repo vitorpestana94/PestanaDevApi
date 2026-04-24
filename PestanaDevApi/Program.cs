@@ -10,6 +10,11 @@ using PestanaDevApi.Services.Auth;
 using PestanaDevApi.Interfaces.Services.Auth;
 using PestanaDevApi.Services.Email;
 using PestanaDevApi.Interfaces.Services.Email;
+using PestanaDevApi.Interfaces.Factories;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using PestanaDevApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +26,63 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0
+            });
+    });
+});
+
 // Setup secrets.
 LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Configuration);
 
 // Setup Database connection
 DbConfig.Setup(builder.Configuration, builder.Services);
 
-#region Services
+// Setup Quartz
+DbConfig.SetupQuartz(builder.Configuration, builder.Services);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = builder.Configuration["jwt.issuer"],
+
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Convert.FromBase64String(builder.Configuration["jwt.key"]!)
+        )
+    };
+});
+
+#region Factories
+builder.Services.AddScoped<IDbConnectionFactory, MySqlConnectionFactory>();
+#endregion
+
+#region Filters
+builder.Services.AddScoped<ResendConfirmationCodeFilter>();
+#endregion
+
+#region Services
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -65,6 +119,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRateLimiter();
+
 app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>
@@ -99,6 +155,7 @@ app.UseExceptionHandler(builder =>
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

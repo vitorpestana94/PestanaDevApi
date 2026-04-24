@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services.Email;
+using PestanaDevApi.Constants;
+using PestanaDevApi.Utils;
+using PestanaDevApi.Filters;
 
 namespace PestanaDevApi.Controllers
 {
     [Route("email")] 
     [ApiController]
-    [AllowAnonymous]
 
     public class EmailController: Controller
     {
@@ -20,6 +22,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("contact")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendContactEmail([FromBody] ContactEmailRequestDto requestDto)
         {
             EmailResponse response = await _emailService.SendContactEmail(requestDto);
@@ -31,9 +34,23 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("confirmation")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendConfirmationCodeEmail([FromBody] ConfirmationCodeEmailRequestDto requestDto)
         {
-            EmailResponse response = await _emailService.SendConfirmationCodeEmail(requestDto);
+            SendConfirmationCodeEmailResponseDto response = await _emailService.SendConfirmationCodeEmail(requestDto);
+
+            if (!response.IsSuccess)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        [HttpPost("confirmation/resend")]
+        [ServiceFilter(typeof(ResendConfirmationCodeFilter))]
+        [Authorize]
+        public async Task<IActionResult> ResendConfirmationCodeEmail([FromBody] ConfirmationCodeEmailRequestDto requestDto)
+        {
+            SendConfirmationCodeEmailResponseDto response = await _emailService.ResendConfirmationCodeEmail(requestDto);
 
             if (!response.IsSuccess)
                 return BadRequest(response);

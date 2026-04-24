@@ -8,7 +8,6 @@ namespace PestanaDevApi.Controllers
 {
     [Route("platform/auth")]
     [ApiController]
-    [AllowAnonymous]
 
     public class PlatformController : Controller
     {
@@ -20,6 +19,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginOrSignUpWithProvider([FromBody] LoginOrSignUpWithPlatformRequestDto request)
         {
             AuthResponseDto response = await _platformService.LoginOrSignUpWithProvider(request);

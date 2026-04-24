@@ -1,43 +1,69 @@
 ﻿using System.Data;
 using Dapper;
 using PestanaDevApi.Interfaces.Repositories;
+using PestanaDevApi.Interfaces.Factories;
 using Sql = PestanaDevApi.Constants.Queries.ConfirmationCodeQueries;
 using Params = PestanaDevApi.Utils.DapperParams;
 
 namespace PestanaDevApi.Repositories
 {
-    public class ConfirmationCodeGenerationRepository: IConfirmationCodeGenerationRepository
+    public class ConfirmationCodeGenerationRepository:  IConfirmationCodeGenerationRepository
     {
-        private readonly IDbConnection _db;
+        private readonly IDbConnectionFactory _factory;
 
-        public ConfirmationCodeGenerationRepository(IDbConnection db)
+        public ConfirmationCodeGenerationRepository(IDbConnectionFactory factory)
         {
-            _db = db;
+            _factory = factory;
         }
 
         public async Task InsertConfirmationCode(string email, string code)
         {
-            await _db.ExecuteAsync(Sql.InserConfirmationCode, new { UserEmail = email, ConfirmationCode = code });
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.InserConfirmationCode, new { UserEmail = email, ConfirmationCode = code });
+        }
+
+        public async Task UpdateConfirmationCode(string email, string code)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.UpdateConfirmationCode, new { UserEmail = email, ConfirmationCode = code });
         }
 
         public async Task<bool> SelectOneIfTheresEmail(string email)
         {
-            return await _db.QueryFirstOrDefaultAsync<bool>(Sql.SelectOneIfTheresEmail, Params.ToUserEmail(email));
+            using IDbConnection db = _factory.CreateConnection();
+
+
+            return await db.QueryFirstOrDefaultAsync<bool>(Sql.SelectOneIfTheresEmail, Params.ToUserEmail(email));
         }
 
         public async Task<string> SelectCodeByEmail(string email)
         {
-            return await _db.QueryFirstOrDefaultAsync<string>(Sql.SelectCodeByEmail, Params.ToUserEmail(email)) ?? string.Empty;
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<string>(Sql.SelectCodeByEmail, Params.ToUserEmail(email)) ?? string.Empty;
         }
 
         public async Task<bool> SelectOneIfCodeIsStillFresh(string email)
         {
-            return await _db.QueryFirstOrDefaultAsync<bool>(Sql.SelectOneIfCodeIsStillFresh, Params.ToUserEmail(email));
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<bool>(Sql.SelectOneIfCodeIsStillFresh, Params.ToUserEmail(email));
         }
 
         public async Task DeleteConfirmationCode(string email)
         {
-            await _db.ExecuteAsync(Sql.DeleteConfirmationCode, Params.ToUserEmail(email));
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteConfirmationCode, Params.ToUserEmail(email));
+        }
+
+        public async Task DeleteUnfreshConfirmationCodes()
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteUnfreshConfirmationCodes);
         }
     }
 }

@@ -8,7 +8,6 @@ namespace PestanaDevApi.Controllers
 {
     [Route("confirmation")]
     [ApiController]
-    [AllowAnonymous]
 
     public class ConfirmationController : Controller
     {
@@ -20,6 +19,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckConfirmationCode([FromBody] CheckConfirmationCodeRequest request)
         {
             CheckConfirmationCodeResponse response = await _service.IsConfirmationCodeValid(request);

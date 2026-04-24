@@ -1,56 +1,47 @@
 ﻿using System.Data;
 using Dapper;
+using PestanaDevApi.Interfaces.Factories;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Models;
 using PestanaDevApi.Models.Enums;
+using Sql = PestanaDevApi.Constants.Queries.LoginQueries;
+using Params = PestanaDevApi.Utils.DapperParams;
 
 namespace PestanaDevApi.Repositories
 {
-    public class LoginRepository: DefaultRepository, ILoginRepository
+    public class LoginRepository: ILoginRepository
     {
-        public readonly IDbConnection _dbConnection;
+        private readonly IDbConnectionFactory _factory;
 
-        public LoginRepository(IDbConnection dbConnection) : base(dbConnection)
+        public LoginRepository(IDbConnectionFactory factory)
         {
-            _dbConnection = dbConnection;
+            _factory = factory;
         }
 
         public async Task<User?> GetUserDataByEmail(string email)
         {
-            return await _dbConnection.QueryFirstOrDefaultAsync<User?>(@"
-            SELECT
-                  id, user_name, user_email, user_password, user_picture 
-            FROM
-                  USERS_PROFILE_DATA
-            WHERE
-                  user_email = @Email", 
-            new { Email = email});
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<User?>(Sql.SelectUserDataByEmail, Params.ToEmail(email));
         }
 
         public async Task<Guid> GetUserIdByEmail(string email)
         {
-            return await _dbConnection.QueryFirstOrDefaultAsync<Guid>(@"
-            SELECT
-                  id 
-            FROM
-                  USERS_PROFILE_DATA
-            WHERE
-                  user_email = @Email",
-            new { Email = email });
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<Guid>(Sql.SelectUserIdByEmail, Params.ToEmail(email));
         }
 
         public async Task<Guid> GetUserIdByPlatformId(Platform platform, string platformId)
         {
-            return await _dbConnection.QueryFirstOrDefaultAsync<Guid>(@"
-            SELECT
-                  user_id
-            FROM
-                  USERS_PROFILE_PLATFORM_DATA
-            WHERE
-                  user_signup_platform = @Platform
-            AND   
-                  user_platform_id = @PId;", 
-            new { Platform = platform.ToString(), PId = platformId });
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<Guid>(Sql.SelectUserIdByPlatformId, 
+            new 
+            { 
+                Platform = platform.ToString(), 
+                PId = platformId 
+            });
         }
     }
 }
