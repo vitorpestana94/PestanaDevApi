@@ -78,7 +78,7 @@ namespace PestanaDevApi.Services.Email
             if (!await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailNotSended);
 
-            if(!await _confirmationCodeGenerationService.CheckCreatedAt(request.ClientEmail))
+            if (!await _confirmationCodeGenerationService.CheckCreatedAt(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailResentRequestedTooSoon);
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail, isResend: true);
