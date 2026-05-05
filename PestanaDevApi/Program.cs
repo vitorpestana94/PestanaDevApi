@@ -35,8 +35,8 @@ builder.Services.AddRateLimiter(options =>
         return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
             new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 3,
-                Window = TimeSpan.FromMinutes(10),
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(30),
                 QueueLimit = 0
             });
     });

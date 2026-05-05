@@ -6,8 +6,7 @@ namespace PestanaDevApi.Utils
 {
     public static class ReplaceEmailVariables
     {
-        private static readonly string[] _confirmationCodesVariables = [EmailConstants.CodeOne, EmailConstants.CodeTwo, EmailConstants.CodeThree, 
-        EmailConstants.CodeFour, EmailConstants.CodeFive, EmailConstants.CodeSix, EmailConstants.CodeSeven, EmailConstants.CodeEight];
+        private static readonly string[] _confirmationCodesVariables = [EmailConstants.CodeOne, EmailConstants.CodeTwo, EmailConstants.CodeThree, EmailConstants.CodeFour];
         private static readonly string _copyRight = $"{GetCurrentYear()}{EmailContent.CopyRightEnglish}";
 
         #region Contact Email

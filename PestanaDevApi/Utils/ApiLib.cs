@@ -22,7 +22,7 @@ namespace PestanaDevApi.Utils
             return emailRegex.IsMatch(email);
         }
 
-        public static string GenerateRandomCode(int codeLenght = 8)
+        public static string GenerateRandomCode(int codeLenght = 4)
         {
             return Guid.NewGuid().ToString().Replace("-", "")[..codeLenght];
         }

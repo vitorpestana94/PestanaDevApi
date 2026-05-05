@@ -53,7 +53,7 @@ namespace PestanaDevApi.Services
                 return new CheckConfirmationCodeResponse(HttpStatusCode.BadRequest, ErrorMessages.UnfreshCode);
 
             if (!await ValidateCode(request.ClientEmail, request.Code))
-                return new CheckConfirmationCodeResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidCode);
+                return new CheckConfirmationCodeResponse(HttpStatusCode.Unauthorized, ErrorMessages.InvalidCode);
 
             await _repository.DeleteConfirmationCode(request.ClientEmail);
 

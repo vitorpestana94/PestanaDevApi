@@ -12,7 +12,7 @@ namespace PestanaDevApi.Services.Email
 
         public EmailTemplateService() 
         {
-            _templatesDirectory= EmailConstants.TemplatesDirectory;
+            _templatesDirectory = EmailConstants.TemplatesDirectory;
         }
 
         public async Task<string> GetEmailTemplate(ContactEmailRequestDto request, bool isContactEmailClientConfirmation = false)
@@ -32,7 +32,7 @@ namespace PestanaDevApi.Services.Email
         #region Private Methods
         private async Task<string> GetEmailTemplateString(EmailTemplateName templateName)
         {
-            return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, $"{templateName}.html"));
+            return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, EmailConstants.GetTemplateHtml(templateName)));
         }
 
         private static string ReplaceEmailVariables(ContactEmailRequestDto requestDto, bool isContactEmailClientConfirmation, string emailTemplate)

@@ -1,4 +1,6 @@
-﻿namespace PestanaDevApi.Constants.Email
+﻿using PestanaDevApi.Models.Enums;
+
+namespace PestanaDevApi.Constants.Email
 {
     public class EmailConstants
     {
@@ -16,9 +18,6 @@
         public const string CodeTwo = "{{CodeTwo}}";
         public const string CodeThree = "{{CodeThree}}";
         public const string CodeFour = "{{CodeFour}}";
-        public const string CodeFive = "{{CodeFive}}";
-        public const string CodeSix = "{{CodeSix}}";
-        public const string CodeSeven = "{{CodeSeven}}";
-        public const string CodeEight = "{{CodeEight}}";
+        public static string GetTemplateHtml(EmailTemplateName templateName) => $"{templateName}.html";
     }
 }
