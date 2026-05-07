@@ -26,7 +26,7 @@ namespace PestanaDevApi.Controllers
             if (!response.IsSuccess)
                 return BadRequest(response);
 
-            return Ok(response.ApiTokens);
+            return Ok(response);
         }
 
         [HttpGet("isEmailRegistered/{email}")]

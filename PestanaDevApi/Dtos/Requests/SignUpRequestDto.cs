@@ -15,6 +15,5 @@ namespace PestanaDevApi.Dtos.Requests
 
         [Required]
         public string DeviceId { get; set; } = string.Empty;
-
     }
 }
