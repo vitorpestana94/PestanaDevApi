@@ -29,5 +29,12 @@ namespace PestanaDevApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("sent/{email}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckConfirmationCodeEmailAlreadySent([FromRoute] string email)
+        {
+            return Ok(await _service.CheckConfirmationCodeEmailAlreadySent(email));
+        }
     }
 }

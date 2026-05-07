@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class CheckConfirmationCodeResponse: DefaultResponse
+    public class CheckConfirmationCodeResponse: DefaultResponseDto
     {
         public CheckConfirmationCodeResponse() : base()
         {

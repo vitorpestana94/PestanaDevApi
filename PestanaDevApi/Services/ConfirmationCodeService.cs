@@ -6,6 +6,7 @@ using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Constants;
 using System.Net;
 using PestanaDevApi.Dtos.Requests;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace PestanaDevApi.Services
 {
@@ -39,7 +40,15 @@ namespace PestanaDevApi.Services
             return randomCode;
         }
 
-        public async Task<bool> CheckIfConfirmationCodeEmailAlreadySended(string email)
+        public async Task<CheckIfConfirmationCodeEmailAlreadySentResponseDto> CheckConfirmationCodeEmailAlreadySent(string email)
+        {
+            if (!ApiLib.IsEmailValid(email))
+                return new CheckIfConfirmationCodeEmailAlreadySentResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            return new CheckIfConfirmationCodeEmailAlreadySentResponseDto(confirmationCodeAlreadySent: await CheckIfConfirmationCodeEmailAlreadySent(email));
+        }
+
+        public async Task<bool> CheckIfConfirmationCodeEmailAlreadySent(string email)
         {
             return await _repository.SelectOneIfTheresEmail(email);
         }

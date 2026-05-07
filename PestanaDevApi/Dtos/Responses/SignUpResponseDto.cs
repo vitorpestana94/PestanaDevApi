@@ -3,7 +3,7 @@ using System.Net;
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class SignUpResponseDto : DefaultResponse
+    public class SignUpResponseDto : DefaultResponseDto
     {
         public ApiToken ApiTokens { get; set; } = new();
 

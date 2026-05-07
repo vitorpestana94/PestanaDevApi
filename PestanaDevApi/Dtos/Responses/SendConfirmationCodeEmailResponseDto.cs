@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class SendConfirmationCodeEmailResponseDto: DefaultResponse
+    public class SendConfirmationCodeEmailResponseDto: DefaultResponseDto
     {
 
         public SendConfirmationCodeEmailResponseDto() : base()

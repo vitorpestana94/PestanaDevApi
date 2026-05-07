@@ -22,7 +22,7 @@ namespace PestanaDevApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SendContactEmail([FromBody] ContactEmailRequestDto requestDto)
         {
-            EmailResponse response = await _emailService.SendContactEmail(requestDto);
+            EmailResponseDto response = await _emailService.SendContactEmail(requestDto);
 
             if (!response.IsSuccess)
                 return BadRequest(response);

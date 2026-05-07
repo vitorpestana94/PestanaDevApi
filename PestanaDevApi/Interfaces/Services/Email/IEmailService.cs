@@ -5,7 +5,7 @@ namespace PestanaDevApi.Interfaces.Services.Email
 {
     public interface IEmailService
     {
-        Task<EmailResponse> SendContactEmail(ContactEmailRequestDto request);
+        Task<EmailResponseDto> SendContactEmail(ContactEmailRequestDto request);
         Task<SendConfirmationCodeEmailResponseDto> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request);
         Task<SendConfirmationCodeEmailResponseDto> ResendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request);
     }

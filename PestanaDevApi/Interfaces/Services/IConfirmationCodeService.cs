@@ -18,7 +18,7 @@ namespace PestanaDevApi.Interfaces.Services
         /// This method executes a query that returns a constant value (1) if a matching record exists.
         /// It is intended to be used as an existence check rather than retrieving full entity data.
         /// </remarks>
-        Task<bool> CheckIfConfirmationCodeEmailAlreadySended(string email);
+        Task<bool> CheckIfConfirmationCodeEmailAlreadySent(string email);
 
         /// <summary>
         /// Validates whether the provided confirmation code is valid for the given request.
@@ -70,5 +70,31 @@ namespace PestanaDevApi.Interfaces.Services
         Task DeleteUnfreshConfirmationCodes();
 
         Task<bool> CheckCreatedAt(string email);
+
+        /// <summary>
+        /// Checks whether a confirmation code email has already been sent to the provided email address.
+        /// </summary>
+        /// <param name="email">The email address to be verified.</param>
+        /// <returns>
+        /// A <see cref="CheckIfConfirmationCodeEmailAlreadySentResponseDto"/> containing the validation result
+        /// and information indicating whether a confirmation code email has already been sent.
+        /// </returns>
+        /// <remarks>
+        /// The validation flow consists of the following steps:
+        /// <list type="number">
+        /// <item>
+        /// Validates whether the provided email has a valid format.
+        /// </item>
+        /// <item>
+        /// Checks whether there is already an active confirmation code associated with the email.
+        /// </item>
+        /// </list>
+        /// 
+        /// Returns a BadRequest response when the provided email format is invalid.
+        /// 
+        /// If the email is valid, returns a response indicating whether a confirmation code
+        /// email has already been sent.
+        /// </remarks>
+        Task<CheckIfConfirmationCodeEmailAlreadySentResponseDto> CheckConfirmationCodeEmailAlreadySent(string email);
     }
 }

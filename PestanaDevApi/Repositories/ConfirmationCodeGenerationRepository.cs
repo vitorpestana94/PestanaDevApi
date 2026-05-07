@@ -34,7 +34,6 @@ namespace PestanaDevApi.Repositories
         {
             using IDbConnection db = _factory.CreateConnection();
 
-
             return await db.QueryFirstOrDefaultAsync<bool>(Sql.SelectOneIfTheresEmail, Params.ToUserEmail(email));
         }
 

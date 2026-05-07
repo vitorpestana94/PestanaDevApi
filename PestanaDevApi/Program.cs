@@ -30,12 +30,12 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
     {
-        var ip = context.Connection.RemoteIpAddress?.ToString();
+        string? ip = context.Connection.RemoteIpAddress?.ToString();
 
         return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
             new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,
+                PermitLimit = 20,
                 Window = TimeSpan.FromMinutes(30),
                 QueueLimit = 0
             });

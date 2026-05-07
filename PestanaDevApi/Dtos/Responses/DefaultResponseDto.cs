@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class DefaultResponse
+    public class DefaultResponseDto
     {
         public string Message { get; set; } = string.Empty;
 
@@ -14,28 +14,28 @@ namespace PestanaDevApi.Dtos.Responses
         [JsonIgnore]
         public bool IsSuccess { get; set; }
 
-        public DefaultResponse() 
+        public DefaultResponseDto() 
         {
             IsSuccess  = true;
             StatusCode = HttpStatusCode.OK;
             Message = ResponseMessage.DefaultSuccessMessage;
         }
 
-        public DefaultResponse(string message)
+        public DefaultResponseDto(string message)
         {
             IsSuccess = true;
             StatusCode = HttpStatusCode.OK;
             Message = message;
         }
 
-        public DefaultResponse(HttpStatusCode statusCode)
+        public DefaultResponseDto(HttpStatusCode statusCode)
         {
             IsSuccess = false;
             StatusCode = statusCode;
             Message = GetHttpMessage.Get(statusCode);
         }
 
-        public DefaultResponse(HttpStatusCode statusCode, string errorMessage)
+        public DefaultResponseDto(HttpStatusCode statusCode, string errorMessage)
         {
             IsSuccess = false;
             StatusCode = statusCode;

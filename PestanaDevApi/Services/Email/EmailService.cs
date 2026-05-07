@@ -43,10 +43,10 @@ namespace PestanaDevApi.Services.Email
             _smtp = _config["email.smtp"]!;
         }
 
-        public async Task<EmailResponse> SendContactEmail(ContactEmailRequestDto request)
+        public async Task<EmailResponseDto> SendContactEmail(ContactEmailRequestDto request)
         {
             if (!ApiLib.IsEmailValid(request.ClientEmail))
-                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+                return new EmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
             await Task.WhenAll(
             SendContactEmailToAdmin(request),
@@ -60,7 +60,7 @@ namespace PestanaDevApi.Services.Email
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
-            if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
+            if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
@@ -75,7 +75,7 @@ namespace PestanaDevApi.Services.Email
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
-            if (!await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySended(request.ClientEmail))
+            if (!await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailNotSended);
 
             if (!await _confirmationCodeGenerationService.CheckCreatedAt(request.ClientEmail))

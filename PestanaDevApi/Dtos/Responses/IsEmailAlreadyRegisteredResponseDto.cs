@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class IsEmailAlreadyRegisteredResponseDto: DefaultResponse
+    public class IsEmailAlreadyRegisteredResponseDto: DefaultResponseDto
     {
         public IsEmailRegistered? IsRegistered { get; set; }
 
