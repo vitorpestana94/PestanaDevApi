@@ -6,7 +6,7 @@
         DELETE FROM 
             REFRESH_TOKEN 
         WHERE 
-            UTC_TIMESTAMP() >= DATE_ADD(expired_at, INTERVAL 2 DAYS);";
+            UTC_TIMESTAMP() >= DATE_ADD(expired_at, INTERVAL 2 DAY);";
 
         public const string UpdateRrefreshToken = @"
         UPDATE 
