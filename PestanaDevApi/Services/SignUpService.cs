@@ -12,11 +12,13 @@ namespace PestanaDevApi.Services
     {
         private readonly ISignUpRepository _signUpRepository;
         private readonly ITokenService _tokenService;
+        private readonly IConfirmedEmailsRepository _confirmedEmailsRepository;
 
-        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService)
+        public SignUpService(ISignUpRepository signUpRepository, ITokenService tokenService, IConfirmedEmailsRepository confirmedEmailsRepository)
         {
             _signUpRepository = signUpRepository;
             _tokenService = tokenService;
+            _confirmedEmailsRepository = confirmedEmailsRepository;
         }
 
         public async Task<SignUpResponseDto> SignUp(SignUpRequestDto request)
@@ -24,10 +26,13 @@ namespace PestanaDevApi.Services
             if (!ApiLib.IsEmailValid(request.Email))
                 return new(ErrorMessages.InvalidEmailFormat);
 
-            if(await _signUpRepository.IsEmailBeingUsed(request.Email))
+            if (await _signUpRepository.IsEmailBeingUsed(request.Email))
                 return new(ErrorMessages.EmailAlreadyBeingUsed);
 
-            return new(await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
+            if(!await _confirmedEmailsRepository.IsEmailConfirmed(request.Email))
+                return new(ErrorMessages.EmailNotConfirmed);
+
+            return new (await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
         }
 
         public async Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email)
@@ -35,7 +40,7 @@ namespace PestanaDevApi.Services
             if (!ApiLib.IsEmailValid(email))
                 return new(ErrorMessages.InvalidEmailFormat);
 
-            return new(await _signUpRepository.IsEmailBeingUsed(email));
+            return new (await _signUpRepository.IsEmailBeingUsed(email));
         }
     }
 }

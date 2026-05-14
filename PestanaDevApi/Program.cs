@@ -100,6 +100,7 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 
 #region Repositories
 builder.Services.AddScoped<ISignUpRepository, SignUpRepository>();
+builder.Services.AddScoped<IConfirmedEmailsRepository, ConfirmedEmailsRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();

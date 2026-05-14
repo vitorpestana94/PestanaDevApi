@@ -15,8 +15,9 @@ namespace PestanaDevApi.Services
         private readonly string _secretKey; 
         private readonly IConfiguration _config;
         private readonly IConfirmationCodeGenerationRepository _repository;
+        private readonly IConfirmedEmailsRepository _confirmedEmailsRepository;
 
-        public ConfirmationCodeService(IConfirmationCodeGenerationRepository repository, IConfiguration configuration)
+        public ConfirmationCodeService(IConfirmationCodeGenerationRepository repository, IConfiguration configuration, IConfirmedEmailsRepository confirmedEmailsRepository)
         {
             _config = configuration;
 
@@ -26,6 +27,7 @@ namespace PestanaDevApi.Services
             _secretKey = _config["sha.secret"]!;
 
             _repository = repository;
+            _confirmedEmailsRepository = confirmedEmailsRepository;
         }
 
         public async Task<string> GenerateConfirmationCode(string userEmail, bool isResend = false)
@@ -64,6 +66,7 @@ namespace PestanaDevApi.Services
             if (!await ValidateCode(request.ClientEmail, request.Code))
                 return new CheckConfirmationCodeResponse(HttpStatusCode.Unauthorized, ErrorMessages.InvalidCode);
 
+            await _confirmedEmailsRepository.InsertCofirmedEmail(request.ClientEmail);
             await _repository.DeleteConfirmationCode(request.ClientEmail);
 
             return new();
