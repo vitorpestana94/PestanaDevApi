@@ -66,7 +66,7 @@ namespace PestanaDevApi.Services
             if (!await ValidateCode(request.ClientEmail, request.Code))
                 return new CheckConfirmationCodeResponse(HttpStatusCode.Unauthorized, ErrorMessages.InvalidCode);
 
-            await _confirmedEmailsRepository.InsertCofirmedEmail(request.ClientEmail);
+            await _confirmedEmailsRepository.RegisterEmailConfirmation(request.ClientEmail);
             await _repository.DeleteConfirmationCode(request.ClientEmail);
 
             return new();

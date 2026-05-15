@@ -29,10 +29,14 @@ namespace PestanaDevApi.Services
             if (await _signUpRepository.IsEmailBeingUsed(request.Email))
                 return new(ErrorMessages.EmailAlreadyBeingUsed);
 
-            if(!await _confirmedEmailsRepository.IsEmailConfirmed(request.Email))
+            if (!await _confirmedEmailsRepository.IsEmailConfirmed(request.Email))
                 return new(ErrorMessages.EmailNotConfirmed);
 
-            return new (await _tokenService.GenerateApiTokens(user: await _signUpRepository.RegisterUser(new User(request)), deviceId: request.DeviceId));
+            User newUser = await _signUpRepository.RegisterUser(new User(request));
+
+            await _confirmedEmailsRepository.DeleteEmailConfirmation(request.Email);
+
+            return new (await _tokenService.GenerateApiTokens(newUser, deviceId: request.DeviceId));
         }
 
         public async Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email)

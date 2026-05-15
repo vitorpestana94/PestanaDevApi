@@ -4,7 +4,7 @@
     {
         public const string SelectUserDataByEmail = @"
         SELECT
-            id, user_name, user_email, user_password 
+            id, user_name, user_email, user_password, signup_by_platform 
         FROM
             USERS_PROFILE_DATA
         WHERE

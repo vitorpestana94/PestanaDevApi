@@ -16,7 +16,7 @@ namespace PestanaDevApi.Repositories
             _factory = factory;
         }
 
-        public async Task InsertCofirmedEmail(string email)
+        public async Task RegisterEmailConfirmation(string email)
         {
             using IDbConnection db = _factory.CreateConnection();
 
@@ -28,6 +28,13 @@ namespace PestanaDevApi.Repositories
             using IDbConnection db = _factory.CreateConnection();
 
             return await db.QueryFirstOrDefaultAsync<bool>(Sql.SelectExistEmail, Params.ToUserEmail(email));
+        }
+
+        public async Task DeleteEmailConfirmation(string email)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteConfirmationEmail, Params.ToUserEmail(email));
         }
     }
 }

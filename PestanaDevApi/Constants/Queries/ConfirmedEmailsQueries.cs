@@ -12,5 +12,9 @@
             FROM CONFIRMED_EMAILS
             WHERE user_email = @UserEmail
         );";
+
+        public const string DeleteConfirmationEmail = @"
+        DELETE FROM CONFIRMED_EMAILS
+        WHERE user_email = @UserEmail;";
     }
 }

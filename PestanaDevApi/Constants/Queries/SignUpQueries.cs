@@ -8,8 +8,8 @@
         RETURNING id;";
 
         public const string InsertUserByPlatform = @"
-        INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password)
-        VALUES (@Name, @Email, @Password)
+        INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password, signup_by_platform)
+        VALUES (@Name, @Email, @Password, TRUE)
         RETURNING id;";
 
         public const string InsertUserPlatformData = @"

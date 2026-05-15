@@ -2,7 +2,8 @@
 {
     public interface IConfirmedEmailsRepository
     {
-        Task InsertCofirmedEmail(string email);
+        Task RegisterEmailConfirmation(string email);
         Task<bool> IsEmailConfirmed(string email);
+        Task DeleteEmailConfirmation(string email);
     }
 }

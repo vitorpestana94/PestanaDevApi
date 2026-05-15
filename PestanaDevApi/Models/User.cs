@@ -12,6 +12,7 @@ namespace PestanaDevApi.Models
         public string UserName { get; set; }
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
+        public bool SignupByPlatform { get; set; }
         public string? UserPlatformId { get; set; }
         public Platform? UserSignUpPlatform { get; set; }
 

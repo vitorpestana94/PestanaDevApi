@@ -51,8 +51,11 @@ namespace PestanaDevApi.Services
         {
             User? user = await _platformAuthService.GetUserByIoken(request.Token, request.Platform);
 
-            if(user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
+            if (user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
                 return new(HttpStatusCode.Unauthorized);
+
+            if (user.SignupByPlatform)
+                return new(ErrorMessages.InvalidLoginEndpoint);
 
             return new (await _tokenService.GenerateApiTokens(user, request.DeviceId));
         }
