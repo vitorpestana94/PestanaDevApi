@@ -24,7 +24,7 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<string> GetEmailTemplate(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
-            string emailTemplate = await GetEmailTemplateString(EmailTemplateName.SignUpCodeConfirmationEmail);
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateName.CodeConfirmationEmail);
 
             return Replace.ReplaceConfirmationCodetVariables(request, emailTemplate, confirmationCodes); ;
         }

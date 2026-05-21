@@ -6,6 +6,6 @@
         ContactEmailClientConfirmation,
         EmailConfirmation,
         UserRegistered,
-        SignUpCodeConfirmationEmail
+        CodeConfirmationEmail
     }
 }

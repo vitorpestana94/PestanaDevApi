@@ -65,7 +65,7 @@ namespace PestanaDevApi.Services.Email
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
 
-            await SendSignUpCodeEmail(request, code);
+            await SendConfirmationCodeEmail(request, code);
 
             return new ();
         }
@@ -83,7 +83,7 @@ namespace PestanaDevApi.Services.Email
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail, isResend: true);
 
-            await SendSignUpCodeEmail(request, code);
+            await SendConfirmationCodeEmail(request, code);
 
             return new();
         }
@@ -121,7 +121,7 @@ namespace PestanaDevApi.Services.Email
             await SendEmail(mail);
         }
 
-        private async Task SendSignUpCodeEmail(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
+        private async Task SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
             using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, confirmationCodes));
 
