@@ -55,7 +55,7 @@ namespace PestanaDevApi.Services
             return await _repository.SelectOneIfTheresEmail(email);
         }
 
-        public async Task<CheckConfirmationCodeResponse> IsConfirmationCodeValid(CheckConfirmationCodeRequest request)
+        public async Task<CheckConfirmationCodeResponse> IsConfirmationCodeValid(CheckConfirmationCodeRequestDto request)
         {
             if (!await _repository.SelectOneIfTheresEmail(request.ClientEmail))
                 return new CheckConfirmationCodeResponse(HttpStatusCode.BadRequest, ErrorMessages.EmailDoestNotExists);

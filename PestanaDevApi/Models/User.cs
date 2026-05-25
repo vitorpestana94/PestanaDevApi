@@ -2,6 +2,7 @@
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Models.Enums;
+using PestanaDevApi.Utils;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Models
@@ -32,7 +33,7 @@ namespace PestanaDevApi.Models
         {
             UserName = dto.Name;
             UserEmail = dto.Email;
-            UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            UserPassword = HashFactory.HashPassword(dto.Password);
         }
 
         /// <summary>

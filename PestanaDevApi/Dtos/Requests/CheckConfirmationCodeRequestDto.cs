@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Requests
 {
-    public class CheckConfirmationCodeRequest
+    public class CheckConfirmationCodeRequestDto
     {
         [Required]
         public string ClientEmail { get; set; } = string.Empty;

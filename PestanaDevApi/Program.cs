@@ -104,6 +104,7 @@ builder.Services.AddScoped<IConfirmedEmailsRepository, ConfirmedEmailsRepository
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();
+builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
 #endregion
 
 var app = builder.Build();

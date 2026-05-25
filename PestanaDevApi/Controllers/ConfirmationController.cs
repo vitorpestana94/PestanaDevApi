@@ -20,7 +20,7 @@ namespace PestanaDevApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> CheckConfirmationCode([FromBody] CheckConfirmationCodeRequest request)
+        public async Task<IActionResult> CheckConfirmationCode([FromBody] CheckConfirmationCodeRequestDto request)
         {
             CheckConfirmationCodeResponse response = await _service.IsConfirmationCodeValid(request);
 

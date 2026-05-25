@@ -54,7 +54,7 @@ namespace PestanaDevApi.Interfaces.Services
         /// 
         /// If validation succeeds, returns a successful response with default values.
         /// </remarks>
-        Task<CheckConfirmationCodeResponse> IsConfirmationCodeValid(CheckConfirmationCodeRequest requestl);
+        Task<CheckConfirmationCodeResponse> IsConfirmationCodeValid(CheckConfirmationCodeRequestDto requestl);
 
         /// <summary>
         /// Deletes all expired (no longer valid) confirmation codes from the database.
