@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 #region Factories
-builder.Services.AddScoped<IDbConnectionFactory, MySqlConnectionFactory>();
+builder.Services.AddSingleton<IDbConnectionFactory, MySqlConnectionFactory>();
 #endregion
 
 #region Services
