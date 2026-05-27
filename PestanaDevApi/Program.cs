@@ -89,6 +89,7 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
 builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
 builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
+builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
