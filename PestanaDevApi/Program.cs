@@ -26,21 +26,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Rate Limiting
-builder.Services.AddRateLimiter(options =>
-{
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-    {
-        string? ip = context.Connection.RemoteIpAddress?.ToString();
+//builder.Services.AddRateLimiter(options => Depois preciso ver como deixar isso mais maleável porém seguro, principalmente nos endpoints q mandam emails.
+//{
+//    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+//    {
+//        string? ip = context.Connection.RemoteIpAddress?.ToString();
 
-        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
-            new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 20,
-                Window = TimeSpan.FromMinutes(30),
-                QueueLimit = 0
-            });
-    });
-});
+//        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
+//            new FixedWindowRateLimiterOptions
+//            {
+//                PermitLimit = 20,
+//                Window = TimeSpan.FromMinutes(30),
+//                QueueLimit = 0
+//            });
+//    });
+//});
 
 // Setup secrets.
 LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Configuration);
@@ -117,7 +117,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.UseExceptionHandler(builder =>
 {
