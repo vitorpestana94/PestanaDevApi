@@ -90,6 +90,7 @@ builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
 builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
 builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
@@ -106,6 +107,8 @@ builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();
 builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 #endregion
 
 var app = builder.Build();

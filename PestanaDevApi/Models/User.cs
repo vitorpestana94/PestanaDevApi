@@ -15,7 +15,7 @@ namespace PestanaDevApi.Models
         public string UserPassword { get; set; }
         public bool SignupByPlatform { get; set; }
         public string? UserPlatformId { get; set; }
-        public Platform? UserSignUpPlatform { get; set; }
+        public PlatformEnum? UserSignUpPlatform { get; set; }
 
         public User() 
         {
@@ -45,7 +45,7 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserSignUpPlatform = Platform.Google;
+            UserSignUpPlatform = PlatformEnum.Google;
             UserPlatformId = googlePayload.Subject;
         }
 
@@ -59,7 +59,7 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserSignUpPlatform = Platform.Google;
+            UserSignUpPlatform = PlatformEnum.Google;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserSignUpPlatform = Platform.GitHub;
+            UserSignUpPlatform = PlatformEnum.GitHub;
             UserPlatformId = responseDto.Id.ToString();
         }
 
@@ -85,7 +85,7 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserSignUpPlatform = Platform.GitHub;
+            UserSignUpPlatform = PlatformEnum.GitHub;
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace PestanaDevApi.Models
             UserName = jwt.Claims.First(c => c.Type == "name").Value;
             UserEmail = userEmail;
             UserPassword = "";
-            UserSignUpPlatform = Platform.Linkedin;
+            UserSignUpPlatform = PlatformEnum.Linkedin;
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace PestanaDevApi.Models
             UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
             UserEmail = userEmail;
             UserPassword = "";
-            UserSignUpPlatform = Platform.Linkedin;
+            UserSignUpPlatform = PlatformEnum.Linkedin;
             UserPlatformId = userId;
         }
 

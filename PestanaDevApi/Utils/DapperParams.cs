@@ -14,5 +14,6 @@
         };
 
         public static object ToEmail(string email) => new { Email = email };
+        public static object ToUserId(Guid userId) => new { UserId = userId };
     }
 }

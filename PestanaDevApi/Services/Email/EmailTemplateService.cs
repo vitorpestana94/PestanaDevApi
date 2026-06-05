@@ -17,20 +17,20 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<string> GetEmailTemplate(ContactEmailRequestDto request, bool isContactEmailClientConfirmation = false)
         {
-            string emailTemplate = await GetEmailTemplateString(isContactEmailClientConfirmation ? EmailTemplateName.ContactEmailClientConfirmation : EmailTemplateName.ContactEmail);
+            string emailTemplate = await GetEmailTemplateString(isContactEmailClientConfirmation ? EmailTemplateNameEnum.ContactEmailClientConfirmation : EmailTemplateNameEnum.ContactEmail);
 
             return ReplaceEmailVariables(request, isContactEmailClientConfirmation,  emailTemplate);
         }
 
         public async Task<string> GetEmailTemplate(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
-            string emailTemplate = await GetEmailTemplateString(EmailTemplateName.CodeConfirmationEmail);
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateNameEnum.CodeConfirmationEmail);
 
             return Replace.ReplaceConfirmationCodetVariables(request, emailTemplate, confirmationCodes); ;
         }
 
         #region Private Methods
-        private async Task<string> GetEmailTemplateString(EmailTemplateName templateName)
+        private async Task<string> GetEmailTemplateString(EmailTemplateNameEnum templateName)
         {
             return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, EmailConstants.GetTemplateHtml(templateName)));
         }

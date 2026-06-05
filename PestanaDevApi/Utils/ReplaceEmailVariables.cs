@@ -1,5 +1,7 @@
 ﻿using PestanaDevApi.Constants.Email;
 using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Models.Enums;
+using PestanaDevApi.Extensions.Enums;
 using Locale = PestanaDevApi.Constants.LocaleConstants;
 
 namespace PestanaDevApi.Utils
@@ -36,9 +38,9 @@ namespace PestanaDevApi.Utils
         {
             return requestDto.ClientLocale switch
             {
-                Locale.En => EnglishReplace(emailTemplate, confirmationCodes),
-                Locale.Pt => PortugueseReplace(emailTemplate, confirmationCodes),
-                _ => EnglishReplace(emailTemplate, confirmationCodes)
+                Locale.En => EnglishReplace(emailTemplate, confirmationCodes, requestDto.ConfirmationCodeEmailType),
+                Locale.Pt => PortugueseReplace(emailTemplate, confirmationCodes, requestDto.ConfirmationCodeEmailType),
+                _ => EnglishReplace(emailTemplate, confirmationCodes, requestDto.ConfirmationCodeEmailType)
             };
         }
         #endregion
@@ -64,24 +66,24 @@ namespace PestanaDevApi.Utils
         #endregion
         
         #region Confirmation Code
-        private static string EnglishReplace(string emailTemplate, string confirmationCodes)
+        private static string EnglishReplace(string emailTemplate, string confirmationCodes, ConfirmationCodeEmailTypeEnum confirmationType)
         {
             emailTemplate = GetEmailTemplateWithCodes(emailTemplate, confirmationCodes);
 
             return emailTemplate.Replace(EmailConstants.Title, $"{EmailContent.ConfirmationCodeTitleEnglish}")
                                 .Replace(EmailConstants.Paragraph, EmailContent.ConfirmationCodeTitleParagraphEnglish)
                                 .Replace(EmailConstants.Copyright, _copyRight)
-                                .Replace(EmailConstants.Subcopyright, EmailContent.SubCopyRightContactConfirmationEnglish);
+                                .Replace(EmailConstants.Subcopyright, confirmationType.ToSubCopyRight(Locale.En));
         }
 
-        private static string PortugueseReplace(string emailTemplate, string confirmationCodes)
+        private static string PortugueseReplace(string emailTemplate, string confirmationCodes, ConfirmationCodeEmailTypeEnum confirmationType)
         {
             emailTemplate = GetEmailTemplateWithCodes(emailTemplate, confirmationCodes);
 
             return emailTemplate.Replace(EmailConstants.Title, $"{EmailContent.ConfirmationCodeTitlePortuguese}")
                                 .Replace(EmailConstants.Paragraph, EmailContent.ConfirmationCodeTitleParagraphPortuguese)
                                 .Replace(EmailConstants.Copyright, _copyRight)
-                                .Replace(EmailConstants.Subcopyright, EmailContent.SubCopyRightContactConfirmationPortuguese);
+                                .Replace(EmailConstants.Subcopyright, confirmationType.ToSubCopyRight(Locale.Pt));
         }
 
         #endregion

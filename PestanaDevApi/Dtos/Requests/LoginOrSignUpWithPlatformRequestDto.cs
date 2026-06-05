@@ -6,7 +6,7 @@ namespace PestanaDevApi.Dtos.Requests
     public class LoginOrSignUpWithPlatformRequestDto
     {
         [Required]
-        public Platform Platform { get; set; }
+        public PlatformEnum Platform { get; set; }
 
         [Required]
         public string DeviceId { get; set; } = string.Empty;

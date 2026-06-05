@@ -6,7 +6,7 @@ namespace PestanaDevApi.Interfaces.Repositories
     public interface ILoginRepository
     {
         Task<User?> GetUserDataByEmail(string email);
-        Task<Guid> GetUserIdByPlatformId(Platform platform, string platformId);
+        Task<Guid> GetUserIdByPlatformId(PlatformEnum platform, string platformId);
         Task<Guid> GetUserIdByEmail(string email);
     }
 }

@@ -5,7 +5,7 @@ namespace PestanaDevApi.Dtos.Responses
 {
     public class AuthResponseDto: DefaultResponseDto
     {
-        public ApiToken ApiTokens { get; set; } = new();
+        public ApiToken? ApiTokens { get; set; } = null;
 
         public AuthResponseDto()
         {
@@ -20,7 +20,7 @@ namespace PestanaDevApi.Dtos.Responses
             ApiTokens = apiToken;
         }
 
-        public AuthResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
+        public AuthResponseDto(string errorMessage) : base(HttpStatusCode.Unauthorized, errorMessage)
         {
         }
     }

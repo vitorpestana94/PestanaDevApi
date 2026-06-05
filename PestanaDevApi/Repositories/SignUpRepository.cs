@@ -38,12 +38,12 @@ namespace PestanaDevApi.Repositories
 
             newUser.Id = await db.ExecuteScalarAsync<Guid>(Sql.InsertUserByPlatform, user.ToInsert());
 
-            await InsertUserPlatformData(newUser.Id, (Platform)user.UserSignUpPlatform!, user.UserPlatformId!);
+            await InsertUserPlatformData(newUser.Id, (PlatformEnum)user.UserSignUpPlatform!, user.UserPlatformId!);
 
             return newUser;
         }
 
-        public async Task InsertUserPlatformData(Guid userId, Platform platform, string platformId)
+        public async Task InsertUserPlatformData(Guid userId, PlatformEnum platform, string platformId)
         {
             using IDbConnection db = _factory.CreateConnection();
 

@@ -11,8 +11,10 @@
         
         public const string CopyRightEnglish = " Pestana Dev. All rights reserved.";
         public const string SubCopyRightContactConfirmationEnglish = "You received this email because you requested contact on my website.";
-        public const string SubCopyRightConfirmationCodeEnglish = "You received this email because you requested a sign up on my website.";
-
+        public const string SubCopyRightSignUpConfirmationCodeEnglish = "You received this email because you requested a sign up on my website.";
+        public const string SubCopyRightForgotPasswordConfirmationCodeEnglish = "You received this email because you forgot your password on my website.";
+        public const string SubCopyRightChangeCredentialsConfirmationCodeEnglish = "You received this email because you are trying to change your credentials on my website.";
+        public const string SubCopyRightDeleteAccountConfirmationCodeEnglish = "You received this email because you are trying to delete your account on my website.";
         #endregion
 
         #region Confirmation Code
@@ -32,11 +34,13 @@
         public const string ConfirmationCodeTitleParagraphPortuguese = @"Copie cada elemento e cole campo de confirmação.";
         #endregion
 
-
         public const string SubCopyRightContactConfirmationPortuguese = "Você recebeu este e-mail porque requisitou contato no meu site.";
-        public const string SubCopyRightConfirmationCidePortuguese = "Você recebeu este e-mail porque requisitou um cadastro no meu site.";
-        public const string ContactConfirmationEmailParagraphPortuguese = @"Recebi seu email e agradeço o contato.<br>Retornarei o mais breve possível";
-        
+        public const string SubCopyRightConfirmationCodeSignUpPortuguese = "Você recebeu este e-mail porque requisitou um cadastro no meu site.";
+        public const string SubCopyRightForgotPasswordConfirmationPortuguese = "Você recebeu este e-mail porque esqueceu sua senha no meu site.";
+        public const string SubCopyRightChangeCredentialsPortuguese = "Você recebeu este e-mail porque esqueceu sua senha no meu site.";
+        public const string SubCopyRightDeleteAccountConfirmationCodePortuguese = "Você recebeu este e-mail porque está tentando deletar sua conta no meu site.";
+        public const string ContactConfirmationEmailParagraphPortuguese = "Recebi seu email e agradeço o contato.<br>Retornarei o mais breve possível";
+
         #endregion
     }
 }

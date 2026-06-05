@@ -18,6 +18,6 @@ namespace PestanaDevApi.Constants.Email
         public const string CodeTwo = "{{CodeTwo}}";
         public const string CodeThree = "{{CodeThree}}";
         public const string CodeFour = "{{CodeFour}}";
-        public static string GetTemplateHtml(EmailTemplateName templateName) => $"{templateName}.html";
+        public static string GetTemplateHtml(EmailTemplateNameEnum templateName) => $"{templateName}.html";
     }
 }

@@ -32,7 +32,7 @@ namespace PestanaDevApi.Repositories
             return await db.QueryFirstOrDefaultAsync<Guid>(Sql.SelectUserIdByEmail, Params.ToEmail(email));
         }
 
-        public async Task<Guid> GetUserIdByPlatformId(Platform platform, string platformId)
+        public async Task<Guid> GetUserIdByPlatformId(PlatformEnum platform, string platformId)
         {
             using IDbConnection db = _factory.CreateConnection();
 
