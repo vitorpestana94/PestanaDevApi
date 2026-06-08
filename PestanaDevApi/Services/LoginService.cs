@@ -37,7 +37,7 @@ namespace PestanaDevApi.Services
             if (user == null || IsPasswordNotValid(request.Password, user.UserPassword))
                 return new(ErrorMessages.InvalidCredentials);
 
-            return new (await _tokenService.GenerateApiTokens(user, request.DeviceId));
+            return new(await _tokenService.GenerateApiTokens(user, request.DeviceId));
         }
 
         /// <summary>

@@ -10,6 +10,26 @@
         FROM
             USERS_PROFILE_DATA
         WHERE
-            id = @UserId";
+            id = @UserId;";
+
+        public const string UpdateUser = @"
+        UPDATE
+            USERS_PROFILE_DATA
+        SET
+            user_name = @Name,
+            user_email = @Email
+        WHERE
+            id = @UserId;";
+
+        public const string DeleteUser = @"
+        DELETE FROM 
+            USERS_PROFILE_DATA
+        WHERE
+            id @UserId;
+        
+        DELETE FROM
+            USERS_PROFILE_PLATFORM_DATA
+        WHERE
+            id @UserId;";
     }
 }

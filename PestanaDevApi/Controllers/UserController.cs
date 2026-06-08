@@ -1,8 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Extensions;
+using PestanaDevApi.Extensions.Dtos.Responses;
 
 namespace PestanaDevApi.Controllers
 {
@@ -13,7 +16,7 @@ namespace PestanaDevApi.Controllers
     public class UserController: Controller
     {
         private readonly IUserService _service;
-        private Guid _userId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        private Guid UserId => User.GetUserId();
 
         public UserController(IUserService service) 
         { 
@@ -23,10 +26,32 @@ namespace PestanaDevApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            GetUserResponseDto response = await _service.GetUser(_userId);
+            GetUserResponseDto response = await _service.GetUser(UserId);
 
             if (!response.IsSuccess)
-                return Unauthorized(response);
+                return NotFound(response);
+
+            return Ok(response.Data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUserData(ChangeUserDataRequestDto dto)
+        {
+            ChangeUserDataResponseDto response = await _service.ChangeUserData(dto, UserId);
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser()
+        {
+            DeleteUserResponseDto response = await _service.DeleteUser(UserId);
+
+            if (!response.IsSuccess)
+               return response.HandleFailure();
 
             return Ok(response);
         }

@@ -8,6 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\Dtos\NovaPasta1\**" />
+    <Compile Remove="Extensions\Dtos\NovaPasta\**" />
+    <Content Remove="Extensions\Dtos\NovaPasta1\**" />
+    <Content Remove="Extensions\Dtos\NovaPasta\**" />
+    <EmbeddedResource Remove="Extensions\Dtos\NovaPasta1\**" />
+    <EmbeddedResource Remove="Extensions\Dtos\NovaPasta\**" />
+    <None Remove="Extensions\Dtos\NovaPasta1\**" />
+    <None Remove="Extensions\Dtos\NovaPasta\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="Google.Apis.Auth" Version="1.73.0" />

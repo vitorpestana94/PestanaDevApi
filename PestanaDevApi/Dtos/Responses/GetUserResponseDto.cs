@@ -25,6 +25,10 @@ namespace PestanaDevApi.Dtos.Responses
         public GetUserResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
         {
         }
+
+        public GetUserResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage) 
+        { 
+        }
     }
 
     public class UserData
