@@ -30,28 +30,21 @@ namespace PestanaDevApi.Repositories
         {
             using IDbConnection db = _factory.CreateConnection();
 
-            try
-            {
-                return await db.ExecuteAsync(Sql.UpdateUser, dto.ToUpdate(currentUserData: oldData, userId)) > 0;
-            }
-            catch (Exception) 
-            {
-                return false;
-            }
+            return await db.ExecuteAsync(Sql.UpdateUser, dto.ToUpdate(currentUserData: oldData, userId)) > 0;
         }
 
         public async Task<bool> DeleteUserData(Guid userId)
         {
             using IDbConnection db = _factory.CreateConnection();
 
-            try
-            {
-                return await db.ExecuteAsync(Sql.DeleteUser, Params.ToUserId(userId)) > 0;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+             return await db.ExecuteAsync(Sql.DeleteUser, Params.ToUserId(userId)) > 0;
+        }
+
+        public async Task<bool> ChangeUserPassword(ChangePasswordRequestDto dto, Guid userId)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteAsync(Sql.UpdateUserPassword, dto.ToUpdate(userId)) > 0;
         }
     }
 }

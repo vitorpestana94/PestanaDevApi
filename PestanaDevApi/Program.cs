@@ -42,6 +42,7 @@ builder.Services.AddSwaggerGen();
 //    });
 //});
 
+
 // Setup secrets.
 LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Configuration);
 
@@ -72,6 +73,9 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 #region Factories
 builder.Services.AddSingleton<IDbConnectionFactory, MySqlConnectionFactory>();
@@ -113,15 +117,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-//app.UseRateLimiter();
-
 app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>
@@ -129,7 +124,6 @@ app.UseExceptionHandler(builder =>
         ILogger logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
         int statusCode = error switch
         {
             ApiException apiEx => apiEx.StatusCode,
@@ -153,6 +147,14 @@ app.UseExceptionHandler(builder =>
     });
 });
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+//app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 

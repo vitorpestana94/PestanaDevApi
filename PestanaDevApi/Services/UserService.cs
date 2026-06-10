@@ -6,7 +6,6 @@ using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
 using System.Net;
 using PestanaDevApi.Utils;
-using Org.BouncyCastle.Asn1.Ocsp;
 using PestanaDevApi.Extensions.Dtos.Requests;
 
 namespace PestanaDevApi.Services
@@ -54,6 +53,8 @@ namespace PestanaDevApi.Services
 
                 if (!await _confirmedEmailsRepository.IsEmailConfirmed(dto.Email!))
                     return new(ErrorMessages.EmailNotConfirmed);
+
+                await _confirmedEmailsRepository.DeleteEmailConfirmation(dto.Email!);
             }
 
             if (!await _repository.UpdateUserData(dto, currentUserData, userId))
@@ -72,12 +73,34 @@ namespace PestanaDevApi.Services
             if (!await _confirmedEmailsRepository.IsEmailConfirmed(user.UserEmail))
                 return new(ErrorMessages.UserEmailWasNotConfirmed);
 
-            bool wasUserDeleted = await _repository.DeleteUserData(userId);
+            await _confirmedEmailsRepository.DeleteEmailConfirmation(user.UserEmail);
+
+            if (!await _repository.DeleteUserData(userId))
+                return new(HttpStatusCode.InternalServerError, ErrorMessages.UserNotDeleted);
+
+            return new();
+        }
+
+        public async Task<ChangePasswordResponseDto> ChangeUserPassword(ChangePasswordRequestDto dto, Guid userId)
+        {
+            User? user = await _repository.GetUser(userId);
+
+            if (user == null)
+                return new(HttpStatusCode.NotFound, ErrorMessages.UserNotFound);
+
+            if (user.SignupByPlatform)
+                return new(ErrorMessages.UserDontHavePassword);
+
+            if (PasswordVerifier.IsPasswordNotValid(dtoPassword: dto.CurrentPassword, userPassword: user.UserPassword))
+                return new(HttpStatusCode.Unauthorized, ErrorMessages.InvalidCredentials);
+
+            if (!await _confirmedEmailsRepository.IsEmailConfirmed(user.UserEmail))
+                return new(ErrorMessages.UserEmailWasNotConfirmed);
 
             await _confirmedEmailsRepository.DeleteEmailConfirmation(user.UserEmail);
 
-            if (!wasUserDeleted)
-                return new(HttpStatusCode.InternalServerError, ErrorMessages.UserNotDeleted);
+            if (!await _repository.ChangeUserPassword(dto, userId))
+                return new(HttpStatusCode.InternalServerError, ErrorMessages.UserPasswordNotUpdated);
 
             return new();
         }

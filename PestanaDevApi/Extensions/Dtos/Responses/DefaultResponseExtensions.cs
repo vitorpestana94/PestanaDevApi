@@ -12,6 +12,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             {
                 HttpStatusCode.NotFound => new NotFoundObjectResult(dto),
                 HttpStatusCode.InternalServerError => new ObjectResult(dto) { StatusCode = 500 },
+                HttpStatusCode.Unauthorized => new UnauthorizedObjectResult(dto),
                 _ => new BadRequestObjectResult(dto)
             };
         }

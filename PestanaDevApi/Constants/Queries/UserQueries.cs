@@ -31,5 +31,13 @@
             USERS_PROFILE_PLATFORM_DATA
         WHERE
             id @UserId;";
+
+        public const string UpdateUserPassword = @"
+        UPDATE
+            USERS_PROFILE_DATA
+        SET
+            user_password = @Password
+        WHERE
+            id = @UserId;";
     }
 }
