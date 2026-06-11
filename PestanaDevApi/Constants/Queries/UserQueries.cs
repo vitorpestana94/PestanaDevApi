@@ -5,7 +5,8 @@
         public const string GetUser = @"
         SELECT
             user_name, 
-            user_email, 
+            user_email,
+            user_password,
             signup_by_platform 
         FROM
             USERS_PROFILE_DATA
