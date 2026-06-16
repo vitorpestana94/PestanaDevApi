@@ -1,8 +1,13 @@
-﻿namespace PestanaDevApi.Dtos.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PestanaDevApi.Dtos.Requests
 {
-    public class ChangePasswordRequestDto
+    public class ChangePasswordRequestDto: CaptchaRequestDto
     {
+        [Required]
         public required string NewPassword { get; set; }
+        
+        [Required]
         public required string CurrentPassword { get; set; }
     }
 }

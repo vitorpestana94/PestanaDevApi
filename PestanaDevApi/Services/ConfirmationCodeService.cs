@@ -6,7 +6,6 @@ using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Constants;
 using System.Net;
 using PestanaDevApi.Dtos.Requests;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace PestanaDevApi.Services
 {

@@ -56,9 +56,9 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser()
+        public async Task<IActionResult> DeleteUser(DeleteUserRequestDto dto)
         {
-            DeleteUserResponseDto response = await _service.DeleteUser(UserId);
+            DeleteUserResponseDto response = await _service.DeleteUser(dto, UserId);
 
             if (!response.IsSuccess)
                return response.HandleFailure();

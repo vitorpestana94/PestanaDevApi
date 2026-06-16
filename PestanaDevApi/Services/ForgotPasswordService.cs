@@ -1,4 +1,5 @@
-﻿using PestanaDevApi.Constants;
+﻿using System.Net;
+using PestanaDevApi.Constants;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
@@ -11,15 +12,20 @@ namespace PestanaDevApi.Services
     {
         private readonly IConfirmedEmailsRepository _confirmedEmailsRepository;
         private readonly IForgotPasswordRepository _forgetPasswordRepository;
+        private readonly ICaptchaService _captchaService;
 
-        public ForgotPasswordService(IConfirmedEmailsRepository confirmedEmailsRepository, IForgotPasswordRepository forgotPasswordRepository) 
+        public ForgotPasswordService(IConfirmedEmailsRepository confirmedEmailsRepository, IForgotPasswordRepository forgotPasswordRepository, ICaptchaService captchaService) 
         {
             _confirmedEmailsRepository = confirmedEmailsRepository;
             _forgetPasswordRepository = forgotPasswordRepository;
+            _captchaService = captchaService;
         }
 
         public async Task<ForgotPasswordResponseDto> ForgotPassword(ForgotPasswordRequestDto request)
         {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             if (!ApiLib.IsEmailValid(request.Email))
                 return new(ErrorMessages.InvalidEmailFormat);
 

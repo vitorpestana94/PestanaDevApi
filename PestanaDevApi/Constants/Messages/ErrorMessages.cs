@@ -6,7 +6,7 @@
         public const string InvalidLoginEndpointUserWithPlatform = "Invalid Login Endpoint: you registered using a platform. Please, login using platform.";
         public const string InvalidLoginEndpointUserWithPassword = "Invalid Login Endpoint: you registered manually. Please, login using your email and password.";
         public const string UserNotFound = $"{NotFoundTitle} user not found!";
-
+        public const string UserBeheaviorItsNotHuman = $"{ForbiddenTitle} Google's score response indicates that user's behavior is not human.";
         #region User
         public const string UserNotUpdated = $"{InternalServerErrorTitle} user was not updated due internal errors!";
         public const string UserNotDeleted = $"{InternalServerErrorTitle} user was not deleted due internal errors!";

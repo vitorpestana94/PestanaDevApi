@@ -26,12 +26,12 @@
         DELETE FROM 
             USERS_PROFILE_DATA
         WHERE
-            id @UserId;
+            id = @UserId;
         
         DELETE FROM
             USERS_PROFILE_PLATFORM_DATA
         WHERE
-            id @UserId;";
+            user_id = @UserId;";
 
         public const string UpdateUserPassword = @"
         UPDATE

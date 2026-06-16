@@ -13,14 +13,16 @@ namespace PestanaDevApi.Services
     public class UserService: IUserService
     {
         private readonly IUserRepository _repository;
+        private readonly ICaptchaService _captchaService;
         private readonly ISignUpRepository _signUpRepository;
         private readonly IConfirmedEmailsRepository _confirmedEmailsRepository;
 
-        public UserService(IUserRepository repository, ISignUpRepository signUpRepository, IConfirmedEmailsRepository confirmedEmailsRepository)
+        public UserService(IUserRepository repository, ISignUpRepository signUpRepository, IConfirmedEmailsRepository confirmedEmailsRepository, ICaptchaService captchaService)
         {
             _repository = repository;
             _signUpRepository = signUpRepository;
             _confirmedEmailsRepository = confirmedEmailsRepository;
+            _captchaService = captchaService;
         }
 
         public async Task<GetUserResponseDto> GetUser(Guid userId)
@@ -35,6 +37,9 @@ namespace PestanaDevApi.Services
 
         public async Task<ChangeUserDataResponseDto> ChangeUserData(ChangeUserDataRequestDto dto, Guid userId)
         {
+            if (!await _captchaService.ValidateCaptchaV3(dto.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             if (dto.WasDataNotUpdated())
                 return new(ErrorMessages.RequestDontHaveAnyChangedData);
 
@@ -63,8 +68,11 @@ namespace PestanaDevApi.Services
             return new();
         }
 
-        public async Task<DeleteUserResponseDto> DeleteUser(Guid userId)
+        public async Task<DeleteUserResponseDto> DeleteUser(DeleteUserRequestDto dto, Guid userId)
         {
+            if (!await _captchaService.ValidateCaptchaV3(dto.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             User? user = await _repository.GetUser(userId);
 
             if (user == null)
@@ -83,6 +91,9 @@ namespace PestanaDevApi.Services
 
         public async Task<ChangePasswordResponseDto> ChangeUserPassword(ChangePasswordRequestDto dto, Guid userId)
         {
+            if (!await _captchaService.ValidateCaptchaV3(dto.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             User? user = await _repository.GetUser(userId);
 
             if (user == null)

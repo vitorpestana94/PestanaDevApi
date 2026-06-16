@@ -14,6 +14,8 @@ using PestanaDevApi.Interfaces.Factories;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using saideira_api.Services.Interfaces;
+using PestanaDevApi.Interfaces.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +97,7 @@ builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
 builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
@@ -113,6 +116,11 @@ builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCo
 builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+#endregion
+
+#region Utils
+builder.Services.AddScoped<IGoogleApisHttpClient, GoogleApisHttpClient>();
+builder.Services.AddHttpClient<GoogleApisHttpClient>();
 #endregion
 
 var app = builder.Build();

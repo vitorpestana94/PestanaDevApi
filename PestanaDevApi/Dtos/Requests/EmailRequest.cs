@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Requests
 {
-    public class EmailRequest
+    public class EmailRequest: CaptchaRequestDto
     {
         [Required]
         public string ClientEmail { get; set; } = string.Empty;
