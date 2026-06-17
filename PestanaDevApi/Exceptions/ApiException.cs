@@ -1,6 +1,6 @@
 ﻿namespace PestanaDevApi.Exceptions
 {
-    public class ApiException: Exception
+    public sealed class ApiException: Exception
     {
         public int StatusCode { get; }
 

@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using ErrorMessage = PestanaDevApi.Constants.ErrorMessages;
+using PestanaDevApi.Constants.Messages;
 
 namespace PestanaDevApi.Utils
 {
@@ -16,12 +16,12 @@ namespace PestanaDevApi.Utils
         {
             return statusCode switch
             {
-                400 => ErrorMessage.BadRequest,
-                401 => ErrorMessage.Unauthorized,
-                404 => ErrorMessage.NotFound,
-                415 => ErrorMessage.UnsupportedMediaType,
-                500 => ErrorMessage.InternalServerError,
-                _ => ErrorMessage.DefaultMessage
+                400 => ErrorMessages.BadRequest,
+                401 => ErrorMessages.Unauthorized,
+                404 => ErrorMessages.NotFound,
+                415 => ErrorMessages.UnsupportedMediaType,
+                500 => ErrorMessages.InternalServerError,
+                _ => ErrorMessages.DefaultMessage
             };
         }
 
@@ -36,12 +36,12 @@ namespace PestanaDevApi.Utils
         {
             return statusCode switch
             {
-                HttpStatusCode.BadRequest => ErrorMessage.BadRequest,
-                HttpStatusCode.Unauthorized => ErrorMessage.Unauthorized,
-                HttpStatusCode.NotFound => ErrorMessage.NotFound,
-                HttpStatusCode.UnsupportedMediaType => ErrorMessage.UnsupportedMediaType,
-                HttpStatusCode.InternalServerError => ErrorMessage.InternalServerError,
-                _ => ErrorMessage.DefaultMessage
+                HttpStatusCode.BadRequest => ErrorMessages.BadRequest,
+                HttpStatusCode.Unauthorized => ErrorMessages.Unauthorized,
+                HttpStatusCode.NotFound => ErrorMessages.NotFound,
+                HttpStatusCode.UnsupportedMediaType => ErrorMessages.UnsupportedMediaType,
+                HttpStatusCode.InternalServerError => ErrorMessages.InternalServerError,
+                _ => ErrorMessages.DefaultMessage
             };
         }
     }

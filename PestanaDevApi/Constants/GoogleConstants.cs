@@ -15,13 +15,6 @@
             public static string GetPlacesSearchUrlParams(string placeId, string apiKey) => $"&place_id={placeId}&key={apiKey}";
         }
 
-        public class ExternalAuth
-        {
-            public const string Google = "google";
-            public const string Apple = "apple";
-            public const string AppleOauth = "apple-oauth";
-        }
-
         public class GoogleCaptchaErroCodes
         {
             public const string MissingInputSecret = "missing-input-secret";

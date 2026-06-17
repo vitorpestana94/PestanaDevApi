@@ -14,7 +14,11 @@ namespace PestanaDevApi.Dtos.Responses
         public AuthResponseDto(HttpStatusCode statusCode) : base(statusCode)
         { 
         }
-        
+
+        public AuthResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage)
+        {
+        }
+
         public AuthResponseDto(ApiToken apiToken) : base() 
         {
             ApiTokens = apiToken;

@@ -18,7 +18,6 @@ namespace PestanaDevApi.Utils
             _http = http;
         }
 
-
         /// <summary>
         /// Request google's captcha validation API
         /// </summary>

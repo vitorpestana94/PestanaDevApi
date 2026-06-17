@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using PestanaDevApi.Constants;
+using PestanaDevApi.Constants.Messages;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
@@ -23,9 +23,6 @@ namespace PestanaDevApi.Services
 
         public async Task<ForgotPasswordResponseDto> ForgotPassword(ForgotPasswordRequestDto request)
         {
-            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
-                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
-
             if (!ApiLib.IsEmailValid(request.Email))
                 return new(ErrorMessages.InvalidEmailFormat);
 

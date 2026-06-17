@@ -3,7 +3,7 @@ using PestanaDevApi.Interfaces.Services;
 using Hash = PestanaDevApi.Utils.SHA526Factory;
 using PestanaDevApi.Utils;
 using PestanaDevApi.Dtos.Responses;
-using PestanaDevApi.Constants;
+using PestanaDevApi.Constants.Messages;
 using System.Net;
 using PestanaDevApi.Dtos.Requests;
 

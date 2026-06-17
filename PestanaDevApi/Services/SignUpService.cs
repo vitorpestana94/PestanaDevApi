@@ -1,4 +1,4 @@
-﻿using PestanaDevApi.Constants;
+﻿using PestanaDevApi.Constants.Messages;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;

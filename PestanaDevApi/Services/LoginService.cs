@@ -4,7 +4,7 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
 using PestanaDevApi.Utils;
-using PestanaDevApi.Constants;
+using PestanaDevApi.Constants.Messages;
 using System.Net;
 using PestanaDevApi.Interfaces.Services.Auth;
 
@@ -15,12 +15,14 @@ namespace PestanaDevApi.Services
         private readonly ILoginRepository _loginRepository;
         private readonly ITokenService _tokenService;
         private readonly IPlatformAuthService _platformAuthService;
+        private readonly ICaptchaService _captchaService;
 
-        public LoginService(ILoginRepository loginRepository, ITokenService tokenService, IPlatformAuthService platformAuthService)
+        public LoginService(ILoginRepository loginRepository, ITokenService tokenService, IPlatformAuthService platformAuthService, ICaptchaService captchaService)
         {
             _loginRepository = loginRepository;
             _tokenService = tokenService;
             _platformAuthService = platformAuthService;
+            _captchaService = captchaService;
         }
 
         /// <summary>
@@ -30,6 +32,9 @@ namespace PestanaDevApi.Services
         /// </summary>
         public async Task<AuthResponseDto> Login(LoginRequestDto request)
         {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             User? user = await GetUserByEmail(request.Email);
 
             if (user == null)

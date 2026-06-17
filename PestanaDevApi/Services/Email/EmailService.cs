@@ -1,7 +1,7 @@
 ﻿using System.Net.Mail;
 using PestanaDevApi.Models;
 using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Constants;
+using PestanaDevApi.Constants.Messages;
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Exceptions;
 using PestanaDevApi.Dtos.Responses;
@@ -16,18 +16,18 @@ namespace PestanaDevApi.Services.Email
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IConfiguration _config;
         private readonly IConfirmationCodeService _confirmationCodeGenerationService;
-        private readonly ITokenService _tokenService;
+        private readonly ICaptchaService _captchaService;
 
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService, ITokenService tokenService)
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService, ICaptchaService captchaService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
             _confirmationCodeGenerationService = codeGenerationService;
-            _tokenService = tokenService;
+            _captchaService = captchaService;
 
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
@@ -45,6 +45,9 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<EmailResponseDto> SendContactEmail(ContactEmailRequestDto request)
         {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new EmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
@@ -57,6 +60,9 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<SendConfirmationCodeEmailResponseDto> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
         {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 
@@ -72,6 +78,9 @@ namespace PestanaDevApi.Services.Email
 
         public async Task<SendConfirmationCodeEmailResponseDto> ResendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
         {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
             if (!ApiLib.IsEmailValid(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
 

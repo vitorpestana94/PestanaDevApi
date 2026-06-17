@@ -12,9 +12,7 @@ using PestanaDevApi.Services.Email;
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Interfaces.Factories;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using saideira_api.Services.Interfaces;
 using PestanaDevApi.Interfaces.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
