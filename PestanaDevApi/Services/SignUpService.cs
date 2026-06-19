@@ -1,4 +1,5 @@
-﻿using PestanaDevApi.Constants.Messages;
+﻿using System.Net;
+using PestanaDevApi.Constants.Messages;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
@@ -30,7 +31,7 @@ namespace PestanaDevApi.Services
                 return new(ErrorMessages.EmailAlreadyBeingUsed);
 
             if (!await _confirmedEmailsRepository.IsEmailConfirmed(request.Email))
-                return new(ErrorMessages.EmailNotConfirmed);
+                return new(HttpStatusCode.Forbidden, ErrorMessages.EmailNotConfirmed);
 
             User newUser = await _signUpRepository.RegisterUser(new User(request));
 

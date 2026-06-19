@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Dtos.Requests
 {
-    public class ChangePasswordRequestDto: CaptchaRequestDto
+    public class ChangePasswordRequestDto
     {
         [Required]
         public required string NewPassword { get; set; }

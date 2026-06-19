@@ -41,7 +41,7 @@ namespace PestanaDevApi.Services
                 return new(ErrorMessages.InvalidCredentials);
 
             if (user.SignupByPlatform)
-                return new(ErrorMessages.InvalidLoginEndpointUserWithPlatform);
+                return new(HttpStatusCode.Forbidden, ErrorMessages.InvalidLoginEndpointUserWithPlatform);
 
             if (user == null || PasswordVerifier.IsPasswordNotValid(dtoPassword: request.Password, userPassword: user.UserPassword))
                 return new(ErrorMessages.InvalidCredentials);

@@ -12,13 +12,11 @@ namespace PestanaDevApi.Services
     {
         private readonly IConfirmedEmailsRepository _confirmedEmailsRepository;
         private readonly IForgotPasswordRepository _forgetPasswordRepository;
-        private readonly ICaptchaService _captchaService;
 
-        public ForgotPasswordService(IConfirmedEmailsRepository confirmedEmailsRepository, IForgotPasswordRepository forgotPasswordRepository, ICaptchaService captchaService) 
+        public ForgotPasswordService(IConfirmedEmailsRepository confirmedEmailsRepository, IForgotPasswordRepository forgotPasswordRepository) 
         {
             _confirmedEmailsRepository = confirmedEmailsRepository;
             _forgetPasswordRepository = forgotPasswordRepository;
-            _captchaService = captchaService;
         }
 
         public async Task<ForgotPasswordResponseDto> ForgotPassword(ForgotPasswordRequestDto request)

@@ -9,10 +9,11 @@ namespace PestanaDevApi.Dtos.Responses
     {
         public string Message { get; set; } = string.Empty;
 
-        public HttpStatusCode StatusCode { get; set; }
-        
         [JsonIgnore]
         public bool IsSuccess { get; set; }
+
+        [JsonIgnore]
+        public HttpStatusCode StatusCode { get; set; }
 
         public DefaultResponseDto() 
         {

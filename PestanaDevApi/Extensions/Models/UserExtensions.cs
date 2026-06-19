@@ -1,4 +1,7 @@
-﻿using PestanaDevApi.Models;
+﻿using Google.Apis.Auth;
+using PestanaDevApi.Dtos.Responses;
+using System.IdentityModel.Tokens.Jwt;
+using PestanaDevApi.Models;
 
 namespace PestanaDevApi.Extensions.Models
 {

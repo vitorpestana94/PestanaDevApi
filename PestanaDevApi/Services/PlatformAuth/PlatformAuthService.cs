@@ -6,6 +6,7 @@ using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Interfaces.Services.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using PestanaDevApi.Extensions;
+using PestanaDevApi.Utils;
 
 namespace PestanaDevApi.Services.Auth
 {
@@ -54,7 +55,7 @@ namespace PestanaDevApi.Services.Auth
 
             Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.Google, response.Subject, response.Email);
 
-            return userId.IsNotEmpty() ? User.FromGoogleIdentity(response, userId) : await RegisterNewUser(new User(response));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromGoogleIdentity(response, userId) : await RegisterNewUser(new User(response));
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace PestanaDevApi.Services.Auth
 
             Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.GitHub, gitHubResponse.Id.ToString(), userEmail);
 
-            return userId.IsNotEmpty() ? User.FromGitHubIdentity(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromGitHubIdentity(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace PestanaDevApi.Services.Auth
             string userEmail = _linkedinAuthService.GetUserEmailFromJwt(jwtResponse);
             Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.Linkedin, jwtResponse.Subject, userEmail);
             
-            return userId.IsNotEmpty() ? User.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
         }
 
         /// <summary>

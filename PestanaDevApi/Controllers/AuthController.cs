@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Extensions.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
 
 namespace PestanaDevApi.Controllers
@@ -32,7 +33,7 @@ namespace PestanaDevApi.Controllers
             AuthResponseDto response = await _loginService.Login(request);
 
             if (!response.IsSuccess)
-                return Unauthorized(response);
+                return response.HandleFailure();
 
             return Ok(response.ApiTokens);
         }
@@ -43,7 +44,7 @@ namespace PestanaDevApi.Controllers
             AuthResponseDto response = await _platformService.LoginOrSignUpWithProvider(request);
 
             if (!response.IsSuccess)
-                return Unauthorized(response);
+                return response.HandleFailure();
 
             return Ok(response.ApiTokens);
         }
@@ -54,7 +55,7 @@ namespace PestanaDevApi.Controllers
             SignUpResponseDto response = await _signUpService.SignUp(request);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response.ApiTokens);
         }
@@ -65,7 +66,7 @@ namespace PestanaDevApi.Controllers
             IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response.IsRegistered);
         }
@@ -76,7 +77,7 @@ namespace PestanaDevApi.Controllers
             ForgotPasswordResponseDto response = await _forgotPasswordService.ForgotPassword(requestDto);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response);
         }

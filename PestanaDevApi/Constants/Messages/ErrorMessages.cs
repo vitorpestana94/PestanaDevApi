@@ -2,9 +2,10 @@
 {
     public static partial class ErrorMessages
     {
-        public const string InvalidCredentials = "Invalid Credentials.";
-        public const string InvalidLoginEndpointUserWithPlatform = "Invalid Login Endpoint: you registered using a platform. Please, login using platform.";
-        public const string InvalidLoginEndpointUserWithPassword = "Invalid Login Endpoint: you registered manually. Please, login using your email and password.";
+        public const string InvalidCredentials = $"{UnauthorizedTitle} Invalid Credentials.";
+        public const string InvalidLoginEndpointUserWithPlatform = $"{ForbiddenTitle} you registered using a platform. Please, login using platform.";
+        public const string InvalidLoginEndpointUserWithPassword = $"{ForbiddenTitle} you registered manually. Please, login using your email and password.";
+        public const string InvalidPlatformToken = $"{ForbiddenTitle} The provided platform token is invalid!.";
         public const string UserNotFound = $"{NotFoundTitle} user not found!";
         public const string UserBeheaviorItsNotHuman = $"{ForbiddenTitle} Google's score response indicates that user's behavior is not human.";
         #region User

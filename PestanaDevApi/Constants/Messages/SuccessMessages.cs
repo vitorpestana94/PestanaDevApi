@@ -2,7 +2,7 @@
 {
     public class SuccessMessages
     {
-        public const string DefaultSuccessMessage = "Ok!";
+        public const string DefaultSuccessMessage = "Ok";
 
         #region User
         public const string UserDataUpdated = "User data updated!";
