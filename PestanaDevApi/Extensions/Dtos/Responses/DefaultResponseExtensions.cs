@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Dtos.Responses.Failures;
 
 namespace PestanaDevApi.Extensions.Dtos.Responses
 {
@@ -11,8 +12,8 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             return dto.StatusCode switch
             {
                 HttpStatusCode.NotFound => new NotFoundObjectResult(dto),
-                HttpStatusCode.InternalServerError => new ObjectResult(dto) { StatusCode = 500 },
-                HttpStatusCode.Forbidden => new ObjectResult(dto) { StatusCode = 403 },
+                HttpStatusCode.InternalServerError => new InternalServerErrorObjectResult(dto),
+                HttpStatusCode.Forbidden => new ForbiddenObjectResult(dto),
                 HttpStatusCode.Unauthorized => new UnauthorizedObjectResult(dto),
                 _ => new BadRequestObjectResult(dto)
             };

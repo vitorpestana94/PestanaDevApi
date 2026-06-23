@@ -32,8 +32,8 @@ namespace PestanaDevApi.Services
         /// </summary>
         public async Task<AuthResponseDto> Login(LoginRequestDto request)
         {
-            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
-                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+            //if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+            //    return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
 
             User? user = await GetUserByEmail(request.Email);
 

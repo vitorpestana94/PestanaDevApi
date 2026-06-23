@@ -33,6 +33,11 @@ namespace PestanaDevApi.Services
             return new ApiToken(CreateJwtToken(user), await CreatetRefreshToken(user.Id, deviceId));
         }
 
+        public ApiToken GenerateApiTokensWithRefreshToken(User user, string refreshToken)
+        {
+            return new ApiToken(CreateJwtToken(user), refreshToken);
+        }
+
         public async Task DeleteExpiredRefreshTokens()
         {
             await _tokenRepository.DeleteExpiredRefreshTokens();
@@ -41,6 +46,11 @@ namespace PestanaDevApi.Services
         public string GenerateResendConfirmationCodeJwt(ConfirmationCodeEmailRequestDto dto, string code)
         {
             return CreateJwtToken(dto, code);
+        }
+
+        public Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto)
+        {
+            return _tokenRepository.GetAndUpdateRefreshToken(dto, GenerateRefreshToken());
         }
 
         #region Private Methods

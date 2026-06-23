@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Exceptions;
 using PestanaDevApi.Extensions.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Services;
 
 namespace PestanaDevApi.Controllers
 {
@@ -17,14 +19,16 @@ namespace PestanaDevApi.Controllers
         private readonly ISignUpService _signUpService;
         private readonly IPlatformService _platformService;
         private readonly IForgotPasswordService _forgotPasswordService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public AuthController(ILoginService loginService, ISignUpService signUpService, 
-            IPlatformService platformService, IForgotPasswordService forgotPasswordService)
+        public AuthController(ILoginService loginService, ISignUpService signUpService, IPlatformService platformService, 
+            IForgotPasswordService forgotPasswordService, IRefreshTokenService refreshTokenService)
         {
             _loginService = loginService;
             _signUpService = signUpService;
             _platformService = platformService;
             _forgotPasswordService = forgotPasswordService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost]
@@ -80,6 +84,17 @@ namespace PestanaDevApi.Controllers
                 return response.HandleFailure();
 
             return Ok(response);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
+        {
+            AuthResponseDto? response = await _refreshTokenService.RefreshToken(request);
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response.ApiTokens);
         }
     }
 }

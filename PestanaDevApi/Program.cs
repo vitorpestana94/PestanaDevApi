@@ -96,6 +96,8 @@ builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICaptchaService, CaptchaService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
@@ -113,6 +115,7 @@ builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();
 builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 #endregion
 

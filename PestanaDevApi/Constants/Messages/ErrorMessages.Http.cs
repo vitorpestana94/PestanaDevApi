@@ -6,7 +6,7 @@
         public const string Unauthorized = $" You do not have permission to access this resource!";
         public const string DefaultMessage = "Something went wrong!";
         public const string NotFound = $"the resource was not found.";
-        public const string UnsupportedMediaType = "Unsupported Media Type: you requested with a wrong type of media!";
+        public const string UnsupportedMediaType = "You requested with a wrong type of media!";
         public const string InternalServerError = $"An unexpected error occurred.";
     }
 }

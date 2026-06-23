@@ -1,4 +1,6 @@
-﻿namespace PestanaDevApi.Interfaces.Repositories
+﻿using PestanaDevApi.Dtos.Requests;
+
+namespace PestanaDevApi.Interfaces.Repositories
 {
     public interface ITokenRepository
     {
@@ -19,5 +21,7 @@
         /// </para>
         /// </summary>
         Task DeleteExpiredRefreshTokens();
+
+        Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto, string refreshToken);
     }
 }

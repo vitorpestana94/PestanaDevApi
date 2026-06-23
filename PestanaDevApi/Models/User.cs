@@ -107,7 +107,7 @@ namespace PestanaDevApi.Models
         /// </summary>
         public User(JwtSecurityToken jwt, string userId, string userEmail)
         {
-            UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
+            UserName = jwt.Claims.First(c => c.Type == "name").Value;
             UserEmail = userEmail;
             UserPassword = "";
             UserSignUpPlatform = PlatformEnum.Linkedin;

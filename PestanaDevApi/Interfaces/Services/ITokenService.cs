@@ -12,7 +12,6 @@ namespace PestanaDevApi.Interfaces.Services
         /// <returns>A Base64-encoded string representing the refresh token.</returns>
         Task<ApiToken> GenerateApiTokens(User user, string deviceId);
 
-
         /// <summary>
         /// Updates refresh tokens that are still valid within a specific time window.
         /// <para>
@@ -21,5 +20,8 @@ namespace PestanaDevApi.Interfaces.Services
         /// </para>
         /// </summary>
         Task DeleteExpiredRefreshTokens();
+
+        ApiToken GenerateApiTokensWithRefreshToken(User user, string refreshToken);
+        Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto);
     }
 }

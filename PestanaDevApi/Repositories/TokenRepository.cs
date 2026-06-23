@@ -5,6 +5,7 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Extensions;
 using Sql = PestanaDevApi.Constants.Queries.TokenQueries;
 using Params = PestanaDevApi.Utils.DapperParams;
+using PestanaDevApi.Dtos.Requests;
 
 namespace PestanaDevApi.Repositories
 {
@@ -40,6 +41,14 @@ namespace PestanaDevApi.Repositories
             using IDbConnection db = _factory.CreateConnection();
 
             await db.ExecuteAsync(Sql.DeleteExpiredRefreshTokens);
+        }
+
+        public async Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto, string refreshToken)
+        {
+            if (!await UpdateRefreshToken(dto.UserId, dto.DeviceId, refreshToken))
+                return null;
+
+            return refreshToken;
         }
 
         #region Private Methods
