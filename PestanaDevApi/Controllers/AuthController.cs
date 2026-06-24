@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
-using PestanaDevApi.Exceptions;
 using PestanaDevApi.Extensions.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
-using PestanaDevApi.Services;
+using PestanaDevApi.Extensions;
 
 namespace PestanaDevApi.Controllers
 {
@@ -95,6 +94,15 @@ namespace PestanaDevApi.Controllers
                 return response.HandleFailure();
 
             return Ok(response.ApiTokens);
+        }
+
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> LogoutUser()
+        {
+            await _loginService.LogoutUser(User.GetUserId(), User.GetDeviceId());
+
+            return Ok();
         }
     }
 }

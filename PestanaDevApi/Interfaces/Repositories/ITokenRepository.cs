@@ -11,7 +11,7 @@ namespace PestanaDevApi.Interfaces.Repositories
         /// <param name="deviceId">The unique identifier of the device. It's a UUID.</param>
         /// <param name="refreshToken">The refresh token.</param>
         /// </summary>
-        Task InsertOrUpdateRefreshToken(Guid userId, string deviceId, string refreshToken);
+        Task InsertRefreshToken(Guid userId, string deviceId, string refreshToken);
 
         /// <summary>
         /// Updates refresh tokens that are still valid within a specific time window.
@@ -22,6 +22,6 @@ namespace PestanaDevApi.Interfaces.Repositories
         /// </summary>
         Task DeleteExpiredRefreshTokens();
 
-        Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto, string refreshToken);
+        Task<string?> UpdateRefreshToken(RefreshTokenRequestDto dto, string refreshToken);
     }
 }

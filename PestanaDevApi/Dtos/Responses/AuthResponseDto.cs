@@ -6,6 +6,7 @@ namespace PestanaDevApi.Dtos.Responses
     public class AuthResponseDto: DefaultResponseDto
     {
         public ApiToken? ApiTokens { get; set; } = null;
+        public string DeviceId { get; set; } = string.Empty;
 
         public AuthResponseDto()
         {

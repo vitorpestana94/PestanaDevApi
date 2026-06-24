@@ -9,9 +9,6 @@ namespace PestanaDevApi.Dtos.Requests
         public PlatformEnum Platform { get; set; }
 
         [Required]
-        public string DeviceId { get; set; } = string.Empty;
-
-        [Required]
         public string Token { get; set; } = string.Empty;
     }
 }

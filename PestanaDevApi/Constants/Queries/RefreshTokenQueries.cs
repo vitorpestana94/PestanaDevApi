@@ -19,6 +19,6 @@
         AND 
             rt.device_id = @DeviceId 
         AND 
-            expired_at > @UtcNow;";
+            expired_at > NOW();";
     }
 }

@@ -8,5 +8,6 @@ namespace PestanaDevApi.Interfaces.Repositories
         Task<User?> GetUserDataByEmail(string email);
         Task<Guid> GetUserIdByPlatformId(PlatformEnum platform, string platformId);
         Task<Guid> GetUserIdByEmail(string email);
+        Task DeleteRefreshToken(Guid userId, string deviceId);
     }
 }

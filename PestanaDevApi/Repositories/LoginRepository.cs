@@ -43,5 +43,12 @@ namespace PestanaDevApi.Repositories
                 PId = platformId 
             });
         }
+
+        public async Task DeleteRefreshToken(Guid userId, string deviceId)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteRefreshToken, new { UserId = userId, DeviceId = deviceId });
+        }
     }
 }

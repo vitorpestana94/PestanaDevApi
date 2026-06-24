@@ -4,7 +4,7 @@
     {
         public static object ToUserEmail(string userEmail) => new { UserEmail = userEmail };
 
-        public static object ToUpsertRefreshToken(Guid userId, string deviceId, string token) =>
+        public static object ToInsertRefreshToken(Guid userId, string deviceId, string token) =>
         new
         {
             Token = token,

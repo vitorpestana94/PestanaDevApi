@@ -32,7 +32,7 @@ namespace PestanaDevApi.Services
             if (user == null) // If the user is null, it means that the provided token is not valid for the requested platform.
                 return new(HttpStatusCode.Forbidden);
 
-            return new(await _tokenService.GenerateApiTokens(user, request.DeviceId));
+            return new(await _tokenService.GenerateApiTokens(user));
         }
     }
 }

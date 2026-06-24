@@ -32,8 +32,8 @@ namespace PestanaDevApi.Services
         /// </summary>
         public async Task<AuthResponseDto> Login(LoginRequestDto request)
         {
-            //if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
-            //    return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
 
             User? user = await GetUserByEmail(request.Email);
 
@@ -46,7 +46,7 @@ namespace PestanaDevApi.Services
             if (user == null || PasswordVerifier.IsPasswordNotValid(dtoPassword: request.Password, userPassword: user.UserPassword))
                 return new(ErrorMessages.InvalidCredentials);
 
-            return new(await _tokenService.GenerateApiTokens(user, request.DeviceId));
+            return new(await _tokenService.GenerateApiTokens(user));
         }
 
         /// <summary>
@@ -66,7 +66,12 @@ namespace PestanaDevApi.Services
             if (!user.SignupByPlatform) // This will probably never happen here; but this line of code is here as a safeguard.
                 return new(ErrorMessages.InvalidLoginEndpointUserWithPassword);
 
-            return new(await _tokenService.GenerateApiTokens(user, request.DeviceId));
+            return new(await _tokenService.GenerateApiTokens(user));
+        }
+
+        public async Task LogoutUser(Guid userId, string deviceId)
+        {
+            await _loginRepository.DeleteRefreshToken(userId, deviceId);
         }
 
         #region Private Methods

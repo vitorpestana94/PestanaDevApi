@@ -9,8 +9,16 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
         {
             UserId = dto.UserId.ToString(),
             dto.Token,
+            dto.DeviceId
+        };
+
+        public static object ToUpdateDeviceIdAndRefreshToken(this RefreshTokenRequestDto dto, string refreshToken) =>
+        new
+        {
+            UserId = dto.UserId.ToString(),
+            Token = refreshToken,
             dto.DeviceId,
-            DateTime.UtcNow
+            ExpiredAt = DateTime.UtcNow.AddDays(2),
         };
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 using PestanaDevApi.Dtos.Requests;
-using Consts = PestanaDevApi.Constants.ClaimsConstants;
 
 namespace PestanaDevApi.Services
 {
@@ -28,14 +27,16 @@ namespace PestanaDevApi.Services
                 throw new InvalidOperationException("JWT key not configured!");
         }
 
-        public async Task<ApiToken> GenerateApiTokens(User user, string deviceId)
+        public async Task<ApiToken> GenerateApiTokens(User user)
         {
-            return new ApiToken(CreateJwtToken(user), await CreatetRefreshToken(user.Id, deviceId));
+            string deviceId = GetDeviceId();
+
+            return new ApiToken(CreateJwtToken(user, deviceId), await CreatetRefreshToken(user.Id, deviceId));
         }
 
-        public ApiToken GenerateApiTokensWithRefreshToken(User user, string refreshToken)
+        public ApiToken GenerateApiTokensWithRefreshToken(User user, string deviceId, string refreshToken)
         {
-            return new ApiToken(CreateJwtToken(user), refreshToken);
+            return new ApiToken(CreateJwtToken(user, deviceId), refreshToken);
         }
 
         public async Task DeleteExpiredRefreshTokens()
@@ -43,15 +44,12 @@ namespace PestanaDevApi.Services
             await _tokenRepository.DeleteExpiredRefreshTokens();
         }
 
-        public string GenerateResendConfirmationCodeJwt(ConfirmationCodeEmailRequestDto dto, string code)
-        {
-            return CreateJwtToken(dto, code);
-        }
-
         public Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto)
         {
-            return _tokenRepository.GetAndUpdateRefreshToken(dto, GenerateRefreshToken());
+            return _tokenRepository.UpdateRefreshToken(dto, GenerateRefreshToken());
         }
+
+        public string GetDeviceId() => Guid.NewGuid().ToString();
 
         #region Private Methods
         /// <summary>
@@ -62,7 +60,7 @@ namespace PestanaDevApi.Services
         {
             string refreshToken = GenerateRefreshToken();
 
-            await _tokenRepository.InsertOrUpdateRefreshToken(userId, deviceId, refreshToken);
+            await _tokenRepository.InsertRefreshToken(userId, deviceId, refreshToken);
 
             return refreshToken;
         }
@@ -87,20 +85,9 @@ namespace PestanaDevApi.Services
         /// <param name="userId">The unique identifier of the user.</param>
         /// <returns>A JWT token as a string.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
-        private string CreateJwtToken(User user)
+        private string CreateJwtToken(User user, string deviceId)
         {
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user)));
-        }
-
-        /// <summary>
-        /// Generates a JWT access token for a specific user.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the user.</param>
-        /// <returns>A JWT token as a string.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
-        private string CreateJwtToken(ConfirmationCodeEmailRequestDto dto, string code)
-        {
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(dto, code), expires: DateTime.UtcNow.AddMinutes(3)));
+            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user, deviceId)));
         }
 
         /// <summary>
@@ -109,7 +96,7 @@ namespace PestanaDevApi.Services
         /// <param name="userId">The unique identifier of the user.</param>
         /// <returns>A JWT claims.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
-        private List<Claim> GetTokenClaims(User user)
+        private List<Claim> GetTokenClaims(User user, string deviceId)
         {
             return
             [
@@ -117,29 +104,8 @@ namespace PestanaDevApi.Services
                 new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
                 new(JwtRegisteredClaimNames.Email, user.UserEmail),
                 new(JwtRegisteredClaimNames.Name, user.UserName),
-                new(JwtRegisteredClaimNames.Sub, user.Id.ToString())
-            ];
-        }
-
-        /// <summary>
-        /// Generates a JWT claims.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the user.</param>
-        /// <returns>A JWT claims.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if the JWT Issuer is not configured.</exception>
-        private List<Claim> GetTokenClaims(ConfirmationCodeEmailRequestDto dto, string code)
-        {
-            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            return
-            [
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
-                new(JwtRegisteredClaimNames.Email, dto.ClientEmail),
-                new(JwtRegisteredClaimNames.Locale, dto.ClientLocale),
-                new(JwtRegisteredClaimNames.Sub, dto.ClientEmail),
-                new(Consts.Code, code),
-                new(Consts.Purpose, Consts.EmailConfirmation)
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Sid, deviceId)
             ];
         }
 

@@ -14,6 +14,7 @@ using PestanaDevApi.Interfaces.Factories;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using PestanaDevApi.Interfaces.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,18 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            return new BadRequestObjectResult(new
+            {
+                status = 400,
+                message = "Validation error"
+            });
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -31,7 +31,7 @@ namespace PestanaDevApi.Services
             if (string.IsNullOrEmpty(refreshToken))
                 return new AuthResponseDto(HttpStatusCode.InternalServerError, ErrorMessages.InternalServerError);
 
-            return new(_tokenService.GenerateApiTokensWithRefreshToken(data, refreshToken));
+            return new(_tokenService.GenerateApiTokensWithRefreshToken(data, request.DeviceId, refreshToken));
         }
     }
 }

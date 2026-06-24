@@ -37,7 +37,7 @@ namespace PestanaDevApi.Services
 
             await _confirmedEmailsRepository.DeleteEmailConfirmation(request.Email);
 
-            return new (await _tokenService.GenerateApiTokens(newUser, deviceId: request.DeviceId));
+            return new (await _tokenService.GenerateApiTokens(newUser));
         }
 
         public async Task<IsEmailAlreadyRegisteredResponseDto> IsEmailAlreadyRegistered(string email)

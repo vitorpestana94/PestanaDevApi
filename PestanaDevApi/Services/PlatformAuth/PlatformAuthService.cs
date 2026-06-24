@@ -4,9 +4,9 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Models;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Interfaces.Services.Auth;
-using System.IdentityModel.Tokens.Jwt;
 using PestanaDevApi.Extensions;
 using PestanaDevApi.Utils;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Services.Auth
 {

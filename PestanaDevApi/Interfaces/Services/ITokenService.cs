@@ -10,7 +10,7 @@ namespace PestanaDevApi.Interfaces.Services
         /// It returns an object that contains both the JWT token and the refresh token.
         /// </summary>
         /// <returns>A Base64-encoded string representing the refresh token.</returns>
-        Task<ApiToken> GenerateApiTokens(User user, string deviceId);
+        Task<ApiToken> GenerateApiTokens(User user);
 
         /// <summary>
         /// Updates refresh tokens that are still valid within a specific time window.
@@ -20,8 +20,8 @@ namespace PestanaDevApi.Interfaces.Services
         /// </para>
         /// </summary>
         Task DeleteExpiredRefreshTokens();
-
-        ApiToken GenerateApiTokensWithRefreshToken(User user, string refreshToken);
+        ApiToken GenerateApiTokensWithRefreshToken(User user, string deviceId, string refreshToken);
         Task<string?> GetAndUpdateRefreshToken(RefreshTokenRequestDto dto);
+        string GetDeviceId();
     }
 }

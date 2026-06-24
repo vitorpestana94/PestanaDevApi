@@ -27,5 +27,12 @@
             user_signup_platform = @Platform
         AND   
             user_platform_id = @PId;";
+
+        public const string DeleteRefreshToken = @"
+        DELETE FROM REFRESH_TOKEN
+        WHERE 
+            user_profile_id = @UserId
+        AND
+            device_id = @DeviceId;";
     }
 }

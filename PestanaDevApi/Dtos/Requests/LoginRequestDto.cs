@@ -10,7 +10,5 @@ namespace PestanaDevApi.Dtos.Requests
         [Required]
         public string Password { get; set; } = string.Empty;
 
-        [Required]
-        public string DeviceId { get; set; } = string.Empty;
     }
 }
