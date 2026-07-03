@@ -4,7 +4,7 @@ namespace PestanaDevApi.Dtos.Responses
 {
     public class IsEmailAlreadyRegisteredResponseDto: DefaultResponseDto
     {
-        public IsEmailRegistered? IsRegistered { get; set; }
+        public bool IsRegistered { get; set; }
 
         public IsEmailAlreadyRegisteredResponseDto()
         {
@@ -16,22 +16,11 @@ namespace PestanaDevApi.Dtos.Responses
 
         public IsEmailAlreadyRegisteredResponseDto(bool isRegistered) : base()
         {
-            IsRegistered = new(isRegistered);
+            IsRegistered = isRegistered;
         }
 
         public IsEmailAlreadyRegisteredResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
         {
-        }
-
-        public class IsEmailRegistered
-        {
-            public bool IsRegistered { get; set; }
-
-            public IsEmailRegistered() { }
-            public IsEmailRegistered(bool isRegistered)
-            {
-                IsRegistered = isRegistered;
-            }
         }
     }
 }

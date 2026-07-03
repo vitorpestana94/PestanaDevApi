@@ -17,17 +17,20 @@ namespace PestanaDevApi.Services.Email
         private readonly IConfiguration _config;
         private readonly IConfirmationCodeService _confirmationCodeGenerationService;
         private readonly ICaptchaService _captchaService;
+        private readonly ISignUpService _signUpService;
 
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService, ICaptchaService captchaService)
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService,
+            ICaptchaService captchaService, ISignUpService signUpService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
             _confirmationCodeGenerationService = codeGenerationService;
             _captchaService = captchaService;
+            _signUpService = signUpService;
 
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
@@ -68,6 +71,11 @@ namespace PestanaDevApi.Services.Email
 
             if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
+
+            IsEmailAlreadyRegisteredResponseDto responseDto = await _signUpService.IsEmailAlreadyRegistered(request.ClientEmail);
+
+            if (responseDto?.IsRegistered ?? false) // Return 200 here to avoid sending an email to a user that already have an registered email.
+                return new();
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
 
