@@ -6,6 +6,7 @@ using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Exceptions;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Utils;
+using PestanaDevApi.Models.Enums;
 using System.Net;
 using PestanaDevApi.Interfaces.Services;
 
@@ -72,10 +73,13 @@ namespace PestanaDevApi.Services.Email
             if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
                 return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
 
-            IsEmailAlreadyRegisteredResponseDto responseDto = await _signUpService.IsEmailAlreadyRegistered(request.ClientEmail);
+            if (request.ConfirmationCodeEmailType == ConfirmationCodeEmailTypeEnum.SignUp)
+            {
+                IsEmailAlreadyRegisteredResponseDto responseDto = await _signUpService.IsEmailAlreadyRegistered(request.ClientEmail);
 
-            if (responseDto?.IsRegistered ?? false) // Return 200 here to avoid sending an email to a user that already have an registered email.
-                return new();
+                if (responseDto?.IsRegistered ?? false) // Return 200 here to avoid sending an email to a user that already have an registered email.
+                    return new();
+            }
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
 

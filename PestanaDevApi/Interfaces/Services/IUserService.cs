@@ -7,7 +7,7 @@ namespace PestanaDevApi.Interfaces.Services
     {
         Task<GetUserResponseDto> GetUser(Guid userId);
         Task<ChangeUserDataResponseDto> ChangeUserData(ChangeUserDataRequestDto dto, Guid userId);
-        Task<DeleteUserResponseDto> DeleteUser(DeleteUserRequestDto dto, Guid userId);
+        Task<DeleteUserResponseDto> DeleteUser(Guid userId);
         Task<ChangePasswordResponseDto> ChangeUserPassword(ChangePasswordRequestDto dto, Guid userId);
     }
 }

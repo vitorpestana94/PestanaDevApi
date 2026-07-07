@@ -64,7 +64,7 @@ namespace PestanaDevApi.Services
             return new();
         }
 
-        public async Task<DeleteUserResponseDto> DeleteUser(DeleteUserRequestDto dto, Guid userId)
+        public async Task<DeleteUserResponseDto> DeleteUser(Guid userId)
         {
             User? user = await _repository.GetUser(userId);
 

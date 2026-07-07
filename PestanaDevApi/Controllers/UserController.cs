@@ -34,7 +34,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> ChangeUserData(ChangeUserDataRequestDto dto)
+        public async Task<IActionResult> ChangeUserData([FromBody] ChangeUserDataRequestDto dto)
         {
             ChangeUserDataResponseDto response = await _service.ChangeUserData(dto, UserId);
 
@@ -45,7 +45,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPatch("password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto dto)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto dto)
         {
             ChangePasswordResponseDto response = await _service.ChangeUserPassword(dto, UserId);
 
@@ -56,9 +56,9 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser(DeleteUserRequestDto dto)
+        public async Task<IActionResult> DeleteUser()
         {
-            DeleteUserResponseDto response = await _service.DeleteUser(dto, UserId);
+            DeleteUserResponseDto response = await _service.DeleteUser(UserId);
 
             if (!response.IsSuccess)
                return response.HandleFailure();
