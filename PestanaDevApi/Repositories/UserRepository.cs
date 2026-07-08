@@ -35,9 +35,14 @@ namespace PestanaDevApi.Repositories
 
         public async Task<bool> DeleteUserData(Guid userId)
         {
+            int rowsDeleted = 0;
+
             using IDbConnection db = _factory.CreateConnection();
 
-             return await db.ExecuteAsync(Sql.DeleteUser, Params.ToUserId(userId)) > 0;
+            rowsDeleted += await db.ExecuteAsync(Sql.DeleteUserRefreshToken, Params.ToUserId(userId));
+            rowsDeleted += await db.ExecuteAsync(Sql.DeleteUser, Params.ToUserId(userId));
+
+            return rowsDeleted > 0;
         }
 
         public async Task<bool> ChangeUserPassword(ChangePasswordRequestDto dto, Guid userId)

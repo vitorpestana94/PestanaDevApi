@@ -33,6 +33,12 @@
         WHERE
             user_id = @UserId;";
 
+        public const string DeleteUserRefreshToken = @"
+        DELETE FROM 
+            REFRESH_TOKEN
+        WHERE
+           user_profile_id = @UserId;";
+
         public const string UpdateUserPassword = @"
         UPDATE
             USERS_PROFILE_DATA
