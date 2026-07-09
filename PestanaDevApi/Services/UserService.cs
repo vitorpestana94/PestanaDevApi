@@ -33,7 +33,6 @@ namespace PestanaDevApi.Services
             return new(user);
         }
 
-
         public async Task<ChangeUserDataResponseDto> ChangeUserData(ChangeUserDataRequestDto dto, Guid userId)
         {
             if (dto.WasDataNotUpdated())
