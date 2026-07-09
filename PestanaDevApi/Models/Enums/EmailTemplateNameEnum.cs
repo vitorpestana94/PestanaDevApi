@@ -1,10 +1,11 @@
 ﻿namespace PestanaDevApi.Models.Enums
 {
-    public enum EmailTemplateName
+    public enum EmailTemplateNameEnum
     {
         ContactEmail,
         ContactEmailClientConfirmation,
         EmailConfirmation,
-        UserRegistered
+        UserRegistered,
+        CodeConfirmationEmail
     }
 }

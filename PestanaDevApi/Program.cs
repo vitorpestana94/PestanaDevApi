@@ -10,6 +10,11 @@ using PestanaDevApi.Services.Auth;
 using PestanaDevApi.Interfaces.Services.Auth;
 using PestanaDevApi.Services.Email;
 using PestanaDevApi.Interfaces.Services.Email;
+using PestanaDevApi.Interfaces.Factories;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using PestanaDevApi.Interfaces.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +23,38 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            return new BadRequestObjectResult(new
+            {
+                status = 400,
+                message = "Validation error"
+            });
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Rate Limiting
+//builder.Services.AddRateLimiter(options => Depois preciso ver como deixar isso mais maleável porém seguro, principalmente nos endpoints q mandam emails.
+//{
+//    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+//    {
+//        string? ip = context.Connection.RemoteIpAddress?.ToString();
+
+//        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
+//            new FixedWindowRateLimiterOptions
+//            {
+//                PermitLimit = 20,
+//                Window = TimeSpan.FromMinutes(30),
+//                QueueLimit = 0
+//            });
+//    });
+//});
+
 
 // Setup secrets.
 LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Configuration);
@@ -27,8 +62,39 @@ LocalSecretManagerConfig.Setup(builder.Environment.EnvironmentName, builder.Conf
 // Setup Database connection
 DbConfig.Setup(builder.Configuration, builder.Services);
 
-#region Services
+// Setup Quartz
+DbConfig.SetupQuartz(builder.Configuration, builder.Services);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = builder.Configuration["jwt.issuer"],
+
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Convert.FromBase64String(builder.Configuration["jwt.key"]!)
+        )
+    };
+});
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+#region Factories
+builder.Services.AddSingleton<IDbConnectionFactory, MySqlConnectionFactory>();
+#endregion
+
+#region Services
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -39,6 +105,12 @@ builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IGitHubAuthService, GitHubAuthService>();
 builder.Services.AddScoped<ILinkedinAuthService, LinkedinAuthService>();
+builder.Services.AddScoped<IConfirmationCodeService, ConfirmationCodeService>();
+builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICaptchaService, CaptchaService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 {
@@ -49,30 +121,31 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
 #endregion
 
 #region Repositories
-
 builder.Services.AddScoped<ISignUpRepository, SignUpRepository>();
+builder.Services.AddScoped<IConfirmedEmailsRepository, ConfirmedEmailsRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCodeGenerationRepository>();
+builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 #endregion
 
-var app = builder.Build();
+#region Utils
+builder.Services.AddScoped<IGoogleApisHttpClient, GoogleApisHttpClient>();
+builder.Services.AddHttpClient<GoogleApisHttpClient>();
+#endregion
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var app = builder.Build();
 
 app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>
     {
-        context.Response.ContentType = "application/json";
+        ILogger logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
         Exception? error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
         int statusCode = error switch
         {
             ApiException apiEx => apiEx.StatusCode,
@@ -84,18 +157,30 @@ app.UseExceptionHandler(builder =>
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
 
-        await context.Response.WriteAsJsonAsync(new
+        logger.LogError(error, "Unhandled exception");
+
+        var response = new
         {
             status = statusCode,
-            message = ApiLib.GetErrorMessage(statusCode, error, app.Environment.IsDevelopment()),
-            stackTrace = app.Environment.IsDevelopment() ? error?.StackTrace : null
-        });
+            message = GetHttpMessage.Get(statusCode),
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
     });
 });
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+//app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
 
 namespace PestanaDevApi.Utils
 {
@@ -23,20 +22,19 @@ namespace PestanaDevApi.Utils
             return emailRegex.IsMatch(email);
         }
 
-        /// <summary>
-        /// Returns the error message by the thrown error and it status code.
-        /// <param name="error">The thrown error</param>
-        /// <param name="statusCode">The thrown error status code</param>
-        /// <returns>
-        /// Error message
-        /// </returns>
-        /// </summary>
-        public static string GetErrorMessage(int statusCode, Exception? error, bool isDevMode)
+        public static string GenerateRandomCode(int codeLenght = 4)
         {
-            if (statusCode == 500 && !isDevMode)
-                return "Ocorreu um erro interno inesperado. Tente novamente mais tarde.";
+            return Guid.NewGuid().ToString().Replace("-", "")[..codeLenght];
+        }
 
-            return error?.Message ?? "Erro desconhecido.";
+        public static bool IsInvalidSecondsGap(string issuedAt, int seconds = 30)
+        {
+            if (string.IsNullOrEmpty(issuedAt))
+                return true;
+
+            DateTime iat = DateTimeOffset.FromUnixTimeSeconds(long.Parse(issuedAt)).UtcDateTime;
+
+            return (DateTime.UtcNow - iat) <= TimeSpan.FromSeconds(seconds);
         }
     }
 }

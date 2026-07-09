@@ -2,7 +2,7 @@
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Constants.Email;
-using PestanaDevApi.Utils;
+using Replace = PestanaDevApi.Utils.ReplaceEmailVariables;
 
 namespace PestanaDevApi.Services.Email
 {
@@ -12,28 +12,36 @@ namespace PestanaDevApi.Services.Email
 
         public EmailTemplateService() 
         {
-            _templatesDirectory= EmailConstants.TemplatesDirectory;
+            _templatesDirectory = EmailConstants.TemplatesDirectory;
         }
 
         public async Task<string> GetEmailTemplate(ContactEmailRequestDto request, bool isContactEmailClientConfirmation = false)
         {
-            string emailTemplate = await GetEmailTemplateString(isContactEmailClientConfirmation ? EmailTemplateName.ContactEmailClientConfirmation : EmailTemplateName.ContactEmail);
+            string emailTemplate = await GetEmailTemplateString(isContactEmailClientConfirmation ? EmailTemplateNameEnum.ContactEmailClientConfirmation : EmailTemplateNameEnum.ContactEmail);
 
             return ReplaceEmailVariables(request, isContactEmailClientConfirmation,  emailTemplate);
         }
 
-        #region Private Methods
-        private async Task<string> GetEmailTemplateString(EmailTemplateName templateName)
+        public async Task<string> GetEmailTemplate(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
-            return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, $"{templateName}.html"));
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateNameEnum.CodeConfirmationEmail);
+
+            return Replace.ReplaceConfirmationCodetVariables(request, emailTemplate, confirmationCodes); ;
+        }
+
+        #region Private Methods
+        private async Task<string> GetEmailTemplateString(EmailTemplateNameEnum templateName)
+        {
+            return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, EmailConstants.GetTemplateHtml(templateName)));
         }
 
         private static string ReplaceEmailVariables(ContactEmailRequestDto requestDto, bool isContactEmailClientConfirmation, string emailTemplate)
         {
             return isContactEmailClientConfirmation ?
-                Utils.ReplaceEmailVariables.ReplaceVariables(requestDto, emailTemplate):
-                Utils.ReplaceEmailVariables.ReplaceAdminEmailContactVariables(requestDto, emailTemplate); 
+                Replace.ReplaceClientContactVariables(requestDto, emailTemplate):
+                Replace.ReplaceAdminEmailContactVariables(requestDto, emailTemplate); 
         }
+
         #endregion
     }
 }

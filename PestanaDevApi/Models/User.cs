@@ -1,8 +1,8 @@
 ﻿using Google.Apis.Auth;
-using Newtonsoft.Json.Linq;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Models.Enums;
+using PestanaDevApi.Utils;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Models
@@ -13,9 +13,9 @@ namespace PestanaDevApi.Models
         public string UserName { get; set; }
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
-        public string? UserPicture { get; set; }
+        public bool SignupByPlatform { get; set; }
         public string? UserPlatformId { get; set; }
-        public Platform? UserSignUpPlatform { get; set; }
+        public PlatformEnum? UserSignUpPlatform { get; set; }
 
         public User() 
         {
@@ -23,7 +23,6 @@ namespace PestanaDevApi.Models
             UserName = string.Empty;
             UserEmail = string.Empty;
             UserPassword = string.Empty;
-            UserPicture = string.Empty;
         }
 
         /// <summary>
@@ -34,8 +33,7 @@ namespace PestanaDevApi.Models
         {
             UserName = dto.Name;
             UserEmail = dto.Email;
-            UserPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-            UserPicture = dto.Picture;
+            UserPassword = HashFactory.HashPassword(dto.Password);
         }
 
         /// <summary>
@@ -47,8 +45,7 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserPicture = googlePayload.Picture;
-            UserSignUpPlatform = Platform.Google;
+            UserSignUpPlatform = PlatformEnum.Google;
             UserPlatformId = googlePayload.Subject;
         }
 
@@ -62,8 +59,7 @@ namespace PestanaDevApi.Models
             UserName = googlePayload.Name;
             UserEmail = googlePayload.Email;
             UserPassword = "";
-            UserPicture = googlePayload.Picture;
-            UserSignUpPlatform = Platform.Google;
+            UserSignUpPlatform = PlatformEnum.Google;
         }
 
         /// <summary>
@@ -75,8 +71,7 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = responseDto.AvatarUrl;
-            UserSignUpPlatform = Platform.GitHub;
+            UserSignUpPlatform = PlatformEnum.GitHub;
             UserPlatformId = responseDto.Id.ToString();
         }
 
@@ -90,8 +85,7 @@ namespace PestanaDevApi.Models
             UserName = responseDto.Username;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = responseDto.AvatarUrl;
-            UserSignUpPlatform = Platform.GitHub;
+            UserSignUpPlatform = PlatformEnum.GitHub;
         }
 
         /// <summary>
@@ -104,8 +98,7 @@ namespace PestanaDevApi.Models
             UserName = jwt.Claims.First(c => c.Type == "name").Value;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
-            UserSignUpPlatform = Platform.Linkedin;
+            UserSignUpPlatform = PlatformEnum.Linkedin;
         }
 
         /// <summary>
@@ -114,39 +107,11 @@ namespace PestanaDevApi.Models
         /// </summary>
         public User(JwtSecurityToken jwt, string userId, string userEmail)
         {
-            UserName = jwt.Claims.First(c => c.Type == "name").Value; ;
+            UserName = jwt.Claims.First(c => c.Type == "name").Value;
             UserEmail = userEmail;
             UserPassword = "";
-            UserPicture = jwt.Claims.First(c => c.Type == "picture").Value;
-            UserSignUpPlatform = Platform.Linkedin;
+            UserSignUpPlatform = PlatformEnum.Linkedin;
             UserPlatformId = userId;
-        }
-
-        /// <summary>
-        /// Creates an instance of a user who is already registered in the system
-        /// based on data returned by Google.
-        /// </summary>
-        public static User FromGoogleIdentity(GoogleJsonWebSignature.Payload googlePayload, Guid userId)
-        {
-            return new User(googlePayload, userId);
-        }
-
-        /// <summary>
-        /// Creates an instance of a user who is already registered in the system
-        /// based on data returned by GitHub.
-        /// </summary>
-        public static User FromGitHubIdentity(GithubResponseDto responseDto, Guid userId, string userEmail)
-        {
-            return new User(responseDto, userId, userEmail);
-        }
-
-        /// <summary>
-        /// Creates an instance of a user who is already registered in the system
-        /// based on data returned by Linkedin.
-        /// </summary>
-        public static User FromLinkedinIdentity(JwtSecurityToken jwt, Guid userId, string userEmail)
-        {
-            return new User(jwt, userId, userEmail);
         }
     }
 }

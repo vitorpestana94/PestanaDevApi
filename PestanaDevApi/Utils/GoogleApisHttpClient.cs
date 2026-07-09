@@ -1,0 +1,77 @@
+﻿using System.Text.Json;
+using System.Text;
+using System.Net;
+using PestanaDevApi.Interfaces.Utils;
+using PestanaDevApi.Dtos.Responses;
+using Consts = PestanaDevApi.Constants.GoogleConstants.GoogleApisHttpClient;
+
+namespace PestanaDevApi.Utils
+{
+    public class GoogleApisHttpClient : IGoogleApisHttpClient
+    {
+        private readonly IConfiguration _config;
+        private readonly HttpClient _http;
+
+        public GoogleApisHttpClient(IConfiguration config, HttpClient http)
+        {
+            _config = config;
+            _http = http;
+        }
+
+        /// <summary>
+        /// Request google's captcha validation API
+        /// </summary>
+        /// <param name="captchaToken">Google's captcha token</param>
+        /// <returns>Object: google's captcha v3 validation response.</returns>
+        public async Task<GetCaptchaV3ValidationResponse> GetCaptchaV3Validation(string captchaToken)
+        {
+            string? url = CreateCaptchaRequesthUrl(captchaToken);
+
+            if (string.IsNullOrEmpty(url))
+                return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
+
+            HttpResponseMessage response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            GoogleCaptchaV3ValidationResponseDto? googleResponse = JsonSerializer.Deserialize<GoogleCaptchaV3ValidationResponseDto>(json);
+
+            if (googleResponse == null)
+                return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
+
+            return new GetCaptchaV3ValidationResponse(googleResponse);
+        }
+
+        #region Private Methods
+        /// <summary>
+        /// Builds the Google captcha verification API URL for retrieving .
+        /// </summary>
+        /// <param name="captchaToken">The token provided by google's captcha v3</param>
+        /// <param name="captchaSecretKey">The google's captcha secret key</param>
+        /// <returns>A fully constructed URL for the Google Places API details request.</returns>
+        private string? CreateCaptchaRequesthUrl(string captchaToken)
+        {
+            string captchaSecretKey = _config["captchaSecret"] ?? "";
+
+            if (string.IsNullOrEmpty(captchaSecretKey) || string.IsNullOrEmpty(captchaToken))
+                return null;
+
+            return GetRecaptchaUrl(captchaToken, captchaSecretKey);
+        }
+
+
+        private static string GetRecaptchaUrl(string captchaToken, string captchaSecretKey)
+        {
+            StringBuilder url = new();
+
+            url.Append(Consts.RecaptchaUrl);
+            url.Append(Consts.GetRecaptchaUrlParams(captchaToken, captchaSecretKey));
+
+            return url.ToString();
+        }
+        #endregion
+    }
+}

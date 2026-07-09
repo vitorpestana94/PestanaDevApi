@@ -4,8 +4,9 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Models;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Interfaces.Services.Auth;
-using System.IdentityModel.Tokens.Jwt;
 using PestanaDevApi.Extensions;
+using PestanaDevApi.Utils;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PestanaDevApi.Services.Auth
 {
@@ -26,13 +27,13 @@ namespace PestanaDevApi.Services.Auth
             _linkedinAuthService = linkedinAuthService;
         }
 
-        public async Task<User?> GetUserByIoken(string token, Platform platform)
+        public async Task<User?> GetUserByIoken(string token, PlatformEnum platform)
         {
             return platform switch
             {
-                Platform.Google => await HandleGoogleIdToken(token),
-                Platform.GitHub => await HandleGitHubAcessToken(token),
-                Platform.Linkedin => await HandleLinkedinIdToken(token),
+                PlatformEnum.Google => await HandleGoogleIdToken(token),
+                PlatformEnum.GitHub => await HandleGitHubAcessToken(token),
+                PlatformEnum.Linkedin => await HandleLinkedinIdToken(token),
                 _ => null
             };
         }
@@ -52,9 +53,9 @@ namespace PestanaDevApi.Services.Auth
             if (response == null)
                 return null;
 
-            Guid userId = await GetUserIdByPlatformOrEmail(Platform.Google, response.Subject, response.Email);
+            Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.Google, response.Subject, response.Email);
 
-            return userId.IsNotEmpty() ? User.FromGoogleIdentity(response, userId) : await RegisterNewUser(new User(response));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromGoogleIdentity(response, userId) : await RegisterNewUser(new User(response));
         }
 
         /// <summary>
@@ -73,9 +74,9 @@ namespace PestanaDevApi.Services.Auth
 
             (GithubResponseDto gitHubResponse, string userEmail) = response.Value;
 
-            Guid userId = await GetUserIdByPlatformOrEmail(Platform.GitHub, gitHubResponse.Id.ToString(), userEmail);
+            Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.GitHub, gitHubResponse.Id.ToString(), userEmail);
 
-            return userId.IsNotEmpty() ? User.FromGitHubIdentity(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromGitHubIdentity(gitHubResponse, userId, userEmail) : await RegisterNewUser(new User(gitHubResponse, userEmail));
         }
 
         /// <summary>
@@ -93,9 +94,9 @@ namespace PestanaDevApi.Services.Auth
                 return null;
 
             string userEmail = _linkedinAuthService.GetUserEmailFromJwt(jwtResponse);
-            Guid userId = await GetUserIdByPlatformOrEmail(Platform.Linkedin, jwtResponse.Subject, userEmail);
+            Guid userId = await GetUserIdByPlatformOrEmail(PlatformEnum.Linkedin, jwtResponse.Subject, userEmail);
             
-            return userId.IsNotEmpty() ? User.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
+            return userId.IsNotEmpty() ? OAuthHelpers.FromLinkedinIdentity(jwtResponse, userId, userEmail) : await RegisterNewUser(new User(jwtResponse, jwtResponse.Subject, userEmail));
         }
 
         /// <summary>
@@ -106,7 +107,7 @@ namespace PestanaDevApi.Services.Auth
         /// <param name="platformId">Auth platform id</param>
         /// <param name="userEmail">User email returned by platform auth.</param>
         /// <returns>User Id on database or Guid.Empty.</returns>
-        private async Task<Guid> GetUserIdByPlatformOrEmail(Platform platform, string platformId, string userEmail)
+        private async Task<Guid> GetUserIdByPlatformOrEmail(PlatformEnum platform, string platformId, string userEmail)
         {
             Guid userId = await _loginRepository.GetUserIdByPlatformId(platform, platformId);
 

@@ -7,5 +7,6 @@ namespace PestanaDevApi.Interfaces.Services
     {
         Task<AuthResponseDto> Login(LoginRequestDto request);
         Task<AuthResponseDto> LoginOrSignUpWithProvider(LoginOrSignUpWithPlatformRequestDto request);
+        Task LogoutUser(Guid userId, string deviceId);
     }
 }

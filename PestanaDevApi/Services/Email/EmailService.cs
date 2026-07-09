@@ -1,30 +1,38 @@
 ﻿using System.Net.Mail;
 using PestanaDevApi.Models;
 using PestanaDevApi.Dtos.Requests;
-using PestanaDevApi.Constants;
+using PestanaDevApi.Constants.Messages;
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Exceptions;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Utils;
+using PestanaDevApi.Models.Enums;
 using System.Net;
+using PestanaDevApi.Interfaces.Services;
 
 namespace PestanaDevApi.Services.Email
 {
     public class EmailService : IEmailService
     {
-        private readonly ILogger<EmailService> _logger;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IConfiguration _config;
+        private readonly IConfirmationCodeService _confirmationCodeGenerationService;
+        private readonly ICaptchaService _captchaService;
+        private readonly ISignUpService _signUpService;
+
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, ILogger<EmailService> logger)
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService,
+            ICaptchaService captchaService, ISignUpService signUpService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
-            _logger = logger;
-            
+            _confirmationCodeGenerationService = codeGenerationService;
+            _captchaService = captchaService;
+            _signUpService = signUpService;
+
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
 
@@ -39,13 +47,64 @@ namespace PestanaDevApi.Services.Email
             _smtp = _config["email.smtp"]!;
         }
 
-        public async Task<EmailResponse> SendContactEmail(ContactEmailRequestDto request)
+        public async Task<EmailResponseDto> SendContactEmail(ContactEmailRequestDto request)
         {
-            if (!ApiLib.IsEmailValid(request.ClientEmail))
-                return new EmailResponse(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
 
-            await SendContactEmailToAdmin(request);
-            await SendContactEmailToClient(request);
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
+                return new EmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            await Task.WhenAll(
+            SendContactEmailToAdmin(request),
+            SendContactEmailToClient(request));
+
+            return new();
+        }
+
+        public async Task<SendConfirmationCodeEmailResponseDto> SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
+        {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            if (await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadySended);
+
+            if (request.ConfirmationCodeEmailType == ConfirmationCodeEmailTypeEnum.SignUp)
+            {
+                IsEmailAlreadyRegisteredResponseDto responseDto = await _signUpService.IsEmailAlreadyRegistered(request.ClientEmail);
+
+                if (responseDto?.IsRegistered ?? false) // Return 200 here to avoid sending an email to a user that already have an registered email.
+                    return new();
+            }
+
+            string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
+
+            await SendConfirmationCodeEmail(request, code);
+
+            return new ();
+        }
+
+        public async Task<SendConfirmationCodeEmailResponseDto> ResendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request)
+        {
+            if (!await _captchaService.ValidateCaptchaV3(request.CaptchaToken))
+                return new(HttpStatusCode.Forbidden, ErrorMessages.UserBeheaviorItsNotHuman);
+
+            if (!ApiLib.IsEmailValid(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.InvalidEmailFormat);
+
+            if (!await _confirmationCodeGenerationService.CheckIfConfirmationCodeEmailAlreadySent(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailNotSended);
+
+            if (!await _confirmationCodeGenerationService.CheckCreatedAt(request.ClientEmail))
+                return new SendConfirmationCodeEmailResponseDto(HttpStatusCode.BadRequest, ErrorMessages.EmailResentRequestedTooSoon);
+
+            string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail, isResend: true);
+
+            await SendConfirmationCodeEmail(request, code);
 
             return new();
         }
@@ -61,14 +120,10 @@ namespace PestanaDevApi.Services.Email
             }
             catch (SmtpException ex)
             {
-                _logger.LogError(ex, ErrorMessages.EmailSendingError);
-
                 throw new ApiException(ErrorMessages.EmailSendingError, 500, ex);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ErrorMessages.EmailUnespectedError);
-
                 throw new ApiException(ErrorMessages.EmailUnespectedError, 500, ex);
             }
         }
@@ -83,6 +138,13 @@ namespace PestanaDevApi.Services.Email
         private async Task SendContactEmailToClient(ContactEmailRequestDto request)
         {
             using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, isContactConfirmation: true));
+
+            await SendEmail(mail);
+        }
+
+        private async Task SendConfirmationCodeEmail(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
+        {
+            using MailMessage mail = new ApiEmailMessage(request, _emailAddress, await _emailTemplateService.GetEmailTemplate(request, confirmationCodes));
 
             await SendEmail(mail);
         }

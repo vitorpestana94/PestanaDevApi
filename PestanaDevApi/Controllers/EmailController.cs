@@ -6,9 +6,8 @@ using PestanaDevApi.Interfaces.Services.Email;
 
 namespace PestanaDevApi.Controllers
 {
-    [Route("email")]
+    [Route("email")] 
     [ApiController]
-    [AllowAnonymous]
 
     public class EmailController: Controller
     {
@@ -20,12 +19,37 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("contact")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendContactEmail([FromBody] ContactEmailRequestDto requestDto)
         {
-            EmailResponse response = await _emailService.SendContactEmail(requestDto);
+            EmailResponseDto response = await _emailService.SendContactEmail(requestDto);
 
             if (!response.IsSuccess)
-                return BadRequest(response.ErrorMessage);
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        [HttpPost("confirmation")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendConfirmationCodeEmail([FromBody] ConfirmationCodeEmailRequestDto requestDto)
+        {
+            SendConfirmationCodeEmailResponseDto response = await _emailService.SendConfirmationCodeEmail(requestDto);
+
+            if (!response.IsSuccess)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        [HttpPost("confirmation/resend")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendConfirmationCodeEmail([FromBody] ConfirmationCodeEmailRequestDto requestDto)
+        {
+            SendConfirmationCodeEmailResponseDto response = await _emailService.ResendConfirmationCodeEmail(requestDto);
+
+            if (!response.IsSuccess)
+                return BadRequest(response);
 
             return Ok(response);
         }

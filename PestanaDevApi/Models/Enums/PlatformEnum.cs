@@ -1,6 +1,6 @@
 ﻿namespace PestanaDevApi.Models.Enums
 {
-    public enum Platform
+    public enum PlatformEnum
     {
         Google,
         GitHub,

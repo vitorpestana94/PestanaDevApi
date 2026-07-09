@@ -1,10 +1,14 @@
-﻿namespace PestanaDevApi.Dtos.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PestanaDevApi.Dtos.Requests
 {
-    public class LoginRequestDto
+    public class LoginRequestDto: CaptchaRequestDto
     {
-        public required string Email { get; set; }
-        public required string Password { get; set; }
-        public required string DeviceId { get; set; }
+        [Required]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
 
     }
 }

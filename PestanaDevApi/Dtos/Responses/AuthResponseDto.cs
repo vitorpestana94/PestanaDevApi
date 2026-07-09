@@ -3,9 +3,10 @@ using System.Net;
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class AuthResponseDto: DefaultResponse
+    public class AuthResponseDto: DefaultResponseDto
     {
-        public ApiToken ApiTokens { get; set; } = new();
+        public ApiToken? ApiTokens { get; set; } = null;
+        public string DeviceId { get; set; } = string.Empty;
 
         public AuthResponseDto()
         {
@@ -14,13 +15,17 @@ namespace PestanaDevApi.Dtos.Responses
         public AuthResponseDto(HttpStatusCode statusCode) : base(statusCode)
         { 
         }
-        
+
+        public AuthResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage)
+        {
+        }
+
         public AuthResponseDto(ApiToken apiToken) : base() 
         {
             ApiTokens = apiToken;
         }
 
-        public AuthResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
+        public AuthResponseDto(string errorMessage) : base(HttpStatusCode.Unauthorized, errorMessage)
         {
         }
     }

@@ -19,7 +19,7 @@ namespace PestanaDevApi.Models
             IsBodyHtml = true;
         }
 
-        public ApiEmailMessage(ContactEmailRequestDto request, string fromEmaillAddress, string body)
+        public ApiEmailMessage(EmailRequest request, string fromEmaillAddress, string body)
         {
             From = new MailAddress(fromEmaillAddress);
             To.Add(request.ClientEmail);

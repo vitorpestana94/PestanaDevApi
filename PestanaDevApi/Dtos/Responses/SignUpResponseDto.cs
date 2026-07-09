@@ -3,7 +3,7 @@ using System.Net;
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class SignUpResponseDto : DefaultResponse
+    public class SignUpResponseDto : DefaultResponseDto
     {
         public ApiToken ApiTokens { get; set; } = new();
 
@@ -19,6 +19,10 @@ namespace PestanaDevApi.Dtos.Responses
         }
 
         public SignUpResponseDto(HttpStatusCode statusCode) : base(statusCode)
+        {
+        }
+
+        public SignUpResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode)
         {
         }
     }
