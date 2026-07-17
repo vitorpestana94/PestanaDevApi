@@ -1,7 +1,5 @@
-﻿using Google.Apis.Auth;
-using PestanaDevApi.Dtos.Responses;
-using System.IdentityModel.Tokens.Jwt;
-using PestanaDevApi.Models;
+﻿using PestanaDevApi.Models;
+using PestanaDevApi.Constants;
 
 namespace PestanaDevApi.Extensions.Models
 {
@@ -12,7 +10,8 @@ namespace PestanaDevApi.Extensions.Models
         {
             Name = user.UserName,
             Email = user.UserEmail,
-            Password = user.UserPassword
+            Password = user.UserPassword,
+            TermsVersion = WebPageVersionConstant.WebPageVersion
         };
     }
 }
