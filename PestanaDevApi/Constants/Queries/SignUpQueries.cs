@@ -3,8 +3,8 @@
     public static class SignUpQueries
     {
         public const string InsertUser = @"
-        INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password)
-        VALUES (@Name, @Email, @Password)
+        INSERT INTO USERS_PROFILE_DATA (user_name, user_email, user_password, accepted_terms_at, accepted_terms_version)
+        VALUES (@Name, @Email, @Password, NOW(), @TermsVersion)
         RETURNING id;";
 
         public const string InsertUserByPlatform = @"
