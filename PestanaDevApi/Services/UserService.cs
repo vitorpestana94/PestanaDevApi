@@ -33,6 +33,16 @@ namespace PestanaDevApi.Services
             return new(user);
         }
 
+        public async Task<GetUserResponseDto> GetUserByEmail(string userEmail)
+        {
+            User? user = await _repository.GetUserByEmail(userEmail);
+
+            if (user == null)
+                return new(HttpStatusCode.NotFound, ErrorMessages.UserNotFound);
+
+            return new(user);
+        }
+
         public async Task<ChangeUserDataResponseDto> ChangeUserData(ChangeUserDataRequestDto dto, Guid userId)
         {
             if (dto.WasDataNotUpdated())

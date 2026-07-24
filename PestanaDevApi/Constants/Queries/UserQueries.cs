@@ -13,6 +13,17 @@
         WHERE
             id = @UserId;";
 
+        public const string GetUserByEmail = @"
+        SELECT
+            user_name, 
+            user_email,
+            user_password,
+            signup_by_platform 
+        FROM
+            USERS_PROFILE_DATA
+        WHERE
+            user_email = @Email;";
+
         public const string UpdateUser = @"
         UPDATE
             USERS_PROFILE_DATA

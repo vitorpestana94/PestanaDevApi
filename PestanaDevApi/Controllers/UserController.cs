@@ -28,7 +28,7 @@ namespace PestanaDevApi.Controllers
             GetUserResponseDto response = await _service.GetUser(UserId);
 
             if (!response.IsSuccess)
-                return NotFound(response);
+                return response.HandleFailure();
 
             return Ok(response.Data);
         }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Extensions.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
 
 namespace PestanaDevApi.Controllers
@@ -25,7 +26,7 @@ namespace PestanaDevApi.Controllers
             CheckConfirmationCodeResponse response = await _service.IsConfirmationCodeValid(request);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response);
         }
