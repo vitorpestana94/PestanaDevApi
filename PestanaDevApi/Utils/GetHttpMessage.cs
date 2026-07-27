@@ -18,6 +18,7 @@ namespace PestanaDevApi.Utils
             {
                 400 => ErrorMessages.BadRequest,
                 401 => ErrorMessages.Unauthorized,
+                403 => ErrorMessages.Forbidden,
                 404 => ErrorMessages.NotFound,
                 415 => ErrorMessages.UnsupportedMediaType,
                 500 => ErrorMessages.InternalServerError,
@@ -39,6 +40,7 @@ namespace PestanaDevApi.Utils
                 HttpStatusCode.BadRequest => ErrorMessages.BadRequest,
                 HttpStatusCode.Unauthorized => ErrorMessages.Unauthorized,
                 HttpStatusCode.NotFound => ErrorMessages.NotFound,
+                HttpStatusCode.Forbidden => ErrorMessages.Forbidden,
                 HttpStatusCode.UnsupportedMediaType => ErrorMessages.UnsupportedMediaType,
                 HttpStatusCode.InternalServerError => ErrorMessages.InternalServerError,
                 _ => ErrorMessages.DefaultMessage
