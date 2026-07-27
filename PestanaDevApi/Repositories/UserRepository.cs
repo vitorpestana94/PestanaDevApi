@@ -26,6 +26,13 @@ namespace PestanaDevApi.Repositories
             return await db.QueryFirstOrDefaultAsync<User?>(Sql.GetUser, Params.ToUserId(userId));
         }
 
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<User?>(Sql.GetUserByEmail, Params.ToEmail(email));
+        }
+
         public async Task<bool> UpdateUserData(ChangeUserDataRequestDto dto, User oldData, Guid userId)
         {
             using IDbConnection db = _factory.CreateConnection();

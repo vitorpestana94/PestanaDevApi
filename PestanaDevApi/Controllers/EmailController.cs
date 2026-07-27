@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Extensions.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services.Email;
 
 namespace PestanaDevApi.Controllers
@@ -25,7 +26,7 @@ namespace PestanaDevApi.Controllers
             EmailResponseDto response = await _emailService.SendContactEmail(requestDto);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response);
         }
@@ -37,7 +38,7 @@ namespace PestanaDevApi.Controllers
             SendConfirmationCodeEmailResponseDto response = await _emailService.SendConfirmationCodeEmail(requestDto);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response);
         }
@@ -49,7 +50,7 @@ namespace PestanaDevApi.Controllers
             SendConfirmationCodeEmailResponseDto response = await _emailService.ResendConfirmationCodeEmail(requestDto);
 
             if (!response.IsSuccess)
-                return BadRequest(response);
+                return response.HandleFailure();
 
             return Ok(response);
         }

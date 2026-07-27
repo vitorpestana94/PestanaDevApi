@@ -22,7 +22,7 @@ namespace PestanaDevApi.Dtos.Responses
         {
         }
 
-        public SignUpResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode)
+        public SignUpResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage)
         {
         }
     }

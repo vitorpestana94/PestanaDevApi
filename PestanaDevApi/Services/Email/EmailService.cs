@@ -9,6 +9,7 @@ using PestanaDevApi.Utils;
 using PestanaDevApi.Models.Enums;
 using System.Net;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Extensions.Dtos.Responses;
 
 namespace PestanaDevApi.Services.Email
 {
@@ -19,19 +20,21 @@ namespace PestanaDevApi.Services.Email
         private readonly IConfirmationCodeService _confirmationCodeGenerationService;
         private readonly ICaptchaService _captchaService;
         private readonly ISignUpService _signUpService;
+        private readonly IUserService _userService;
 
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
 
         public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService,
-            ICaptchaService captchaService, ISignUpService signUpService)
+            ICaptchaService captchaService, ISignUpService signUpService, IUserService userService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
             _confirmationCodeGenerationService = codeGenerationService;
             _captchaService = captchaService;
             _signUpService = signUpService;
+            _userService = userService;
 
             if (string.IsNullOrEmpty(_config["email.address"]))
                 throw new InvalidOperationException(ErrorMessages.EmailAddress);
@@ -79,6 +82,13 @@ namespace PestanaDevApi.Services.Email
 
                 if (responseDto?.IsRegistered ?? false) // Return 200 here to avoid sending an email to a user that already have an registered email.
                     return new();
+            } 
+            else if (request.ConfirmationCodeEmailType == ConfirmationCodeEmailTypeEnum.ForgotPassword)
+            {
+                GetUserResponseDto responseDto = await _userService.GetUserByEmail(request.ClientEmail);
+
+                if (responseDto.UserRegisteredUsingPlatform())
+                    return new(HttpStatusCode.BadRequest, ErrorMessages.UserSignUpWithPlatform);
             }
 
             string code = await _confirmationCodeGenerationService.GenerateConfirmationCode(request.ClientEmail);
