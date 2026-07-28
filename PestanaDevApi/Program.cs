@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using PestanaDevApi.Interfaces.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,21 +40,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Rate Limiting
-//builder.Services.AddRateLimiter(options => Depois preciso ver como deixar isso mais maleável porém seguro, principalmente nos endpoints q mandam emails.
-//{
-//    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-//    {
-//        string? ip = context.Connection.RemoteIpAddress?.ToString();
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        string? ip = context.Connection.RemoteIpAddress?.ToString();
 
-//        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
-//            new FixedWindowRateLimiterOptions
-//            {
-//                PermitLimit = 20,
-//                Window = TimeSpan.FromMinutes(30),
-//                QueueLimit = 0
-//            });
-//    });
-//});
+        return RateLimitPartition.GetFixedWindowLimiter(ip!, _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 500,
+                Window = TimeSpan.FromMinutes(30),
+                QueueLimit = 0
+            });
+    });
+});
 
 
 // Setup secrets.
@@ -110,6 +111,7 @@ builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<INasaIntegrationService, NasaIntegrationService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
