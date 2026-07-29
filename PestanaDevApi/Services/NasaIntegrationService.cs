@@ -2,39 +2,50 @@
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Extensions.Dtos.Requests;
+using PestanaDevApi.Constants.Messages;
+using System.Net;
 
 namespace PestanaDevApi.Services
 {
     public class NasaIntegrationService: INasaIntegrationService
     {
-        public async Task<NasaAstronomyPictureOfTheDayResponseDto> GetNasaAstronomyPicture(GetNasaAstronomyPictureRequest request)
+        private readonly INasaRequestService _requestService;
+
+        public NasaIntegrationService(INasaRequestService requestService)
+        {
+            _requestService = requestService;
+        }
+
+        public async Task<NasaAstronomyPictureOfDayResponseDto> GetNasaAstronomyPictureOfDay(GetNasaAstronomyPictureOfDayRequest request)
         {
             if (request.IsSpecificDatePicture())
-                return await GetTheAstronomyPictureOfTheDay(request.Date!);
-
-
-            if (request.IsPicturesFromPeriod())
-                return await GetTheAstronomyPicturePeriod(request.StartDate!, request.EndDate!);
+                return await GetTheAstronomyPictureOfTheDay(request);
 
             return await GetTheAstronomyPictureOfToday();
         }
 
-        #region Private Methods
-        private async Task<NasaAstronomyPictureOfTheDayResponseDto> GetTheAstronomyPictureOfToday()
-        {
-        }
-
-        private async Task<NasaAstronomyPictureOfTheDayResponseDto> GetTheAstronomyPicturePeriod(GetNasaAstronomyPictureRequest request)
+        public async Task<NasaAstronomyPictureOfPeriodResponseDto> GetNasaAstronomyPictureOfPeriod(GetNasaAstronomyPictureOfPeriodRequest request)
         {
             if (request.CheckStartAndEndDates())
-                return // retornar aqui a dto de erro.
+                return new(ErrorMessages.InvalidStartOrEndDate);
+
+            return new();
         }
 
-        private async Task<NasaAstronomyPictureOfTheDayResponseDto> GetTheAstronomyPictureOfTheDay(GetNasaAstronomyPictureRequest request)
+        #region Private Methods
+        private async Task<NasaAstronomyPictureOfDayResponseDto> GetTheAstronomyPictureOfToday()
         {
+            NasaResponse? response = await _requestService.GetNasaPictureOfToday();
 
+            return response == null ? new(HttpStatusCode.InternalServerError, ErrorMessages.NasaResponseWithErrors) : new(response);
+        }
+
+        private async Task<NasaAstronomyPictureOfDayResponseDto> GetTheAstronomyPictureOfTheDay(GetNasaAstronomyPictureOfDayRequest request)
+        {
             if (request.CheckSpecificDate())
-                return // retornar aqui a dto de erro.
+                return new(ErrorMessages.InvalidDate);
+
+            return new();
         }
         #endregion
     }

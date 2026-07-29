@@ -2,6 +2,6 @@
 {
     public interface IRequestService
     {
-        Task<TResponse?> GetAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default);
+        Task<TResponse?> GetAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParams = null, CancellationToken cancellationToken = default);
     }
 }

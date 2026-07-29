@@ -112,6 +112,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INasaIntegrationService, NasaIntegrationService>();
+builder.Services.AddScoped<INasaRequestService, NasaRequestService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>

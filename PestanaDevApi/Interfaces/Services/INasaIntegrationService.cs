@@ -5,6 +5,6 @@ namespace PestanaDevApi.Interfaces.Services
 {
     public interface INasaIntegrationService
     {
-        NasaAstronomyPictureOfTheDayResponseDto GetNasaAstronomyPicture(GetNasaAstronomyPictureRequest request);
+        Task<NasaAstronomyPictureOfDayResponseDto> GetNasaAstronomyPictureOfDay(GetNasaAstronomyPictureOfDayRequest request);
     }
 }

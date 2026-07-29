@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace PestanaDevApi.Utils
 {
@@ -36,5 +37,7 @@ namespace PestanaDevApi.Utils
 
             return (DateTime.UtcNow - iat) <= TimeSpan.FromSeconds(seconds);
         }
+
+        public static bool CheckDate(string date) => DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
     }
 }

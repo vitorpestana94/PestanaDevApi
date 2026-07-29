@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using PestanaDevApi.Interfaces.Services;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace PestanaDevApi.Services
 {
@@ -13,13 +15,16 @@ namespace PestanaDevApi.Services
             _httpClient = httpClient;
         }
 
-        public async Task<TResponse?> GetAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default )
+        public async Task<TResponse?> GetAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParams = null, CancellationToken cancellationToken = default)
         {
+            if (queryParams != null)
+                endpoint = QueryHelpers.AddQueryString(endpoint, queryParams!);
+
             using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
 
             if (headers != null)
             {
-                foreach (var header in headers)
+                foreach (KeyValuePair<string, string> header in headers)
                     request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
 
