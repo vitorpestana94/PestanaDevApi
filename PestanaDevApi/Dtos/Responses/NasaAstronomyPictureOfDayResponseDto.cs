@@ -4,7 +4,7 @@ namespace PestanaDevApi.Dtos.Responses
 {
     public class NasaAstronomyPictureOfDayResponseDto: DefaultResponseDto
     {
-        public NasaResponse NasaResponse { get; set; } = new NasaResponse();
+        public NasaResponse? NasaResponse { get; set; } = null;
 
         public NasaAstronomyPictureOfDayResponseDto() 
         { 

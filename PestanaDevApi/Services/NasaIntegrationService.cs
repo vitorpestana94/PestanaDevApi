@@ -24,15 +24,24 @@ namespace PestanaDevApi.Services
             return await GetTheAstronomyPictureOfToday();
         }
 
-        public async Task<NasaAstronomyPictureOfPeriodResponseDto> GetNasaAstronomyPictureOfPeriod(GetNasaAstronomyPictureOfPeriodRequest request)
+        public async Task<NasaAstronomyPicturesOfPeriodResponseDto> GetNasaAstronomyPictureOfPeriod(GetNasaAstronomyPicturesOfPeriodRequest request)
         {
-            if (request.CheckStartAndEndDates())
+            if (!request.AreBothDatesValids())
                 return new(ErrorMessages.InvalidStartOrEndDate);
 
-            return new();
+            IEnumerable<NasaResponse>? response = await _requestService.GetNasaPicturesOfPeriod(request.StartDate!, request.EndDate!);
+
+            return response == null ? new(HttpStatusCode.InternalServerError, ErrorMessages.NasaResponseWithErrors) : new(response);
         }
 
         #region Private Methods
+        /// <summary>
+        /// Retrieves today's Astronomy Picture of the Day from the NASA API.
+        /// </summary>
+        /// <returns>
+        /// A response containing today's Astronomy Picture of the Day
+        /// or an error response.
+        /// </returns>
         private async Task<NasaAstronomyPictureOfDayResponseDto> GetTheAstronomyPictureOfToday()
         {
             NasaResponse? response = await _requestService.GetNasaPictureOfToday();
@@ -40,12 +49,24 @@ namespace PestanaDevApi.Services
             return response == null ? new(HttpStatusCode.InternalServerError, ErrorMessages.NasaResponseWithErrors) : new(response);
         }
 
+        /// <summary>
+        /// Retrieves the Astronomy Picture of the Day for a specific date.
+        /// </summary>
+        /// <param name="request">
+        /// Request containing the desired date.
+        /// </param>
+        /// <returns>
+        /// A response containing the Astronomy Picture of the Day for the specified date
+        /// or an error response.
+        /// </returns>
         private async Task<NasaAstronomyPictureOfDayResponseDto> GetTheAstronomyPictureOfTheDay(GetNasaAstronomyPictureOfDayRequest request)
         {
-            if (request.CheckSpecificDate())
+            if (request.IsDateNotValid())
                 return new(ErrorMessages.InvalidDate);
 
-            return new();
+            NasaResponse? response = await _requestService.GetNasaPictureOfDay(request.Date!);
+
+            return response == null ? new(HttpStatusCode.InternalServerError, ErrorMessages.NasaResponseWithErrors) : new(response);
         }
         #endregion
     }

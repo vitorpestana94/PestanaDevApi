@@ -2,23 +2,28 @@
 
 namespace PestanaDevApi.Dtos.Responses
 {
-    public class NasaAstronomyPictureOfPeriodResponseDto: DefaultResponseDto
+    public class NasaAstronomyPicturesOfPeriodResponseDto: DefaultResponseDto
     {
-        public IEnumerable<NasaResponse> NasaResponse { get; set; } = [];
+        public IEnumerable<NasaResponse>? NasaResponse { get; set; } = null;
 
-        public NasaAstronomyPictureOfPeriodResponseDto()
+        public NasaAstronomyPicturesOfPeriodResponseDto()
         {
         }
 
-        public NasaAstronomyPictureOfPeriodResponseDto(HttpStatusCode statusCode) : base(statusCode)
+        public NasaAstronomyPicturesOfPeriodResponseDto(IEnumerable<NasaResponse> nasaResponse) : base()
+        {
+            NasaResponse = nasaResponse;
+        }
+
+        public NasaAstronomyPicturesOfPeriodResponseDto(HttpStatusCode statusCode) : base(statusCode)
         {
         }
 
-        public NasaAstronomyPictureOfPeriodResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage)
+        public NasaAstronomyPicturesOfPeriodResponseDto(HttpStatusCode statusCode, string errorMessage) : base(statusCode, errorMessage)
         {
         }
 
-        public NasaAstronomyPictureOfPeriodResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
+        public NasaAstronomyPicturesOfPeriodResponseDto(string errorMessage) : base(HttpStatusCode.BadRequest, errorMessage)
         {
         }
     }

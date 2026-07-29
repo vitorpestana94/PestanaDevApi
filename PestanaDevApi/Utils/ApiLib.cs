@@ -39,5 +39,11 @@ namespace PestanaDevApi.Utils
         }
 
         public static bool CheckDate(string date) => DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
+        public static DateTime ParseDate(string date) => DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+        public static bool IsFutureDate(string date)
+        {
+            return ParseDate(date).Date > DateTime.UtcNow.Date;
+        }
     }
 }
