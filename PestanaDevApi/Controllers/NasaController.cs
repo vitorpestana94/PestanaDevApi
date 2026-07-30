@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Extensions.Dtos.Responses;
@@ -8,6 +9,7 @@ namespace PestanaDevApi.Controllers
 {
     [Route("nasa")]
     [ApiController]
+    [Authorize]
 
     public class NasaController: Controller
     {
