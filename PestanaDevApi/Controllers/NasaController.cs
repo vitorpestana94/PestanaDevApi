@@ -13,7 +13,7 @@ namespace PestanaDevApi.Controllers
 
     public class NasaController: Controller
     {
-        INasaIntegrationService _service;
+        private readonly INasaIntegrationService  _service;
 
         public NasaController(INasaIntegrationService service) 
         {
@@ -32,7 +32,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpGet("period")]
-        public async Task<IActionResult> NasaAstronomyPicturesOfPeriodResponseDto([FromQuery] GetNasaAstronomyPicturesOfPeriodRequest request)
+        public async Task<IActionResult> NasaAstronomyPicturesOfPeriod([FromQuery] GetNasaAstronomyPicturesOfPeriodRequest request)
         {
             NasaAstronomyPicturesOfPeriodResponseDto response = await _service.GetNasaAstronomyPictureOfPeriod(request);
 
