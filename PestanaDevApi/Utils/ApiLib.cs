@@ -27,23 +27,5 @@ namespace PestanaDevApi.Utils
         {
             return Guid.NewGuid().ToString().Replace("-", "")[..codeLenght];
         }
-
-        public static bool IsInvalidSecondsGap(string issuedAt, int seconds = 30)
-        {
-            if (string.IsNullOrEmpty(issuedAt))
-                return true;
-
-            DateTime iat = DateTimeOffset.FromUnixTimeSeconds(long.Parse(issuedAt)).UtcDateTime;
-
-            return (DateTime.UtcNow - iat) <= TimeSpan.FromSeconds(seconds);
-        }
-
-        public static bool CheckDate(string date) => DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d);
-        public static DateTime ParseDate(string date) => DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None);
-
-        public static bool IsFutureDate(string date)
-        {
-            return ParseDate(date).Date > DateTime.UtcNow.Date;
-        }
     }
 }

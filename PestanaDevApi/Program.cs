@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using PestanaDevApi.Interfaces.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.RateLimiting;
+using PestanaDevApi.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddControllers()
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add memory cache.
+builder.Services.AddMemoryCache();
 
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>
@@ -113,6 +117,8 @@ builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INasaIntegrationService, NasaIntegrationService>();
 builder.Services.AddScoped<INasaRequestService, NasaRequestService>();
+builder.Services.AddScoped<INasaCacheService, NasaCacheService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>

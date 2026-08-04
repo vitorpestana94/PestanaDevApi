@@ -30,5 +30,7 @@ namespace PestanaDevApi.Interfaces.Services
         /// for the specified period or an error response.
         /// </returns>
         Task<NasaAstronomyPicturesOfPeriodResponseDto> GetNasaAstronomyPictureOfPeriod(GetNasaAstronomyPicturesOfPeriodRequest request);
+
+        Task RefreshNasaCache();
     }
 }

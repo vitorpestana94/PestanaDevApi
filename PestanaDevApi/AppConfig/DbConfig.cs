@@ -55,6 +55,15 @@ namespace PestanaDevApi.AppConfig
                 {
                     cron.InTimeZone(TimeZoneInfo.Utc);
                 })); // Every day at 3 AM
+
+                JobKey DeleteNasaCacheKey = JobKey.Create(nameof(NasaCacheRefreshJob));
+
+                options.AddJob<NasaCacheRefreshJob>(DeleteNasaCacheKey)
+                .AddTrigger(trigger => trigger.ForJob(DeleteNasaCacheKey)
+                .WithCronSchedule(Consts.DeleteNasaCacheJob, cron =>
+                {
+                    cron.InTimeZone(TimeZoneInfo.Utc);
+                })); // Every day at 4 AM
             });
 
             services.AddQuartzHostedService(options => 

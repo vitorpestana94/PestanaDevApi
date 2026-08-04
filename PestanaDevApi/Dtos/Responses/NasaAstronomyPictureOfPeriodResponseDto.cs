@@ -12,7 +12,7 @@ namespace PestanaDevApi.Dtos.Responses
 
         public NasaAstronomyPicturesOfPeriodResponseDto(IEnumerable<NasaResponse> nasaResponse) : base()
         {
-            NasaResponse = nasaResponse;
+            NasaResponse = nasaResponse.OrderByDescending(response => response.Date) ;
         }
 
         public NasaAstronomyPicturesOfPeriodResponseDto(HttpStatusCode statusCode) : base(statusCode)

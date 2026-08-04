@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using PestanaDevApi.Dtos.Requests;
+﻿using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Utils;
 
 namespace PestanaDevApi.Extensions.Dtos.Requests
@@ -17,12 +17,20 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             return true;
         }
 
+        public static bool IsCached(this GetNasaAstronomyPicturesOfPeriodRequest dto, NasaAstronomyPicturesOfPeriodResponseDto cache)
+        {
+            if (cache.NasaResponse == null || !cache.NasaResponse.Any())
+                return false;
+
+            return cache.NasaResponse.Min(data => data.Date) == dto.StartDate && cache.NasaResponse.Max(data => data.Date) == dto.EndDate;
+        }
+
         #region Private Methods
         private static bool AreDatesValids(string? startDate, string? endDate)
         {
             foreach (string date in new string[] { startDate!, endDate! })
             {
-                if (!ApiLib.CheckDate(date) || ApiLib.IsFutureDate(date))
+                if (!DateLib.CheckDate(date) || DateLib.IsFutureDate(date))
                     return false;
             }
 
@@ -33,8 +41,8 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
 
         private static bool IsEndDateBeforeStartDate(string startDate, string endDate)
         {
-            DateTime startDateAsDate = ApiLib.ParseDate(startDate);
-            DateTime endDateAsDate = ApiLib.ParseDate(endDate);
+            DateTime startDateAsDate = DateLib.ParseDate(startDate);
+            DateTime endDateAsDate = DateLib.ParseDate(endDate);
 
             return startDateAsDate > endDateAsDate;
         }
