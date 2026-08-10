@@ -119,6 +119,8 @@ builder.Services.AddScoped<INasaIntegrationService, NasaIntegrationService>();
 builder.Services.AddScoped<INasaRequestService, NasaRequestService>();
 builder.Services.AddScoped<INasaCacheService, NasaCacheService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<IArtInstituteOfChicagoRequestService, ArtInstituteOfChicagoRequestService>();
+builder.Services.AddScoped<IArtInstituteOfChicagoIntegrationService, ArtInstituteOfChicagoIntegrationService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>

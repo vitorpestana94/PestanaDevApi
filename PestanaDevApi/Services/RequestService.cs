@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using PestanaDevApi.Interfaces.Services;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -27,6 +26,17 @@ namespace PestanaDevApi.Services
                 foreach (KeyValuePair<string, string> header in headers)
                     request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
+
+
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
+                "User-Agent",
+                "curl/8.0.0"
+            );
+
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
+                "Accept",
+                "*/*"
+            );
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
 
