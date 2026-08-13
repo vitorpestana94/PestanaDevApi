@@ -69,7 +69,7 @@ namespace PestanaDevApi.Services.Auth
         {
             try
             {
-                return await _requestService.GetAsync<GithubResponseDto>(_githubEndPoint, headers);
+                return await _requestService.RequestAsync<GithubResponseDto>(_githubEndPoint, headers);
             }
             catch
             {
@@ -87,7 +87,7 @@ namespace PestanaDevApi.Services.Auth
         {
             try
             {
-                IEnumerable<GitHubResponseEmailDto?>? emailsResponse = await _requestService.GetAsync<IEnumerable<GitHubResponseEmailDto>>($"{_githubEndPoint}/emails", headers);
+                IEnumerable<GitHubResponseEmailDto?>? emailsResponse = await _requestService.RequestAsync<IEnumerable<GitHubResponseEmailDto>>($"{_githubEndPoint}/emails", headers);
 
                 string email = emailsResponse?.FirstOrDefault(e => e != null && e.Primary && e.Verified)?.Email ?? string.Empty;
 

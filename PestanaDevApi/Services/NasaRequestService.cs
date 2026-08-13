@@ -29,7 +29,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.GetAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams());
+                return await _http.RequestAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams());
             }
             catch
             {
@@ -41,7 +41,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.GetAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams(date));
+                return await _http.RequestAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams(date));
             }
             catch
             {
@@ -53,7 +53,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.GetAsync<IEnumerable<NasaResponse>>(_endPoint, queryParams: GetQueryParams(startDate, endDate));
+                return await _http.RequestAsync<IEnumerable<NasaResponse>>(_endPoint, queryParams: GetQueryParams(startDate, endDate));
             }
             catch
             {

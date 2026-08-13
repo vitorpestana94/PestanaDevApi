@@ -14,29 +14,18 @@ namespace PestanaDevApi.Services
             _httpClient = httpClient;
         }
 
-        public async Task<TResponse?> GetAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParams = null, CancellationToken cancellationToken = default)
+        public async Task<TResponse?> RequestAsync<TResponse>(string endpoint, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParams = null, CancellationToken cancellationToken = default, HttpMethod? method = null)
         {
             if (queryParams != null)
                 endpoint = QueryHelpers.AddQueryString(endpoint, queryParams!);
 
-            using HttpRequestMessage request = new(HttpMethod.Get, endpoint);
+            using HttpRequestMessage request = new(method ?? HttpMethod.Get, endpoint);
 
             if (headers != null)
             {
                 foreach (KeyValuePair<string, string> header in headers)
                     request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
-
-
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
-                "User-Agent",
-                "curl/8.0.0"
-            );
-
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
-                "Accept",
-                "*/*"
-            );
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
 

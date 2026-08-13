@@ -7,15 +7,15 @@ using PestanaDevApi.Interfaces.Services;
 
 namespace PestanaDevApi.Controllers
 {
-    [Route("art-institute-of-chicago")]
+    [Route("metropolitan-museum")]
     [ApiController]
     [AllowAnonymous]
 
-    public class ArtInstituteOfChicagoController : Controller
+    public class MetropolitanMuseumController : Controller
     {
-        private readonly IArtInstituteOfChicagoIntegrationService _service;
+        private readonly IMetropolitanMuseumIntegrationService _service;
 
-        public ArtInstituteOfChicagoController(IArtInstituteOfChicagoIntegrationService service)
+        public MetropolitanMuseumController(IMetropolitanMuseumIntegrationService service)
         {
             _service = service;
         }

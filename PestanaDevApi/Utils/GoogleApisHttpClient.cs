@@ -4,15 +4,17 @@ using System.Net;
 using PestanaDevApi.Interfaces.Utils;
 using PestanaDevApi.Dtos.Responses;
 using Consts = PestanaDevApi.Constants.GoogleConstants.GoogleApisHttpClient;
+using PestanaDevApi.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace PestanaDevApi.Utils
 {
     public class GoogleApisHttpClient : IGoogleApisHttpClient
     {
         private readonly IConfiguration _config;
-        private readonly HttpClient _http;
+        private readonly IRequestService _http;
 
-        public GoogleApisHttpClient(IConfiguration config, HttpClient http)
+        public GoogleApisHttpClient(IConfiguration config, IRequestService http)
         {
             _config = config;
             _http = http;
@@ -30,19 +32,21 @@ namespace PestanaDevApi.Utils
             if (string.IsNullOrEmpty(url))
                 return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
 
-            HttpResponseMessage response = await _http.GetAsync(url);
+            GoogleCaptchaV3ValidationResponseDto? response;
 
-            if (!response.IsSuccessStatusCode)
+            try
+            {
+                response = await _http.RequestAsync<GoogleCaptchaV3ValidationResponseDto>(url);
+            }
+            catch
+            {
+                return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
+            }
+
+            if (response == null)
                 return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
 
-            string json = await response.Content.ReadAsStringAsync();
-
-            GoogleCaptchaV3ValidationResponseDto? googleResponse = JsonSerializer.Deserialize<GoogleCaptchaV3ValidationResponseDto>(json);
-
-            if (googleResponse == null)
-                return new GetCaptchaV3ValidationResponse(HttpStatusCode.InternalServerError);
-
-            return new GetCaptchaV3ValidationResponse(googleResponse);
+            return new GetCaptchaV3ValidationResponse(response);
         }
 
         #region Private Methods

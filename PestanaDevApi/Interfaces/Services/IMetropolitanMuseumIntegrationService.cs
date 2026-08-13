@@ -2,7 +2,7 @@
 
 namespace PestanaDevApi.Interfaces.Services
 {
-    public interface IArtInstituteOfChicagoIntegrationService
+    public interface IMetropolitanMuseumIntegrationService
     {
         Task<GetArtWorkResponseDto> GetArtWork(string? search);
     }
