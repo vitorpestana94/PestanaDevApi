@@ -13,7 +13,7 @@ namespace PestanaDevApi.Dtos.Responses
 
         public GetArtWorkResponseDto(MetropolitanMuseumSearchResponseDto[] response) : base()
         {
-            ArtData = response.Where(art => art.IsPublicDomain && !string.IsNullOrEmpty(art.PrimaryImage));
+            ArtData = response.Where(art => art.IsPublicDomain && !string.IsNullOrEmpty(art.PrimaryImageSmall));
         }
 
         public GetArtWorkResponseDto(HttpStatusCode statusCode) : base(statusCode)

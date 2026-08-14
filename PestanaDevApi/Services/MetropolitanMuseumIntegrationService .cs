@@ -23,14 +23,14 @@ namespace PestanaDevApi.Services
             SearchArtWorksIdsResponseDto? searchResponse = await _requestService.SearchArtWorksIds(search);
 
             if (searchResponse == null)
-                return new GetArtWorkResponseDto(HttpStatusCode.InternalServerError, ErrorMessages.ErrorRequestingArtInstituteOfChicagoApi);
+                return new GetArtWorkResponseDto(HttpStatusCode.InternalServerError, ErrorMessages.ErrorRequestingMetropolitanMuseum);
 
-            List<int> objectIds = searchResponse.ObjectIds.Take(40).ToList(); // pegando so 10 por enquanto, dps precisamos rever isso
+            List<int> objectIds = searchResponse.ObjectIds.Take(35).ToList();
 
             MetropolitanMuseumSearchResponseDto?[] artworks = await Task.WhenAll(objectIds.Select(id => _requestService.GetArtWork(id.ToString())));
 
             if (artworks == null || artworks.Length == 0)
-                return new GetArtWorkResponseDto(HttpStatusCode.InternalServerError, ErrorMessages.ErrorRequestingArtInstituteOfChicagoApi);
+                return new GetArtWorkResponseDto(HttpStatusCode.InternalServerError, ErrorMessages.ErrorRequestingMetropolitanMuseum);
 
             return new GetArtWorkResponseDto(artworks!);
         }
