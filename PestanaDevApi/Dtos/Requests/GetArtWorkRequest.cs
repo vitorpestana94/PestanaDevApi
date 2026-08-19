@@ -2,6 +2,6 @@
 {
     public class GetArtWorkRequest
     {
-        public string? Search {  get; set; }
+        public string Search {  get; set; }
     }
 }

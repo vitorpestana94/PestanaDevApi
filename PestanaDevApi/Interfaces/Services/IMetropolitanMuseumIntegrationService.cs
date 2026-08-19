@@ -4,6 +4,6 @@ namespace PestanaDevApi.Interfaces.Services
 {
     public interface IMetropolitanMuseumIntegrationService
     {
-        Task<GetArtWorkResponseDto> GetArtWork(string? search);
+        Task<GetArtWorkResponseDto> GetArtWork(string search);
     }
 }
