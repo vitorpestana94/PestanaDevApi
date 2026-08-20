@@ -122,6 +122,7 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IMetropolitanMuseumRequestService, MetropolitanMuseumRequestService>();
 builder.Services.AddScoped<IMetropolitanMuseumIntegrationService, MetropolitanMuseumIntegrationService>();
 builder.Services.AddScoped<IMetropolitanMuseumCacheService, MetropolitanMuseumCacheService>();
+builder.Services.AddScoped<ISemaphoreService, SemaphoreService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>

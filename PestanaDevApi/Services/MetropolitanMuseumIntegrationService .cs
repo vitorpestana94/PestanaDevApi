@@ -11,24 +11,31 @@ namespace PestanaDevApi.Services
     {
         private readonly IMetropolitanMuseumRequestService _requestService;
         private readonly IMetropolitanMuseumCacheService _cacheService;
+        private readonly ISemaphoreService _semaphoreService;
 
-        public MetropolitanMuseumIntegrationService(IMetropolitanMuseumRequestService requestService, IMetropolitanMuseumCacheService cacheService)
+        public MetropolitanMuseumIntegrationService(IMetropolitanMuseumRequestService requestService, IMetropolitanMuseumCacheService cacheService, ISemaphoreService semaphoreService)
         {
             _requestService = requestService;
             _cacheService = cacheService;
+            _semaphoreService = semaphoreService;
         }
 
         public async Task<GetArtWorkResponseDto> GetArtWork(string search)
         {
+            return await _semaphoreService.Work(() => GetArts(search));
+        }
+
+        #region Private Methods
+        private async Task<GetArtWorkResponseDto> GetArts(string search)
+        {
             if (string.IsNullOrEmpty(search))
                 return new GetArtWorkResponseDto(ErrorMessages.SearchEmpty);
-            
+
             search = search.Trim();
 
             return _cacheService.GetMetropolitanMuseumCache(search) ?? await RequestMetropolitanMuseum(search);
         }
 
-        #region Private Methods
         private async Task<GetArtWorkResponseDto> RequestMetropolitanMuseum(string search)
         {
             SearchArtWorksIdsResponseDto? searchResponse = await _requestService.SearchArtWorksIds(search);
