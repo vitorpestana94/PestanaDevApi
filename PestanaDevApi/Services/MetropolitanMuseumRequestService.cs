@@ -1,6 +1,7 @@
 ﻿using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces;
 using PestanaDevApi.Interfaces.Services;
+using Consts = PestanaDevApi.Constants.MetropolitanMuseumConstants;
 
 namespace PestanaDevApi.Services
 {
@@ -25,7 +26,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.RequestAsync<SearchArtWorksIdsResponseDto>($"{_endPoint}/search", queryParams: new() { { "q", search } });
+                return await _http.RequestAsync<SearchArtWorksIdsResponseDto>($"{_endPoint}{Consts.SearchPath}", queryParams: new() { { "q", search } });
             }
             catch
             {
@@ -37,7 +38,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.RequestAsync<MetropolitanMuseumSearchResponseDto>($"{_endPoint}/objects/{artWorkId}");
+                return await _http.RequestAsync<MetropolitanMuseumSearchResponseDto>($"{_endPoint}{Consts.ObjectsPath}{artWorkId}");
             }
             catch
             {

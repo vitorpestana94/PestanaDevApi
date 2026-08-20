@@ -64,6 +64,15 @@ namespace PestanaDevApi.AppConfig
                 {
                     cron.InTimeZone(TimeZoneInfo.Utc);
                 })); // Every day at 4 AM
+
+                JobKey DeleteMetropolitanMuseumCacheKey = JobKey.Create(nameof(MetropolitanMuseumCacheRefreshJob));
+
+                options.AddJob<NasaCacheRefreshJob>(DeleteMetropolitanMuseumCacheKey)
+                .AddTrigger(trigger => trigger.ForJob(DeleteMetropolitanMuseumCacheKey)
+                .WithCronSchedule(Consts.DeleteMetropolitanMuseumCacheJob, cron =>
+                {
+                    cron.InTimeZone(TimeZoneInfo.Utc);
+                })); // Every day at 4 : 30 AM
             });
 
             services.AddQuartzHostedService(options => 

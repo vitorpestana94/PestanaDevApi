@@ -1,11 +1,9 @@
-﻿using System.Text.Json;
-using System.Text;
+﻿using System.Text;
 using System.Net;
 using PestanaDevApi.Interfaces.Utils;
 using PestanaDevApi.Dtos.Responses;
 using Consts = PestanaDevApi.Constants.GoogleConstants.GoogleApisHttpClient;
 using PestanaDevApi.Interfaces.Services;
-using Microsoft.AspNetCore.Http;
 
 namespace PestanaDevApi.Utils
 {
