@@ -5,7 +5,6 @@ using PestanaDevApi.Extensions.Dtos.Requests;
 using PestanaDevApi.Constants.Messages;
 using System.Net;
 using PestanaDevApi.Utils;
-using PestanaDevApi.Interfaces;
 
 namespace PestanaDevApi.Services
 {
