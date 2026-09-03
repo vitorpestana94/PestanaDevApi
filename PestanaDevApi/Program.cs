@@ -17,6 +17,7 @@ using PestanaDevApi.Interfaces.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.RateLimiting;
 using PestanaDevApi.Interfaces;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,13 @@ builder.Services.AddControllers()
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+});
 
 // Add memory cache.
 builder.Services.AddMemoryCache();
@@ -189,7 +197,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseRateLimiter();
+app.UseRateLimiter();
+
+app.UseForwardedHeaders();
+
 
 app.UseHttpsRedirection();
 
