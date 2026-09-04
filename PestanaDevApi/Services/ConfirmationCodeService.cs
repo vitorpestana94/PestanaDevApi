@@ -74,8 +74,6 @@ namespace PestanaDevApi.Services
             else
             {
                 await _repository.DeleteConfirmationCode(request.ClientEmail);
-
-                return new CheckConfirmationCodeResponse(HttpStatusCode.BadRequest, ErrorMessages.EmailAlreadyConfirmed);
             }
 
             return new();
