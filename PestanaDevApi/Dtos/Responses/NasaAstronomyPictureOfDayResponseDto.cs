@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using PestanaDevApi.Extensions.Dtos.Responses;
 
 namespace PestanaDevApi.Dtos.Responses
 {
@@ -12,7 +13,7 @@ namespace PestanaDevApi.Dtos.Responses
 
         public NasaAstronomyPictureOfDayResponseDto(NasaResponse response) : base()
         {
-            NasaResponse = response;
+            NasaResponse = response.ParseNasaResponse();
         }
 
         public NasaAstronomyPictureOfDayResponseDto(HttpStatusCode statusCode) : base(statusCode)

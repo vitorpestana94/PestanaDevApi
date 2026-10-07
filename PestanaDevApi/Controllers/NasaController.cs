@@ -9,7 +9,7 @@ namespace PestanaDevApi.Controllers
 {
     [Route("nasa")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
 
     public class NasaController: Controller
     {
