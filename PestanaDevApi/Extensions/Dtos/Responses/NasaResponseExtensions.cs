@@ -8,7 +8,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
     {
         public static NasaResponse ParseNasaResponse(this NasaResponse response)
         {
-            response.Explanation = Regex.Replace(ParseHtmlToText(response.Explanation), @"^Explanation:\s*", "");
+            response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation));
             response.Copyright = ParseHtmlToText(response.Copyright);
 
             return response;
@@ -30,6 +30,11 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             doc.LoadHtml(htmlText);
 
            return doc.DocumentNode.InnerText;
+        }
+
+        private static string RemoveUndesiredExplanationContent(string explanation)
+        {
+            return Regex.Replace(explanation, @"^Explanation:\s*|Tomorrow's picture:[\s\S]*$","",RegexOptions.IgnoreCase);
         }
     }
 }
