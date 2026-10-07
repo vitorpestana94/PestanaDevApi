@@ -99,7 +99,7 @@ namespace PestanaDevApi.Services
             if (request.IsDateNotValid())
                 return new(ErrorMessages.InvalidDate);
 
-            NasaResponse? response = await _requestService.GetNasaPictureOfDay(request.Date!);
+            NasaResponse? response = await _requestService.GetNasaPictureOfDay(request.GetDateAsNasaFormat());
 
             return response == null ? new(HttpStatusCode.InternalServerError, ErrorMessages.NasaResponseWithErrors) : new(response);
         }
