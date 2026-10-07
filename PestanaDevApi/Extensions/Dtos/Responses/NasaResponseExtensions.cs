@@ -1,5 +1,6 @@
 ﻿using PestanaDevApi.Dtos.Responses;
 using HtmlAgilityPack;
+using System.Text.RegularExpressions;
 
 namespace PestanaDevApi.Extensions.Dtos.Responses
 {
@@ -7,7 +8,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
     {
         public static NasaResponse ParseNasaResponse(this NasaResponse response)
         {
-            response.Explanation = ParseHtmlToText(response.Explanation);
+            response.Explanation = Regex.Replace(ParseHtmlToText(response.Explanation), @"^Explanation:\s*", "");
             response.Copyright = ParseHtmlToText(response.Copyright);
 
             return response;
