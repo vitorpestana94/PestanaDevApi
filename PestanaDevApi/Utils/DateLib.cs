@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using PestanaDevApi.Extensions;
 
 namespace PestanaDevApi.Utils
 {
@@ -19,7 +20,9 @@ namespace PestanaDevApi.Utils
             DateTime yesterDay = DateTime.UtcNow.AddDays(-1).Date;
             DateTime oneWeekAgo = DateTime.UtcNow.AddDays(-7).Date;
 
-            return (startDate: oneWeekAgo.ToString(_dateFormat), endDate: yesterDay.ToString(_dateFormat));
+            return (startDate: oneWeekAgo.GetNasaDateFormat(), endDate: yesterDay.GetNasaDateFormat());
         }
+
+        public static string GetNasaDate(string date) => ParseDate(date).GetNasaDateFormat();
     }
 }
