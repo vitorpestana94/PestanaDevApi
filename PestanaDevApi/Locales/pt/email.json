@@ -9,12 +9,12 @@
   },
   "confirmationCode": {
     "title": "Olá! Aqui está o seu código de confirmação.",
-    "paragraph": "Copie cada elemento e cole campo de confirmação.",
+    "paragraph": "Copie cada elemento e cole no campo de confirmação.",
     "subcopyright": {
       "Contact": "Você recebeu este e-mail porque requisitou contato no meu site.",
       "SignUp": "Você recebeu este e-mail porque requisitou um cadastro no meu site.",
       "ForgotPassword": "Você recebeu este e-mail porque esqueceu sua senha no meu site.",
-      "CredentialsChange": "Você recebeu este e-mail porque esqueceu sua senha no meu site.",
+      "CredentialsChange": "Você recebeu este e-mail porque esqueceu suas credenciais no meu site.",
       "DeleteAccount": "Você recebeu este e-mail porque está tentando deletar sua conta no meu site."
     }
   }
