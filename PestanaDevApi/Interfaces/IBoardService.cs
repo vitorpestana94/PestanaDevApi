@@ -1,7 +1,10 @@
-﻿namespace PestanaDevApi.Interfaces
+﻿using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Dtos.Requests;
+
+namespace PestanaDevApi.Interfaces
 {
     public interface IBoardService
     {
-        Task CreateBoard(Guid userId);
+        Task<CreateBoardResponseDto> CreateBoard(Guid userId, CreateBoardRequestDto dto);
     }
 }

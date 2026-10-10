@@ -1,4 +1,6 @@
-﻿using PestanaDevApi.Interfaces;
+﻿using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Interfaces;
 using PestanaDevApi.Interfaces.Repositories;
 
 namespace PestanaDevApi.Services
@@ -12,9 +14,12 @@ namespace PestanaDevApi.Services
             _repository = repository;
         }
 
-        public async Task CreateBoard(Guid userId)
+        public async Task<CreateBoardResponseDto> CreateBoard(Guid userId, CreateBoardRequestDto dto)
         {
 
+            await _repository.InsertBoard(userId, dto);
+
+            return new();
         }
     }
 }
