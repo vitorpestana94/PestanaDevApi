@@ -11,9 +11,5 @@
         public int Position { get; set; }
 
         public DateTime CreatedAt { get; set; }
-
-        public Board Board { get; set; } = null!;
-
-        public ICollection<BoardTask> Tasks { get; set; } = [];
     }
 }

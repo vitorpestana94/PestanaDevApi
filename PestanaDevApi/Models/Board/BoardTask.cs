@@ -19,9 +19,5 @@
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
-
-        public BoardColumn Column { get; set; } = null!;
-
-        public BoardUser? TaskOwner { get; set; }
     }
 }

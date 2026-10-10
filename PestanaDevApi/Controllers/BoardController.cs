@@ -24,9 +24,31 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckConfirmationCode([FromBody] CreateBoardRequestDto request)
+        public async Task<IActionResult> CreateBoard([FromBody] CreateBoardRequestDto request)
         {
             CreateBoardResponseDto response = await _service.CreateBoard(UserId, request);
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserBoardsIds()
+        {
+            GetBoardsResponseDto response = await _service.GetUserBoardsIds(UserId);
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBoardData(Guid id)
+        {
+            GetBoardDataResponseDto response = await _service.GetBoardData(id);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();

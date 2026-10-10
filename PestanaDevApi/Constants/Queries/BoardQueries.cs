@@ -2,6 +2,7 @@
 {
     public static class BoardQueries
     {
+        #region Inserts
         public const string Insert = @"
         START TRANSACTION;
 
@@ -34,5 +35,60 @@
         );
 
         COMMIT;";
+        #endregion
+
+        #region Selects
+        public const string Select = @"
+        SELECT
+            id AS Id,
+            owner_id AS OwnerId,
+            name AS Name,
+            description AS Description,
+            created_at AS CreatedAt,
+            updated_at AS UpdatedAt
+        FROM BOARD
+        WHERE owner_id = @UserId;";
+
+        public const string SelectBoardData = @"
+        SELECT
+            id AS Id,
+            owner_id AS OwnerId,
+            name AS Name,
+            description AS Description,
+            created_at AS CreatedAt,
+            updated_at AS UpdatedAt
+        FROM BOARD
+        WHERE id = @Id;
+
+        SELECT
+            id AS Id,
+            board_id AS BoardId,
+            name AS Name,
+            position AS Position,
+            created_at AS CreatedAt
+        FROM BOARD_COLUMNS
+        WHERE board_id = @Id;
+
+        SELECT
+            id AS Id,
+            board_id AS BoardId,
+            column_id AS ColumnId,
+            task_owner_id AS TaskOwnerId,
+            task_type AS TaskType,
+            task_name AS TaskName,
+            task_description AS TaskDescription,
+            created_at AS CreatedAt,
+            updated_at AS UpdatedAt
+        FROM BOARD_TASKS
+        WHERE board_id = @Id;
+
+        SELECT
+            u.id AS Id,
+            u.user_name AS UserName,
+            u.user_email AS UserEmail
+        FROM USERS_PROFILE_DATA u
+        INNER JOIN BOARD_USERS bu ON bu.user_id = u.id
+        WHERE bu.board_id = @Id;";
+        #endregion
     }
 }

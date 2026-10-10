@@ -13,11 +13,5 @@
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
-
-        public User Owner { get; set; } = null!;
-
-        public ICollection<BoardUser> Users { get; set; } = [];
-
-        public ICollection<BoardColumn> Columns { get; set; } = [];
     }
 }

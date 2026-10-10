@@ -8,13 +8,13 @@ namespace PestanaDevApi.Dtos.Requests
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        public ColumnNames ColumnsNames { get; set; } = new();
+        public CreateColumnNames ColumnsNames { get; set; } = new();
 
         [Required]
-        public BoardTask BoardTask { get; set; } = new();
+        public CreateBoardTask BoardTask { get; set; } = new();
     }
 
-    public class ColumnNames
+    public class CreateColumnNames
     {
         [Required]
         public string ColumnNameOne { get; set; } = string.Empty;
@@ -32,7 +32,7 @@ namespace PestanaDevApi.Dtos.Requests
         public string ColumnNameFive { get; set; } = string.Empty;
     }
 
-    public class BoardTask
+    public class CreateBoardTask
     {
         [Required] 
         public string TaskName { get; set; } = string.Empty;
