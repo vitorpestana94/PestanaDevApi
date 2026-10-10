@@ -21,12 +21,9 @@
 
         #region Board Columns
         public const string ColumnNotFound = $"8C1B : Column was not found!";
-        public const string ColumnNotCreated = $"4F5A : Column was not created due internal errors!";
         public const string ColumnNotUpdated = $"D6B3 : Column was not updated due internal errors!";
-        public const string ColumnNotDeleted = $"0A9E : Column was not deleted due internal errors!";
         public const string ColumnRequestDontHaveAnyChangedData = $"E2F4 : Cannot update column because no changes were detected.";
         public const string ColumnNameAlreadyExists = $"6D8A : This board already has a column with this name!";
-        public const string BoardMustHaveAtLeastOneColumn = $"9F3C : The board must have at least one column!";
         #endregion
 
         #region Board Members

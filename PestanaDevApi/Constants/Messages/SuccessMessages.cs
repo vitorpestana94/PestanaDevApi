@@ -15,9 +15,7 @@
         public const string BoardDeleted = "Board was successfully deleted!";
         public const string TaskUpdated = "Task was successfully updated!";
         public const string TaskDeleted = "Task was successfully deleted!";
-        public const string ColumnCreated = "Column was successfully created!";
         public const string ColumnUpdated = "Column was successfully updated!";
-        public const string ColumnDeleted = "Column was successfully deleted!";
         public const string MemberAdded = "Member was successfully added!";
         public const string MemberRemoved = "Member was successfully removed!";
         #endregion
