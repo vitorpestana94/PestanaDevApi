@@ -15,12 +15,20 @@ namespace PestanaDevApi.Controllers
     public class BoardController: Controller
     {
         private readonly IBoardService _service;
+        private readonly IBoardPanelService _panelService;
+        private readonly IBoardTaskService _taskService;
+        private readonly IBoardColumnService _columnService;
+        private readonly IBoardMemberService _memberService;
         private Guid UserId => User.GetUserId();
 
 
-        public BoardController(IBoardService service)
+        public BoardController(IBoardService service, IBoardPanelService panelService, IBoardTaskService taskService, IBoardColumnService columnService, IBoardMemberService memberService)
         {
             _service = service;
+            _panelService = panelService;
+            _taskService = taskService;
+            _columnService = columnService;
+            _memberService = memberService;
         }
 
         [HttpPost]
@@ -60,7 +68,7 @@ namespace PestanaDevApi.Controllers
         [HttpPatch("{boardId}")]
         public async Task<IActionResult> UpdateBoard(Guid boardId, [FromBody] UpdateBoardRequestDto request)
         {
-            UpdateBoardResponseDto response = await _service.UpdateBoard(UserId, boardId, request);
+            UpdateBoardResponseDto response = await _panelService.UpdateBoard(UserId, boardId, request);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -71,7 +79,7 @@ namespace PestanaDevApi.Controllers
         [HttpDelete("{boardId}")]
         public async Task<IActionResult> DeleteBoard(Guid boardId)
         {
-            DeleteBoardResponseDto response = await _service.DeleteBoard(UserId, boardId);
+            DeleteBoardResponseDto response = await _panelService.DeleteBoard(UserId, boardId);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -84,7 +92,7 @@ namespace PestanaDevApi.Controllers
         [HttpPatch("{boardId}/tasks/{taskId}")]
         public async Task<IActionResult> UpdateTask(Guid boardId, Guid taskId, [FromBody] UpdateBoardTaskRequestDto request)
         {
-            UpdateBoardTaskResponseDto response = await _service.UpdateTask(UserId, boardId, taskId, request);
+            UpdateBoardTaskResponseDto response = await _taskService.UpdateTask(UserId, boardId, taskId, request);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -95,7 +103,7 @@ namespace PestanaDevApi.Controllers
         [HttpDelete("{boardId}/tasks/{taskId}")]
         public async Task<IActionResult> DeleteTask(Guid boardId, Guid taskId)
         {
-            DeleteBoardTaskResponseDto response = await _service.DeleteTask(UserId, boardId, taskId);
+            DeleteBoardTaskResponseDto response = await _taskService.DeleteTask(UserId, boardId, taskId);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -105,32 +113,10 @@ namespace PestanaDevApi.Controllers
         #endregion
 
         #region Columns
-        [HttpPost("{boardId}/columns")]
-        public async Task<IActionResult> CreateColumn(Guid boardId, [FromBody] CreateBoardColumnRequestDto request)
-        {
-            CreateBoardColumnResponseDto response = await _service.CreateColumn(UserId, boardId, request);
-
-            if (!response.IsSuccess)
-                return response.HandleFailure();
-
-            return Ok(response);
-        }
-
         [HttpPatch("{boardId}/columns/{columnId}")]
         public async Task<IActionResult> UpdateColumn(Guid boardId, Guid columnId, [FromBody] UpdateBoardColumnRequestDto request)
         {
-            UpdateBoardColumnResponseDto response = await _service.UpdateColumn(UserId, boardId, columnId, request);
-
-            if (!response.IsSuccess)
-                return response.HandleFailure();
-
-            return Ok(response);
-        }
-
-        [HttpDelete("{boardId}/columns/{columnId}")]
-        public async Task<IActionResult> DeleteColumn(Guid boardId, Guid columnId)
-        {
-            DeleteBoardColumnResponseDto response = await _service.DeleteColumn(UserId, boardId, columnId);
+            UpdateBoardColumnResponseDto response = await _columnService.UpdateColumn(UserId, boardId, columnId, request);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -143,7 +129,7 @@ namespace PestanaDevApi.Controllers
         [HttpGet("{boardId}/members")]
         public async Task<IActionResult> GetBoardMembers(Guid boardId)
         {
-            GetBoardMembersResponseDto response = await _service.GetBoardMembers(UserId, boardId);
+            GetBoardMembersResponseDto response = await _memberService.GetBoardMembers(UserId, boardId);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -154,7 +140,7 @@ namespace PestanaDevApi.Controllers
         [HttpPost("{boardId}/members")]
         public async Task<IActionResult> AddBoardMember(Guid boardId, [FromBody] AddBoardMemberRequestDto request)
         {
-            AddBoardMemberResponseDto response = await _service.AddBoardMember(UserId, boardId, request);
+            AddBoardMemberResponseDto response = await _memberService.AddBoardMember(UserId, boardId, request);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
@@ -165,7 +151,7 @@ namespace PestanaDevApi.Controllers
         [HttpDelete("{boardId}/members/{userId}")]
         public async Task<IActionResult> RemoveBoardMember(Guid boardId, Guid userId)
         {
-            RemoveBoardMemberResponseDto response = await _service.RemoveBoardMember(UserId, boardId, userId);
+            RemoveBoardMemberResponseDto response = await _memberService.RemoveBoardMember(UserId, boardId, userId);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();
