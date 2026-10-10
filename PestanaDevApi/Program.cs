@@ -131,6 +131,7 @@ builder.Services.AddScoped<IMetropolitanMuseumRequestService, MetropolitanMuseum
 builder.Services.AddScoped<IMetropolitanMuseumIntegrationService, MetropolitanMuseumIntegrationService>();
 builder.Services.AddScoped<IMetropolitanMuseumCacheService, MetropolitanMuseumCacheService>();
 builder.Services.AddScoped<ISemaphoreService, SemaphoreService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
@@ -150,6 +151,7 @@ builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCo
 builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();
 
 #endregion
 
