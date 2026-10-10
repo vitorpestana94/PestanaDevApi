@@ -1,12 +1,13 @@
 ﻿using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Extensions;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Utils;
 
 namespace PestanaDevApi.Services
 {
     public class NasaRequestService: INasaRequestService
     {
         private readonly string _endPoint;
-        private readonly string _key;
         private readonly IConfiguration _config;
         private readonly IRequestService _http;
 
@@ -15,21 +16,17 @@ namespace PestanaDevApi.Services
             _config = configuration;
             _http = http;
 
-            if (string.IsNullOrEmpty(_config["nasa.key"]))
-                throw new InvalidOperationException("Nasa key not configured!");
-
             if (string.IsNullOrEmpty(_config["nasa.endpoint"]))
-                throw new InvalidOperationException("Nasa end-poin not configured!");
+                throw new InvalidOperationException("Nasa end-point not configured!");
 
             _endPoint = _config["nasa.endpoint"]!;
-            _key = _config["nasa.key"]!;
         }
 
         public async Task<NasaResponse?> GetNasaPictureOfToday()
         {
             try
             {
-                return await _http.RequestAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams());
+                return await _http.RequestAsync<NasaResponse>(GetNasaEndPointWithDate());
             }
             catch
             {
@@ -41,7 +38,7 @@ namespace PestanaDevApi.Services
         {
             try
             {
-                return await _http.RequestAsync<NasaResponse>(_endPoint, queryParams: GetQueryParams(date));
+                return await _http.RequestAsync<NasaResponse>(GetNasaEndPointWithDate(date));
             }
             catch
             {
@@ -63,14 +60,6 @@ namespace PestanaDevApi.Services
 
         #region Private Methods
         /// <summary>
-        /// Creates the default query parameters required for every NASA API request.
-        /// </summary>
-        /// <returns>
-        /// A dictionary containing the API authentication key.
-        /// </returns>
-        private Dictionary<string, string> GetQueryParams() => new() { { "api_key" , _key}};
-
-        /// <summary>
         /// Creates the query parameters required to retrieve the Astronomy Picture of the Day
         /// for a specific date.
         /// </summary>
@@ -80,14 +69,9 @@ namespace PestanaDevApi.Services
         /// <returns>
         /// A dictionary containing the API key and the requested date.
         /// </returns>
-        private Dictionary<string, string> GetQueryParams(string date)
-        {
-            Dictionary<string, string> queryParams = GetQueryParams();
+        private string GetNasaEndPointWithDate() => $"{_endPoint}/{DateTime.Today.GetNasaDateFormat()}";
 
-            queryParams.Add("date", date);
-
-            return queryParams;
-        }
+        private string GetNasaEndPointWithDate(string date) => $"{_endPoint}/{date}";
 
         /// <summary>
         /// Creates the query parameters required to retrieve Astronomy Pictures of the Day
@@ -102,12 +86,13 @@ namespace PestanaDevApi.Services
         /// <returns>
         /// A dictionary containing the API key, start date, and end date.
         /// </returns>
-        private Dictionary<string, string> GetQueryParams(string startDate, string endDate)
+        private static Dictionary<string, string> GetQueryParams(string startDate, string endDate)
         {
-            Dictionary<string, string> queryParams = GetQueryParams();
-
-            queryParams.Add("start_date", startDate);
-            queryParams.Add("end_date", endDate);
+            Dictionary<string, string> queryParams = new()
+            {
+                { "date_from", DateLib.GetNasaDate(startDate) },
+                { "date_to", DateLib.GetNasaDate(endDate) }
+            };
 
             return queryParams;
         }

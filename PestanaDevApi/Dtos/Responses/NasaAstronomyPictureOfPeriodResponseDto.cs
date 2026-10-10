@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using PestanaDevApi.Extensions.Dtos.Responses;
 
 namespace PestanaDevApi.Dtos.Responses
 {
@@ -12,7 +13,7 @@ namespace PestanaDevApi.Dtos.Responses
 
         public NasaAstronomyPicturesOfPeriodResponseDto(IEnumerable<NasaResponse> nasaResponse) : base()
         {
-            NasaResponse = nasaResponse.OrderByDescending(response => response.Date) ;
+            NasaResponse = nasaResponse.ParseNasaResponse();
         }
 
         public NasaAstronomyPicturesOfPeriodResponseDto(HttpStatusCode statusCode) : base(statusCode)
