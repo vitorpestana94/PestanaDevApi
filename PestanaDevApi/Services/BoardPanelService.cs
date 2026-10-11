@@ -4,6 +4,7 @@ using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Models;
 using PestanaDevApi.Models.Board;
 using PestanaDevApi.Extensions.Models;
 using PestanaDevApi.Extensions.Dtos.Requests;
@@ -14,12 +15,14 @@ namespace PestanaDevApi.Services
     public class BoardPanelService: IBoardPanelService
     {
         private readonly IBoardPanelRepository _repository;
+        private readonly IBoardMemberRepository _memberRepository;
         private readonly IBoardCacheService _cacheService;
         private readonly IBoardNotificationService _notificationService;
 
-        public BoardPanelService(IBoardPanelRepository repository, IBoardCacheService cacheService, IBoardNotificationService notificationService)
+        public BoardPanelService(IBoardPanelRepository repository, IBoardMemberRepository memberRepository, IBoardCacheService cacheService, IBoardNotificationService notificationService)
         {
             _repository = repository;
+            _memberRepository = memberRepository;
             _cacheService = cacheService;
             _notificationService = notificationService;
         }
@@ -41,7 +44,7 @@ namespace PestanaDevApi.Services
                 return new(HttpStatusCode.InternalServerError, ErrorMessage.BoardNotUpdated);
 
             _cacheService.DeleteBoardDataCache(boardId);
-            _cacheService.DeleteUserBoardsCache(board.OwnerId);
+            await DeleteMembersBoardsCache(boardId);
 
             Board? updatedBoard = await _repository.GetBoard(boardId);
 
@@ -61,16 +64,34 @@ namespace PestanaDevApi.Services
             if (!board.IsBoardOwner(userId))
                 return new(HttpStatusCode.Forbidden, ErrorMessage.UserIsNotBoardOwner);
 
+            // The members are read before the delete, since the delete also removes them.
+            IEnumerable<User> members = await _memberRepository.GetBoardMembers(boardId);
+
             if (!await _repository.DeleteBoard(boardId))
                 return new(HttpStatusCode.InternalServerError, ErrorMessage.BoardNotDeleted);
 
             _cacheService.DeleteBoardDataCache(boardId);
             _cacheService.DeleteBoardMembersCache(boardId);
-            _cacheService.DeleteUserBoardsCache(board.OwnerId);
+            DeleteMembersBoardsCache(members);
 
             await _notificationService.NotifyBoardDeleted(userId, boardId);
 
             return new();
         }
+
+        #region Private Methods
+        /// <summary>
+        /// Removes the cached boards list of every board member, since the list shows the board name.
+        /// </summary>
+        private async Task DeleteMembersBoardsCache(Guid boardId) => DeleteMembersBoardsCache(await _memberRepository.GetBoardMembers(boardId));
+
+        private void DeleteMembersBoardsCache(IEnumerable<User> members)
+        {
+            foreach (User member in members)
+            {
+                _cacheService.DeleteUserBoardsCache(member.Id);
+            }
+        }
+        #endregion
     }
 }

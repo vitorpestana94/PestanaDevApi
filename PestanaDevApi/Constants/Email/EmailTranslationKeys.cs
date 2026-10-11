@@ -21,5 +21,13 @@ namespace PestanaDevApi.Constants.Email
         public const string ConfirmationCodeParagraph = "email:confirmationCode.paragraph";
         public static string GetConfirmationCodeSubcopyright(ConfirmationCodeEmailTypeEnum type) => $"email:confirmationCode.subcopyright.{type}";
         #endregion
+
+        #region Board Invitation
+        public const string BoardInvitationSubject = "email:boardInvitation.subject";
+        public const string BoardInvitationTitle = "email:boardInvitation.title";
+        public const string BoardInvitationParagraph = "email:boardInvitation.paragraph";
+        public const string BoardInvitationButton = "email:boardInvitation.button";
+        public const string BoardInvitationSubcopyright = "email:boardInvitation.subcopyright";
+        #endregion
     }
 }

@@ -20,5 +20,12 @@
       "CredentialsChange": "You received this email because you are trying to change your credentials on my website.",
       "DeleteAccount": "You received this email because you are trying to delete your account on my website."
     }
+  },
+  "boardInvitation": {
+    "subject": "You've been invited to a Scrum Board",
+    "title": "You've been invited to a Scrum Board!",
+    "paragraph": "<strong>{{ownerEmail}}</strong> invited you to join their Scrum Board.<br>To accept the invitation, you first need to create your account.",
+    "button": "Sign up and join the board",
+    "subcopyright": "You received this email because {{ownerEmail}} invited you to a Scrum Board on my website."
   }
 }

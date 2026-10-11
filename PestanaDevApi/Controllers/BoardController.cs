@@ -56,7 +56,7 @@ namespace PestanaDevApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBoardData(Guid id)
         {
-            GetBoardDataResponseDto response = await _service.GetBoardData(id);
+            GetBoardDataResponseDto response = await _service.GetBoardData(UserId, id);
 
             if (!response.IsSuccess)
                 return response.HandleFailure();

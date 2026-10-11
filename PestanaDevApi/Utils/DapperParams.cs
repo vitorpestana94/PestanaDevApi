@@ -18,5 +18,7 @@
         public static object ToBaordId(Guid boardId) => new { BoardId = boardId };
         public static object ToId(Guid id) => new { Id = id };
         public static object ToBoardIdAndUserId(Guid boardId, Guid userId) => new { BoardId = boardId, UserId = userId };
-        public static object ToBoardIdAndTaskId(Guid boardId, Guid taskId) => new { BoardId = boardId, TaskId = taskId };    }
+        public static object ToBoardIdAndTaskId(Guid boardId, Guid taskId) => new { BoardId = boardId, TaskId = taskId };
+        public static object ToBoardIdAndEmail(Guid boardId, string email) => new { BoardId = boardId, Email = email };
+        public static object ToInsertInvitation(Guid boardId, string email, Guid invitedBy) => new { BoardId = boardId, Email = email, UserId = invitedBy };    }
 }

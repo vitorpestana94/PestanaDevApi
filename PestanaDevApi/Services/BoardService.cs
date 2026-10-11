@@ -6,6 +6,7 @@ using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Models;
 using PestanaDevApi.Models.Board;
+using PestanaDevApi.Extensions.Dtos.Requests;
 using ErrorMessage = PestanaDevApi.Constants.Messages.ErrorMessages;
 
 namespace PestanaDevApi.Services
@@ -13,16 +14,22 @@ namespace PestanaDevApi.Services
     public class BoardService: IBoardService
     {
         private readonly IBoardRepository _repository;
+        private readonly IBoardPanelRepository _boardPanelRepository;
         private readonly IBoardCacheService _cacheService;
 
-        public BoardService(IBoardRepository repository, IBoardCacheService cacheService)
+        public BoardService(IBoardRepository repository, IBoardPanelRepository boardPanelRepository, IBoardCacheService cacheService)
         {
             _repository = repository;
+            _boardPanelRepository = boardPanelRepository;
             _cacheService = cacheService;
         }
 
         public async Task<CreateBoardResponseDto> CreateBoard(Guid userId, CreateBoardRequestDto dto)
         {
+            // Without this check the database unique constraint (board_id, name) would return an internal error.
+            if (dto.ColumnsNames.HasDuplicatedNames())
+                return new(HttpStatusCode.BadRequest, ErrorMessage.BoardColumnsNamesMustBeUnique);
+
             await _repository.InsertBoard(userId, dto);
 
             _cacheService.DeleteUserBoardsCache(userId);
@@ -35,14 +42,17 @@ namespace PestanaDevApi.Services
             return _cacheService.GetUserBoardsCache(userId) ?? await GetUserBoardsIdsFromDB(userId);
         }
 
-        public async Task<GetBoardDataResponseDto> GetBoardData(Guid boardId)
+        public async Task<GetBoardDataResponseDto> GetBoardData(Guid userId, Guid boardId)
         {
+            if (!await _boardPanelRepository.IsBoardMember(boardId, userId))
+                return new(HttpStatusCode.Forbidden, ErrorMessage.UserIsNotBoardMember);
+
             return _cacheService.GetBoardDataCache(boardId) ?? await GettBoardDataFromDB(boardId);
         }
 
         #region Private Methods
         /// <summary>
-        /// Retrieves the boards owned by the user from the database and caches the response.
+        /// Retrieves the boards where the user is a member from the database and caches the response.
         /// </summary>
         private async Task<GetBoardsResponseDto> GetUserBoardsIdsFromDB(Guid userId)
         {

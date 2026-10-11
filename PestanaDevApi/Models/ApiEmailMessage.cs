@@ -27,5 +27,14 @@ namespace PestanaDevApi.Models
             Body = body;
             IsBodyHtml = true;
         }
+
+        public ApiEmailMessage(EmailRequest request, string fromEmaillAddress, string subject, string body)
+        {
+            From = new MailAddress(fromEmaillAddress);
+            To.Add(request.ClientEmail);
+            Subject = subject;
+            Body = body;
+            IsBodyHtml = true;
+        }
     }
 }

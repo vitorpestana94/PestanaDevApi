@@ -44,5 +44,35 @@ namespace PestanaDevApi.Repositories
 
             return await db.ExecuteAsync(Sql.DeleteMember, Params.ToBoardIdAndUserId(boardId, userId)) > 0;
         }
+
+        public async Task<User?> GetUserById(Guid userId)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.QueryFirstOrDefaultAsync<User?>(Sql.SelectUserById, Params.ToUserId(userId));
+        }
+
+        #region Invitations
+        public async Task<bool> InsertInvitation(Guid boardId, string email, Guid invitedBy)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteAsync(Sql.InsertInvitation, Params.ToInsertInvitation(boardId, email, invitedBy)) > 0;
+        }
+
+        public async Task<bool> IsUserInvited(Guid boardId, string email)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteScalarAsync<bool>(Sql.SelectIsUserInvited, Params.ToBoardIdAndEmail(boardId, email));
+        }
+
+        public async Task DeleteInvitation(Guid boardId, string email)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            await db.ExecuteAsync(Sql.DeleteInvitation, Params.ToBoardIdAndEmail(boardId, email));
+        }
+        #endregion
     }
 }

@@ -19,5 +19,12 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             dto.BoardTask.TaskType,
             dto.BoardTask.TaskDescription
         };
+
+        public static bool HasDuplicatedNames(this CreateColumnNames columnsNames)
+        {
+            string[] names = [columnsNames.ColumnNameOne, columnsNames.ColumnNameTwo, columnsNames.ColumnNameThree, columnsNames.ColumnNameFour, columnsNames.ColumnNameFive];
+
+            return names.Distinct(StringComparer.OrdinalIgnoreCase).Count() != names.Length;
+        }
     }
 }

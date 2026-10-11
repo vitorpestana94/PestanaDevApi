@@ -4,6 +4,7 @@ using Moq;
 using PestanaDevApi.Constants.Email;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
+using PestanaDevApi.Exceptions;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Models.Enums;
@@ -91,6 +92,26 @@ namespace PestanaDevApi.Tests.Services
             Assert.Contains($"{DateTime.Now.Year} Pestana Dev.", html);
             Assert.DoesNotContain("{{", html);
         }
+
+        [Fact]
+        public async Task GetEmailTemplate_FillsTheBoardInvitationEmailWithOwnerAndSignUpButton()
+        {
+            BoardInvitationEmailDto request = new(Guid.NewGuid(), "invited@email.com", "owner@email.com", "pt");
+
+            string html = await _service.GetEmailTemplate(request, "http://localhost:3000/pt/authentication/sign-up?redirectTo=scrum-board&boardId=1");
+
+            Assert.Contains("Você recebeu um convite para um Scrum Board!", html);
+            Assert.Contains("<strong>owner@email.com</strong>", html);
+            Assert.Contains("href=\"http://localhost:3000/pt/authentication/sign-up?redirectTo=scrum-board&amp;boardId=1\"", html);
+            Assert.Contains("Cadastre-se e entre no board", html);
+            Assert.DoesNotContain("{{", html);
+        }
+
+        [Fact]
+        public void GetBoardInvitationSubject_IsTranslated()
+        {
+            Assert.Equal("You've been invited to a Scrum Board", _service.GetBoardInvitationSubject(new(Guid.NewGuid(), "invited@email.com", "owner@email.com", "en")));
+        }
     }
 
     public class EmailServiceTests
@@ -160,6 +181,14 @@ namespace PestanaDevApi.Tests.Services
 
             Assert.True(response.IsSuccess);
             _codeService.Verify(c => c.GenerateConfirmationCode(It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SendBoardInvitationEmail_Throws_WhenClientSideSystemUrlIsNotConfigured()
+        {
+            ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _service.SendBoardInvitationEmail(new(Guid.NewGuid(), "invited@email.com", "owner@email.com", "en")));
+
+            Assert.Equal(500, exception.StatusCode);
         }
 
         [Fact]

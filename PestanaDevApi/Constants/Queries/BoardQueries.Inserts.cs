@@ -38,5 +38,13 @@
         public const string InsertMember = @"
         INSERT INTO BOARD_USERS(board_id, user_id)
         VALUES(@BoardId, @UserId);";
+
+        // Inviting the same email again only refreshes the invitation.
+        public const string InsertInvitation = @"
+        INSERT INTO BOARD_INVITATIONS(board_id, invited_email, invited_by)
+        VALUES(@BoardId, @Email, @UserId)
+        ON DUPLICATE KEY UPDATE
+            invited_by = @UserId,
+            created_at = CURRENT_TIMESTAMP(6);";
     }
 }

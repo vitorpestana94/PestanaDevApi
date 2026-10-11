@@ -9,6 +9,7 @@
         public const string BoardRequestDontHaveAnyChangedData = $"C3D2 : Cannot update board because no changes were detected.";
         public const string UserIsNotBoardMember = $"7E1A : You are not a member of this board!";
         public const string UserIsNotBoardOwner = $"E8C5 : Only the board owner can do this action!";
+        public const string BoardColumnsNamesMustBeUnique = $"A7D3 : The board columns names must be different from each other!";
         #endregion
 
         #region Board Tasks
@@ -32,6 +33,9 @@
         public const string MemberNotRemoved = $"3E4B : Member was not removed due internal errors!";
         public const string UserIsAlreadyBoardMember = $"F5C7 : This user is already a member of this board!";
         public const string BoardOwnerCannotBeRemoved = $"2C8D : The board owner cannot be removed from the board!";
+        public const string UserWasNotInvitedToBoard = $"5E9B : You were not invited to this board!";
+        public const string MemberNotInvited = $"C2F8 : The invitation was not created due internal errors!";
+        public const string ClientSideSystemUrlNotConfigured = $"7A4E : The client side system url is not configured!";
         #endregion
     }
 }

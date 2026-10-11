@@ -17,6 +17,7 @@
         public const string TaskDeleted = "Task was successfully deleted!";
         public const string ColumnUpdated = "Column was successfully updated!";
         public const string MemberAdded = "Member was successfully added!";
+        public const string MemberInvited = "The user is not registered yet, so an invitation to sign up was sent by email!";
         public const string MemberRemoved = "Member was successfully removed!";
         #endregion
     }

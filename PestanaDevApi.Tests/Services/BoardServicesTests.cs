@@ -4,6 +4,7 @@ using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
+using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Models;
 using PestanaDevApi.Models.Board;
 using PestanaDevApi.Services;
@@ -33,22 +34,40 @@ namespace PestanaDevApi.Tests.Services
     public class BoardServiceTests
     {
         private readonly Mock<IBoardRepository> _repository = new();
+        private readonly Mock<IBoardPanelRepository> _boardPanelRepository = new();
         private readonly Mock<IBoardCacheService> _cacheService = new();
         private readonly BoardService _service;
+        private readonly Guid _userId = Guid.NewGuid();
+        private readonly Guid _boardId = Guid.NewGuid();
 
         public BoardServiceTests()
         {
-            _service = new(_repository.Object, _cacheService.Object);
+            _boardPanelRepository.Setup(r => r.IsBoardMember(_boardId, _userId)).ReturnsAsync(true);
+            _service = new(_repository.Object, _boardPanelRepository.Object, _cacheService.Object);
+        }
+
+        private static CreateBoardRequestDto CreateRequest(string columnFive = "Done") => new()
+        {
+            Name = "Board",
+            ColumnsNames = new() { ColumnNameOne = "Todo", ColumnNameTwo = "Doing", ColumnNameThree = "Review", ColumnNameFour = "Test", ColumnNameFive = columnFive }
+        };
+
+        [Fact]
+        public async Task GetBoardData_ReturnsForbidden_WhenUserIsNotMember()
+        {
+            GetBoardDataResponseDto response = await _service.GetBoardData(Guid.NewGuid(), _boardId);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            _cacheService.Verify(c => c.GetBoardDataCache(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
         public async Task GetBoardData_ReturnsCache_WithoutRequestingTheDatabase()
         {
-            Guid boardId = Guid.NewGuid();
             GetBoardDataResponseDto cached = new(HttpStatusCode.OK, "cached");
-            _cacheService.Setup(c => c.GetBoardDataCache(boardId)).Returns(cached);
+            _cacheService.Setup(c => c.GetBoardDataCache(_boardId)).Returns(cached);
 
-            GetBoardDataResponseDto response = await _service.GetBoardData(boardId);
+            GetBoardDataResponseDto response = await _service.GetBoardData(_userId, _boardId);
 
             Assert.Same(cached, response);
             _repository.Verify(r => r.GetBoardData(It.IsAny<Guid>()), Times.Never);
@@ -57,7 +76,7 @@ namespace PestanaDevApi.Tests.Services
         [Fact]
         public async Task GetBoardData_ReturnsNotFoundAndDoesNotCache_WhenBoardDoesNotExist()
         {
-            GetBoardDataResponseDto response = await _service.GetBoardData(Guid.NewGuid());
+            GetBoardDataResponseDto response = await _service.GetBoardData(_userId, _boardId);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             _cacheService.Verify(c => c.SetBoardDataCache(It.IsAny<Guid>(), It.IsAny<GetBoardDataResponseDto>()), Times.Never);
@@ -66,33 +85,53 @@ namespace PestanaDevApi.Tests.Services
         [Fact]
         public async Task GetBoardData_CachesTheResponse_WhenBoardExists()
         {
-            Guid boardId = Guid.NewGuid();
-            _repository.Setup(r => r.GetBoardData(boardId)).ReturnsAsync((new Board(), new List<BoardTask>(), new List<User>(), new List<BoardColumn>()));
+            _repository.Setup(r => r.GetBoardData(_boardId)).ReturnsAsync((new Board(), new List<BoardTask>(), new List<User>(), new List<BoardColumn>()));
 
-            GetBoardDataResponseDto response = await _service.GetBoardData(boardId);
+            GetBoardDataResponseDto response = await _service.GetBoardData(_userId, _boardId);
 
             Assert.True(response.IsSuccess);
-            _cacheService.Verify(c => c.SetBoardDataCache(boardId, response), Times.Once);
+            _cacheService.Verify(c => c.SetBoardDataCache(_boardId, response), Times.Once);
         }
 
         [Fact]
         public async Task CreateBoard_ClearsUserBoardsCache()
         {
-            Guid userId = Guid.NewGuid();
+            await _service.CreateBoard(_userId, CreateRequest());
 
-            await _service.CreateBoard(userId, new());
+            _cacheService.Verify(c => c.DeleteUserBoardsCache(_userId), Times.Once);
+        }
 
-            _cacheService.Verify(c => c.DeleteUserBoardsCache(userId), Times.Once);
+        [Fact]
+        public async Task CreateBoard_ReturnsBadRequest_WhenColumnsNamesAreDuplicated()
+        {
+            CreateBoardResponseDto response = await _service.CreateBoard(_userId, CreateRequest(columnFive: "todo"));
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            _repository.Verify(r => r.InsertBoard(It.IsAny<Guid>(), It.IsAny<CreateBoardRequestDto>()), Times.Never);
         }
     }
 
     public class BoardPanelServiceTests: BoardTestsBase
     {
+        private readonly Mock<IBoardMemberRepository> _memberRepository = new();
         private readonly BoardPanelService _service;
+        private readonly Guid _memberId = Guid.NewGuid();
 
         public BoardPanelServiceTests()
         {
-            _service = new(BoardRepository.Object, CacheService.Object, NotificationService.Object);
+            _memberRepository.Setup(r => r.GetBoardMembers(BoardId)).ReturnsAsync([new User { Id = OwnerId }, new User { Id = _memberId }]);
+            _service = new(BoardRepository.Object, _memberRepository.Object, CacheService.Object, NotificationService.Object);
+        }
+
+        [Fact]
+        public async Task DeleteBoard_ClearsTheBoardsListCacheOfEveryMember()
+        {
+            BoardRepository.Setup(r => r.DeleteBoard(BoardId)).ReturnsAsync(true);
+
+            await _service.DeleteBoard(OwnerId, BoardId);
+
+            CacheService.Verify(c => c.DeleteUserBoardsCache(OwnerId), Times.Once);
+            CacheService.Verify(c => c.DeleteUserBoardsCache(_memberId), Times.Once);
         }
 
         [Fact]
@@ -264,14 +303,20 @@ namespace PestanaDevApi.Tests.Services
     public class BoardMemberServiceTests: BoardTestsBase
     {
         private readonly Mock<IBoardMemberRepository> _repository = new();
+        private readonly Mock<IEmailService> _emailService = new();
         private readonly BoardMemberService _service;
         private readonly User _newMember = new() { Id = Guid.NewGuid(), UserName = "New", UserEmail = "new@email.com" };
+        private const string NotRegisteredEmail = "not.registered@email.com";
 
         public BoardMemberServiceTests()
         {
             _repository.Setup(r => r.GetUserByEmail(_newMember.UserEmail)).ReturnsAsync(_newMember);
-            _service = new(_repository.Object, BoardRepository.Object, SemaphoreService, CacheService.Object, NotificationService.Object);
+            _repository.Setup(r => r.GetUserById(OwnerId)).ReturnsAsync(new User { Id = OwnerId, UserEmail = "owner@email.com" });
+            _repository.Setup(r => r.InsertMember(BoardId, _newMember.Id)).ReturnsAsync(true);
+            _service = new(_repository.Object, BoardRepository.Object, SemaphoreService, CacheService.Object, NotificationService.Object, _emailService.Object);
         }
+
+        private static AddBoardMemberRequestDto Request(string email) => new() { Email = email, ClientLocale = "pt" };
 
         [Fact]
         public async Task GetBoardMembers_ReturnsForbidden_WhenUserIsNotMember()
@@ -282,19 +327,19 @@ namespace PestanaDevApi.Tests.Services
         }
 
         [Fact]
-        public async Task AddBoardMember_ReturnsForbidden_WhenUserIsNotTheOwner()
+        public async Task AddBoardMember_ReturnsBadRequest_WhenEmailIsInvalid()
         {
-            AddBoardMemberResponseDto response = await _service.AddBoardMember(Guid.NewGuid(), BoardId, new() { Email = _newMember.UserEmail });
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, Request("invalid"));
 
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
-        public async Task AddBoardMember_ReturnsNotFound_WhenEmailIsNotRegistered()
+        public async Task AddBoardMember_ReturnsForbidden_WhenNotOwnerAddsAnotherUser()
         {
-            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, new() { Email = "unknown@email.com" });
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(Guid.NewGuid(), BoardId, Request(_newMember.UserEmail));
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]
@@ -302,22 +347,69 @@ namespace PestanaDevApi.Tests.Services
         {
             BoardRepository.Setup(r => r.IsBoardMember(BoardId, _newMember.Id)).ReturnsAsync(true);
 
-            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, new() { Email = _newMember.UserEmail });
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, Request(_newMember.UserEmail));
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
-        public async Task AddBoardMember_ClearsCacheAndNotifies_WhenAdded()
+        public async Task AddBoardMember_AddsWithoutEmail_WhenUserIsRegistered()
         {
-            _repository.Setup(r => r.InsertMember(BoardId, _newMember.Id)).ReturnsAsync(true);
-
-            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, new() { Email = _newMember.UserEmail });
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, Request(_newMember.UserEmail));
 
             Assert.True(response.IsSuccess);
+            Assert.False(response.InvitationSent);
             CacheService.Verify(c => c.DeleteBoardMembersCache(BoardId), Times.Once);
+            CacheService.Verify(c => c.DeleteUserBoardsCache(_newMember.Id), Times.Once);
             NotificationService.Verify(n => n.NotifyMemberAdded(OwnerId, BoardId, It.Is<BoardMember>(m => m.Id == _newMember.Id && !m.IsOwner)), Times.Once);
+            _emailService.Verify(e => e.SendBoardInvitationEmail(It.IsAny<BoardInvitationEmailDto>()), Times.Never);
         }
+
+        #region Invitation
+        [Fact]
+        public async Task AddBoardMember_SavesInvitationAndSendsEmail_WhenUserIsNotRegistered()
+        {
+            _repository.Setup(r => r.InsertInvitation(BoardId, NotRegisteredEmail, OwnerId)).ReturnsAsync(true);
+
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, Request(NotRegisteredEmail));
+
+            Assert.True(response.IsSuccess);
+            Assert.True(response.InvitationSent);
+            _repository.Verify(r => r.InsertMember(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+            _emailService.Verify(e => e.SendBoardInvitationEmail(It.Is<BoardInvitationEmailDto>(i =>
+                i.BoardId == BoardId && i.ClientEmail == NotRegisteredEmail && i.OwnerEmail == "owner@email.com" && i.ClientLocale == "pt")), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddBoardMember_ReturnsInternalError_WhenInvitationIsNotSaved()
+        {
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(OwnerId, BoardId, Request(NotRegisteredEmail));
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            _emailService.Verify(e => e.SendBoardInvitationEmail(It.IsAny<BoardInvitationEmailDto>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task AddBoardMember_AcceptsTheInvitation_WhenInvitedUserAddsThemselves()
+        {
+            _repository.Setup(r => r.IsUserInvited(BoardId, _newMember.UserEmail)).ReturnsAsync(true);
+
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(_newMember.Id, BoardId, Request(_newMember.UserEmail));
+
+            Assert.True(response.IsSuccess);
+            _repository.Verify(r => r.InsertMember(BoardId, _newMember.Id), Times.Once);
+            _repository.Verify(r => r.DeleteInvitation(BoardId, _newMember.UserEmail), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddBoardMember_ReturnsForbidden_WhenUserAddsThemselvesWithoutInvitation()
+        {
+            AddBoardMemberResponseDto response = await _service.AddBoardMember(_newMember.Id, BoardId, Request(_newMember.UserEmail));
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            _repository.Verify(r => r.InsertMember(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+        }
+        #endregion
 
         [Fact]
         public async Task RemoveBoardMember_ReturnsBadRequest_WhenRemovingTheOwner()

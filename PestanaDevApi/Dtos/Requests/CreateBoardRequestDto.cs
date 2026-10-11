@@ -5,6 +5,7 @@ namespace PestanaDevApi.Dtos.Requests
     public class CreateBoardRequestDto
     {
         [Required]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [Required]
@@ -17,27 +18,34 @@ namespace PestanaDevApi.Dtos.Requests
     public class CreateColumnNames
     {
         [Required]
+        [MaxLength(50)]
         public string ColumnNameOne { get; set; } = string.Empty;
         
         [Required]
+        [MaxLength(50)]
         public string ColumnNameTwo { get; set; } = string.Empty;
 
-        [Required] 
+        [Required]
+        [MaxLength(50)]
         public string ColumnNameThree { get; set; } = string.Empty;
         
-        [Required] 
+        [Required]
+        [MaxLength(50)]
         public string ColumnNameFour { get; set; } = string.Empty;
         
-        [Required] 
+        [Required]
+        [MaxLength(50)]
         public string ColumnNameFive { get; set; } = string.Empty;
     }
 
     public class CreateBoardTask
     {
-        [Required] 
+        [Required]
+        [MaxLength(150)]
         public string TaskName { get; set; } = string.Empty;
         
-        [Required] 
+        [Required]
+        [MaxLength(50)]
         public string TaskType { get; set; } = string.Empty;
 
         [Required]

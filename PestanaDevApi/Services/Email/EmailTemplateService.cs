@@ -1,3 +1,4 @@
+using System.Net;
 using PestanaDevApi.Dtos.Requests;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Interfaces.Services.Email;
@@ -35,6 +36,15 @@ namespace PestanaDevApi.Services.Email
 
             return ReplaceConfirmationCodeVariables(request, emailTemplate, confirmationCodes);
         }
+
+        public async Task<string> GetEmailTemplate(BoardInvitationEmailDto request, string signUpUrl)
+        {
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateNameEnum.BoardInvitationEmail);
+
+            return ReplaceBoardInvitationVariables(request, emailTemplate, signUpUrl);
+        }
+
+        public string GetBoardInvitationSubject(BoardInvitationEmailDto request) => Translate(request.ClientLocale, Keys.BoardInvitationSubject);
 
         #region Private Methods
         private async Task<string> GetEmailTemplateString(EmailTemplateNameEnum templateName)
@@ -78,6 +88,19 @@ namespace PestanaDevApi.Services.Email
                                 .Replace(EmailConstants.Paragraph, Translate(locale, Keys.ConfirmationCodeParagraph))
                                 .Replace(EmailConstants.Copyright, GetCopyright(locale))
                                 .Replace(EmailConstants.Subcopyright, Translate(locale, Keys.GetConfirmationCodeSubcopyright(request.ConfirmationCodeEmailType)));
+        }
+
+        private string ReplaceBoardInvitationVariables(BoardInvitationEmailDto request, string emailTemplate, string signUpUrl)
+        {
+            string locale = request.ClientLocale;
+            Dictionary<string, string> values = new() { ["ownerEmail"] = WebUtility.HtmlEncode(request.OwnerEmail) };
+
+            return emailTemplate.Replace(EmailConstants.Title, Translate(locale, Keys.BoardInvitationTitle))
+                                .Replace(EmailConstants.Paragraph, Translate(locale, Keys.BoardInvitationParagraph, values))
+                                .Replace(EmailConstants.ButtonUrl, WebUtility.HtmlEncode(signUpUrl))
+                                .Replace(EmailConstants.ButtonText, Translate(locale, Keys.BoardInvitationButton))
+                                .Replace(EmailConstants.Copyright, GetCopyright(locale))
+                                .Replace(EmailConstants.Subcopyright, Translate(locale, Keys.BoardInvitationSubcopyright, values));
         }
 
         private string GetCopyright(string locale) => Translate(locale, Keys.Copyright, new() { ["year"] = DateTime.Now.Year.ToString() });

@@ -82,6 +82,20 @@ namespace PestanaDevApi.Tests.Utils
         }
     }
 
+    public class ClientSideUrlBuilderTests
+    {
+        private readonly Guid _boardId = Guid.Parse("3f682819-c4c4-11f1-879f-0242ac110002");
+
+        [Theory]
+        [InlineData("http://localhost:3000/", "pt", "http://localhost:3000/pt/authentication/sign-up?redirectTo=scrum-board&boardId=3f682819-c4c4-11f1-879f-0242ac110002")]
+        [InlineData("http://localhost:3000", "en", "http://localhost:3000/en/authentication/sign-up?redirectTo=scrum-board&boardId=3f682819-c4c4-11f1-879f-0242ac110002")]
+        [InlineData("http://localhost:3000/", "es", "http://localhost:3000/en/authentication/sign-up?redirectTo=scrum-board&boardId=3f682819-c4c4-11f1-879f-0242ac110002")]
+        public void GetBoardInvitationSignUpUrl_BuildsTheLocaleSignUpUrlWithRedirectToFirst(string baseUrl, string locale, string expected)
+        {
+            Assert.Equal(expected, ClientSideUrlBuilder.GetBoardInvitationSignUpUrl(baseUrl, locale, _boardId));
+        }
+    }
+
     public class GetHttpMessageTests
     {
         [Fact]

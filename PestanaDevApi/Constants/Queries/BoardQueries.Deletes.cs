@@ -21,11 +21,24 @@
             board_id = @BoardId;
 
         DELETE FROM
+            BOARD_INVITATIONS
+        WHERE
+            board_id = @BoardId;
+
+        DELETE FROM
             BOARD
         WHERE
             id = @BoardId;
 
         COMMIT;";
+
+        public const string DeleteInvitation = @"
+        DELETE FROM
+            BOARD_INVITATIONS
+        WHERE
+            board_id = @BoardId
+        AND
+            invited_email = @Email;";
 
         public const string DeleteTask = @"
         DELETE FROM

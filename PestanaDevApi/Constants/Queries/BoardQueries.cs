@@ -2,18 +2,25 @@
 {
     public static partial class BoardQueries
     {
+        // Boards where the user is a member (the owner is always a member too).
         public const string Select = @"
         SELECT
-            id AS Id,
-            owner_id AS OwnerId,
-            name AS Name,
-            description AS Description,
-            created_at AS CreatedAt,
-            updated_at AS UpdatedAt
+            b.id AS Id,
+            b.owner_id AS OwnerId,
+            b.name AS Name,
+            b.description AS Description,
+            b.created_at AS CreatedAt,
+            b.updated_at AS UpdatedAt
         FROM
-            BOARD
+            BOARD b
+        INNER JOIN
+            BOARD_USERS bu
+        ON
+            bu.board_id = b.id
         WHERE
-            owner_id = @UserId;";
+            bu.user_id = @UserId
+        ORDER BY
+            b.created_at;";
 
         public const string SelectBoardData = @"
         SELECT
@@ -149,5 +156,27 @@
             USERS_PROFILE_DATA
         WHERE
             user_email = @Email;";
+
+        public const string SelectUserById = @"
+        SELECT
+            id AS Id,
+            user_name AS UserName,
+            user_email AS UserEmail
+        FROM
+            USERS_PROFILE_DATA
+        WHERE
+            id = @UserId;";
+
+        public const string SelectIsUserInvited = @"
+        SELECT EXISTS(
+            SELECT
+                1
+            FROM
+                BOARD_INVITATIONS
+            WHERE
+                board_id = @BoardId
+            AND
+                invited_email = @Email
+        );";
     }
 }
