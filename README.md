@@ -41,7 +41,7 @@ REST API behind my portfolio website and other projects I build. It handles auth
 - **User account**: view, update data, change password and delete account
 - **Scrum board**
   - Boards with 5 default columns, tasks and members
-  - Create tasks, move them between columns and reorder columns
+  - Create tasks (with an optional deadline), move them between columns and reorder columns
   - Owner/member permissions
   - **Real-time updates** for every member through **SignalR**
   - Concurrency control (semaphore) and in-memory cache
@@ -263,6 +263,7 @@ Changes to the board are still made through the REST endpoints. SignalR only **p
 | `BoardDeleted` | `boardId` | `DELETE /board/{id}` |
 | `TaskCreated` | created task | `POST .../tasks` |
 | `TaskUpdated` | updated task | `PATCH .../tasks/{taskId}` |
+| `TaskDeadlineChanged` | `{ taskId, taskName, oldDeadline, newDeadline }` | `PATCH .../tasks/{taskId}` that changed the deadline |
 | `TaskDeleted` | `taskId` | `DELETE .../tasks/{taskId}` |
 | `ColumnsUpdated` | all the columns | `PATCH .../columns/{columnId}` |
 | `MemberAdded` | `{ id, name, email, isOwner }` | `POST .../members` |

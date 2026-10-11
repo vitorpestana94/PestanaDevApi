@@ -41,7 +41,7 @@ API REST por trás do meu site de portfólio e de outros projetos que desenvolvo
 - **Conta do usuário**: consultar, atualizar dados, trocar senha e excluir conta
 - **Scrum board**
   - Boards com 5 colunas padrão, tarefas e participantes
-  - Criar tarefas, movê-las entre colunas e reordenar colunas
+  - Criar tarefas (com prazo opcional), movê-las entre colunas e reordenar colunas
   - Permissões de dono/participante
   - **Atualizações em tempo real** para todos os participantes via **SignalR**
   - Controle de concorrência (semaphore) e cache em memória
@@ -263,6 +263,7 @@ As alterações no board continuam sendo feitas pelos endpoints REST. O SignalR 
 | `BoardDeleted` | `boardId` | `DELETE /board/{id}` |
 | `TaskCreated` | tarefa criada | `POST .../tasks` |
 | `TaskUpdated` | tarefa atualizada | `PATCH .../tasks/{taskId}` |
+| `TaskDeadlineChanged` | `{ taskId, taskName, oldDeadline, newDeadline }` | `PATCH .../tasks/{taskId}` que alterou o prazo |
 | `TaskDeleted` | `taskId` | `DELETE .../tasks/{taskId}` |
 | `ColumnsUpdated` | todas as colunas | `PATCH .../columns/{columnId}` |
 | `MemberAdded` | `{ id, name, email, isOwner }` | `POST .../members` |
