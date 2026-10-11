@@ -1,33 +1,50 @@
-﻿using PestanaDevApi.Dtos.Requests;
+using System.Net;
+using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Interfaces.Services.Email;
 using PestanaDevApi.Models.Enums;
 using PestanaDevApi.Constants.Email;
-using Replace = PestanaDevApi.Utils.ReplaceEmailVariables;
+using Keys = PestanaDevApi.Constants.Email.EmailTranslationKeys;
+using Locale = PestanaDevApi.Constants.LocaleConstants;
 
 namespace PestanaDevApi.Services.Email
 {
     public class EmailTemplateService: IEmailTemplateService
     {
         private readonly string _templatesDirectory;
+        private readonly ITranslationService _translationService;
+        private static readonly string[] _confirmationCodesVariables = [EmailConstants.CodeOne, EmailConstants.CodeTwo, EmailConstants.CodeThree, EmailConstants.CodeFour];
 
-        public EmailTemplateService() 
+        public EmailTemplateService(ITranslationService translationService)
         {
             _templatesDirectory = EmailConstants.TemplatesDirectory;
+            _translationService = translationService;
         }
 
         public async Task<string> GetEmailTemplate(ContactEmailRequestDto request, bool isContactEmailClientConfirmation = false)
         {
             string emailTemplate = await GetEmailTemplateString(isContactEmailClientConfirmation ? EmailTemplateNameEnum.ContactEmailClientConfirmation : EmailTemplateNameEnum.ContactEmail);
 
-            return ReplaceEmailVariables(request, isContactEmailClientConfirmation,  emailTemplate);
+            return isContactEmailClientConfirmation ?
+                ReplaceClientContactVariables(request, emailTemplate) :
+                ReplaceAdminContactVariables(request, emailTemplate);
         }
 
         public async Task<string> GetEmailTemplate(ConfirmationCodeEmailRequestDto request, string confirmationCodes)
         {
             string emailTemplate = await GetEmailTemplateString(EmailTemplateNameEnum.CodeConfirmationEmail);
 
-            return Replace.ReplaceConfirmationCodetVariables(request, emailTemplate, confirmationCodes); ;
+            return ReplaceConfirmationCodeVariables(request, emailTemplate, confirmationCodes);
         }
+
+        public async Task<string> GetEmailTemplate(BoardInvitationEmailDto request, string signUpUrl)
+        {
+            string emailTemplate = await GetEmailTemplateString(EmailTemplateNameEnum.BoardInvitationEmail);
+
+            return ReplaceBoardInvitationVariables(request, emailTemplate, signUpUrl);
+        }
+
+        public string GetBoardInvitationSubject(BoardInvitationEmailDto request) => Translate(request.ClientLocale, Keys.BoardInvitationSubject);
 
         #region Private Methods
         private async Task<string> GetEmailTemplateString(EmailTemplateNameEnum templateName)
@@ -35,13 +52,60 @@ namespace PestanaDevApi.Services.Email
             return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), _templatesDirectory, EmailConstants.GetTemplateHtml(templateName)));
         }
 
-        private static string ReplaceEmailVariables(ContactEmailRequestDto requestDto, bool isContactEmailClientConfirmation, string emailTemplate)
+        /// <summary>
+        /// The admin email is always sent in english, since it goes to the website owner.
+        /// </summary>
+        private string ReplaceAdminContactVariables(ContactEmailRequestDto request, string emailTemplate)
         {
-            return isContactEmailClientConfirmation ?
-                Replace.ReplaceClientContactVariables(requestDto, emailTemplate):
-                Replace.ReplaceAdminEmailContactVariables(requestDto, emailTemplate); 
+            return emailTemplate.Replace(EmailConstants.SubjectVariable, EmailConstants.ContactEmailSubject)
+                                .Replace(EmailConstants.ClientEmailVariable, request.ClientEmail)
+                                .Replace(EmailConstants.ClientNameVariable, request.ClientName)
+                                .Replace(EmailConstants.ClientMessageVariable, request.ClientMessage)
+                                .Replace(EmailConstants.Copyright, GetCopyright(Locale.En))
+                                .Replace(EmailConstants.Subcopyright, Translate(Locale.En, Keys.ContactAdminSubcopyright));
         }
 
+        private string ReplaceClientContactVariables(ContactEmailRequestDto request, string emailTemplate)
+        {
+            string locale = request.ClientLocale;
+
+            return emailTemplate.Replace(EmailConstants.Title, Translate(locale, Keys.ContactClientTitle, new() { ["name"] = request.ClientName }))
+                                .Replace(EmailConstants.Paragraph, Translate(locale, Keys.ContactClientParagraph))
+                                .Replace(EmailConstants.Copyright, GetCopyright(locale))
+                                .Replace(EmailConstants.Subcopyright, Translate(locale, Keys.ContactClientSubcopyright));
+        }
+
+        private string ReplaceConfirmationCodeVariables(ConfirmationCodeEmailRequestDto request, string emailTemplate, string confirmationCodes)
+        {
+            string locale = request.ClientLocale;
+
+            foreach ((string codeVariable, char codeValue) in _confirmationCodesVariables.Zip(confirmationCodes))
+            {
+                emailTemplate = emailTemplate.Replace(codeVariable, codeValue.ToString());
+            }
+
+            return emailTemplate.Replace(EmailConstants.Title, Translate(locale, Keys.ConfirmationCodeTitle))
+                                .Replace(EmailConstants.Paragraph, Translate(locale, Keys.ConfirmationCodeParagraph))
+                                .Replace(EmailConstants.Copyright, GetCopyright(locale))
+                                .Replace(EmailConstants.Subcopyright, Translate(locale, Keys.GetConfirmationCodeSubcopyright(request.ConfirmationCodeEmailType)));
+        }
+
+        private string ReplaceBoardInvitationVariables(BoardInvitationEmailDto request, string emailTemplate, string signUpUrl)
+        {
+            string locale = request.ClientLocale;
+            Dictionary<string, string> values = new() { ["ownerEmail"] = WebUtility.HtmlEncode(request.OwnerEmail) };
+
+            return emailTemplate.Replace(EmailConstants.Title, Translate(locale, Keys.BoardInvitationTitle))
+                                .Replace(EmailConstants.Paragraph, Translate(locale, Keys.BoardInvitationParagraph, values))
+                                .Replace(EmailConstants.ButtonUrl, WebUtility.HtmlEncode(signUpUrl))
+                                .Replace(EmailConstants.ButtonText, Translate(locale, Keys.BoardInvitationButton))
+                                .Replace(EmailConstants.Copyright, GetCopyright(locale))
+                                .Replace(EmailConstants.Subcopyright, Translate(locale, Keys.BoardInvitationSubcopyright, values));
+        }
+
+        private string GetCopyright(string locale) => Translate(locale, Keys.Copyright, new() { ["year"] = DateTime.Now.Year.ToString() });
+
+        private string Translate(string locale, string key, Dictionary<string, string>? values = null) => _translationService.Translate(locale, key, values);
         #endregion
     }
 }

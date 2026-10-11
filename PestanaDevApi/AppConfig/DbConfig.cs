@@ -91,7 +91,7 @@ namespace PestanaDevApi.AppConfig
         {
             (string host, string port, string user, string database, SecureString pass) = GetDefaultParams(configuration, isQuartz);
             
-            string connectionString = $"Server={host}; Port={port}; Database={database}; Uid={user}; Pwd={new NetworkCredential("", pass).Password}; SslMode=Preferred; Pooling=true; Minimum Pool Size=0; Maximum Pool Size=100; Connection Timeout=15;";
+            string connectionString = $"Server={host}; Port={port}; Database={database}; Uid={user}; Pwd={new NetworkCredential("", pass).Password}; SslMode=Preferred; Pooling=true; Minimum Pool Size=0; Maximum Pool Size=100; Connection Timeout=15; AllowUserVariables=True;";
 
             pass.Dispose();
 

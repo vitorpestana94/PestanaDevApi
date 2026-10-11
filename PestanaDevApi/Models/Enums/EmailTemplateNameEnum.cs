@@ -6,6 +6,7 @@
         ContactEmailClientConfirmation,
         EmailConfirmation,
         UserRegistered,
-        CodeConfirmationEmail
+        CodeConfirmationEmail,
+        BoardInvitationEmail
     }
 }

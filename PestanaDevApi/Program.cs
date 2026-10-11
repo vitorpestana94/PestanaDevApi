@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.RateLimiting;
 using PestanaDevApi.Interfaces;
 using Microsoft.AspNetCore.HttpOverrides;
+using PestanaDevApi.Constants;
+using PestanaDevApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +100,37 @@ builder.Services.AddAuthentication(options =>
             Convert.FromBase64String(builder.Configuration["jwt.key"]!)
         )
     };
+
+    // Browsers can't send the Authorization header on WebSocket connections,
+    // so the SignalR client sends the JWT on the "access_token" query string instead.
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            string? accessToken = context.Request.Query[SignalRConstants.AccessTokenQueryKey];
+
+            if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments(SignalRConstants.HubsBasePath))
+                context.Token = accessToken;
+
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddSignalR();
+
+// The SignalR JS client sends credentials on negotiate, so origins must be explicit (no AllowAnyOrigin).
+string[] allowedOrigins = builder.Configuration.GetSection(CorsConstants.AllowedOriginsConfigKey).Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsConstants.FrontEndPolicy, policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 builder.Logging.ClearProviders();
@@ -113,6 +146,7 @@ builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddSingleton<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IPlatformAuthService, PlatformAuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
@@ -131,6 +165,15 @@ builder.Services.AddScoped<IMetropolitanMuseumRequestService, MetropolitanMuseum
 builder.Services.AddScoped<IMetropolitanMuseumIntegrationService, MetropolitanMuseumIntegrationService>();
 builder.Services.AddScoped<IMetropolitanMuseumCacheService, MetropolitanMuseumCacheService>();
 builder.Services.AddScoped<ISemaphoreService, SemaphoreService>();
+builder.Services.AddKeyedSingleton<ISemaphoreService>(SemaphoreConstants.BoardSemaphoreKey, (_, _) => new SemaphoreService());
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IBoardPanelService, BoardPanelService>();
+builder.Services.AddScoped<IBoardTaskService, BoardTaskService>();
+builder.Services.AddScoped<IBoardColumnService, BoardColumnService>();
+builder.Services.AddScoped<IBoardMemberService, BoardMemberService>();
+builder.Services.AddScoped<IBoardCacheService, BoardCacheService>();
+builder.Services.AddScoped<IBoardNotificationService, BoardNotificationService>();
+builder.Services.AddSingleton<IBoardHubConnectionService, BoardHubConnectionService>();
 
 
 builder.Services.AddHttpClient<IRequestService, RequestService>((client =>
@@ -150,6 +193,11 @@ builder.Services.AddScoped<IConfirmationCodeGenerationRepository, ConfirmationCo
 builder.Services.AddScoped<IForgotPasswordRepository, ForgotPasswordRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IBoardRepository, BoardRepository>();
+builder.Services.AddScoped<IBoardPanelRepository, BoardPanelRepository>();
+builder.Services.AddScoped<IBoardTaskRepository, BoardTaskRepository>();
+builder.Services.AddScoped<IBoardColumnRepository, BoardColumnRepository>();
+builder.Services.AddScoped<IBoardMemberRepository, BoardMemberRepository>();
 
 #endregion
 
@@ -204,9 +252,14 @@ app.UseForwardedHeaders();
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+app.UseCors(CorsConstants.FrontEndPolicy);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<BoardHub>(SignalRConstants.BoardHubPath);
 
 app.Run();

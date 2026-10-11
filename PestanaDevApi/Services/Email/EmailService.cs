@@ -10,6 +10,7 @@ using PestanaDevApi.Models.Enums;
 using System.Net;
 using PestanaDevApi.Interfaces.Services;
 using PestanaDevApi.Extensions.Dtos.Responses;
+using PestanaDevApi.Constants;
 
 namespace PestanaDevApi.Services.Email
 {
@@ -117,6 +118,21 @@ namespace PestanaDevApi.Services.Email
             await SendConfirmationCodeEmail(request, code);
 
             return new();
+        }
+
+        public async Task SendBoardInvitationEmail(BoardInvitationEmailDto request)
+        {
+            // Read here (and not on the constructor) so the other emails keep working while it isn't configured.
+            string? clientSideSystemUrl = _config[ClientSideConstants.ClientSideSystemUrlConfigKey];
+
+            if (string.IsNullOrEmpty(clientSideSystemUrl))
+                throw new ApiException(ErrorMessages.ClientSideSystemUrlNotConfigured, 500);
+
+            string signUpUrl = ClientSideUrlBuilder.GetBoardInvitationSignUpUrl(clientSideSystemUrl, request.ClientLocale, request.BoardId);
+
+            using MailMessage mail = new ApiEmailMessage(request, _emailAddress, _emailTemplateService.GetBoardInvitationSubject(request), await _emailTemplateService.GetEmailTemplate(request, signUpUrl));
+
+            await SendEmail(mail);
         }
 
         #region Private Methods

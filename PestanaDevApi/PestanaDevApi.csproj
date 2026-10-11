@@ -41,4 +41,8 @@
 
 	<ItemGroup> <Content Include="EmailTemplates\*.html" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="Locales\**\*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
 </Project>
