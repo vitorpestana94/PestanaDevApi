@@ -14,6 +14,7 @@
 
         #region Board Tasks
         public const string TaskNotFound = $"3B9F : Task was not found!";
+        public const string TaskNotCreated = $"9C4D : Task was not created due internal errors!";
         public const string TaskNotUpdated = $"5D2C : Task was not updated due internal errors!";
         public const string TaskNotDeleted = $"A4E7 : Task was not deleted due internal errors!";
         public const string TaskRequestDontHaveAnyChangedData = $"1F6D : Cannot update task because no changes were detected.";

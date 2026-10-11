@@ -89,6 +89,17 @@ namespace PestanaDevApi.Controllers
         #endregion
 
         #region Tasks
+        [HttpPost("{boardId}/tasks")]
+        public async Task<IActionResult> CreateTask(Guid boardId, [FromBody] CreateBoardTaskRequestDto request)
+        {
+            CreateBoardTaskResponseDto response = await _taskService.CreateTask(UserId, boardId, request);
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response);
+        }
+
         [HttpPatch("{boardId}/tasks/{taskId}")]
         public async Task<IActionResult> UpdateTask(Guid boardId, Guid taskId, [FromBody] UpdateBoardTaskRequestDto request)
         {

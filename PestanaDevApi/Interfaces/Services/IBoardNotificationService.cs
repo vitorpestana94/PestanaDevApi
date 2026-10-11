@@ -11,6 +11,7 @@ namespace PestanaDevApi.Interfaces.Services
     {
         Task NotifyBoardUpdated(Guid changedBy, Board board);
         Task NotifyBoardDeleted(Guid changedBy, Guid boardId);
+        Task NotifyTaskCreated(Guid changedBy, BoardTask task);
         Task NotifyTaskUpdated(Guid changedBy, BoardTask task);
         Task NotifyTaskDeleted(Guid changedBy, Guid boardId, Guid taskId);
         Task NotifyColumnsUpdated(Guid changedBy, Guid boardId, IEnumerable<BoardColumn> columns);

@@ -6,6 +6,26 @@ namespace PestanaDevApi.Interfaces
     public interface IBoardTaskService
     {
         /// <summary>
+        /// Creates a task on a column of the board. Only board members can do it, and the task owner (if sent)
+        /// must also be a board member; when it's not sent, the user creating the task becomes its owner.
+        /// Runs inside the board semaphore to avoid concurrent changes. After the insert, the board cache
+        /// is cleared and the board members are notified through SignalR (TaskCreated).
+        /// </summary>
+        /// <param name="userId">
+        /// Identifier of the user making the request.
+        /// </param>
+        /// <param name="boardId">
+        /// Identifier of the board.
+        /// </param>
+        /// <param name="dto">
+        /// Request containing the column, the optional owner, name, type and description of the task.
+        /// </param>
+        /// <returns>
+        /// A response containing the created task or an error response (forbidden, column not found, invalid owner or internal error).
+        /// </returns>
+        Task<CreateBoardTaskResponseDto> CreateTask(Guid userId, Guid boardId, CreateBoardTaskRequestDto dto);
+
+        /// <summary>
         /// Updates the data of a task and/or moves it to another column of the same board.
         /// Only board members can do it, and the new task owner (if sent) must also be a board member.
         /// Runs inside the board semaphore to avoid concurrent changes. After the update, the board cache

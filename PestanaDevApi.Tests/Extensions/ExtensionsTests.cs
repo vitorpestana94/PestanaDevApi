@@ -47,6 +47,19 @@ namespace PestanaDevApi.Tests.Extensions
         }
     }
 
+    public class CreateBoardTaskRequestDtoExtensionsTests
+    {
+        [Fact]
+        public void GetTaskOwnerId_UsesTheCreator_WhenOwnerIsNotSent()
+        {
+            Guid userId = Guid.NewGuid();
+            Guid ownerId = Guid.NewGuid();
+
+            Assert.Equal(userId, new CreateBoardTaskRequestDto().GetTaskOwnerId(userId));
+            Assert.Equal(ownerId, new CreateBoardTaskRequestDto { TaskOwnerId = ownerId }.GetTaskOwnerId(userId));
+        }
+    }
+
     public class UpdateBoardRequestDtoExtensionsTests
     {
         [Fact]

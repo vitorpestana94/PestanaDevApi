@@ -41,7 +41,7 @@ REST API behind my portfolio website and other projects I build. It handles auth
 - **User account**: view, update data, change password and delete account
 - **Scrum board**
   - Boards with 5 default columns, tasks and members
-  - Move tasks between columns and reorder columns
+  - Create tasks, move them between columns and reorder columns
   - Owner/member permissions
   - **Real-time updates** for every member through **SignalR**
   - Concurrency control (semaphore) and in-memory cache
@@ -233,6 +233,7 @@ captchaSecret=your-recaptcha-v3-secret
 | GET | `/board/{id}` | Board data (columns, tasks, members) | — |
 | PATCH | `/board/{boardId}` | Update name/description | Owner |
 | DELETE | `/board/{boardId}` | Delete the board | Owner |
+| POST | `/board/{boardId}/tasks` | Create a task on a column (returns the created task) | Member |
 | PATCH | `/board/{boardId}/tasks/{taskId}` | Update or move a task | Member |
 | DELETE | `/board/{boardId}/tasks/{taskId}` | Delete a task | Member |
 | PATCH | `/board/{boardId}/columns/{columnId}` | Rename or reorder a column | Member |
@@ -260,6 +261,7 @@ Changes to the board are still made through the REST endpoints. SignalR only **p
 |---|---|---|
 | `BoardUpdated` | board | `PATCH /board/{id}` |
 | `BoardDeleted` | `boardId` | `DELETE /board/{id}` |
+| `TaskCreated` | created task | `POST .../tasks` |
 | `TaskUpdated` | updated task | `PATCH .../tasks/{taskId}` |
 | `TaskDeleted` | `taskId` | `DELETE .../tasks/{taskId}` |
 | `ColumnsUpdated` | all the columns | `PATCH .../columns/{columnId}` |

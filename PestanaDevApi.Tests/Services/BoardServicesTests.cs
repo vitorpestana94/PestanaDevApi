@@ -198,6 +198,48 @@ namespace PestanaDevApi.Tests.Services
             _service = new(_repository.Object, BoardRepository.Object, _columnRepository.Object, SemaphoreService, CacheService.Object, NotificationService.Object);
         }
 
+        #region Create
+        [Fact]
+        public async Task CreateTask_ReturnsForbidden_WhenUserIsNotMember()
+        {
+            CreateBoardTaskResponseDto response = await _service.CreateTask(Guid.NewGuid(), BoardId, new() { ColumnId = _columnId, TaskName = "New" });
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateTask_ReturnsNotFound_WhenColumnIsFromAnotherBoard()
+        {
+            CreateBoardTaskResponseDto response = await _service.CreateTask(OwnerId, BoardId, new() { ColumnId = Guid.NewGuid(), TaskName = "New" });
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            _repository.Verify(r => r.InsertTask(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CreateBoardTaskRequestDto>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task CreateTask_ReturnsBadRequest_WhenOwnerIsNotMember()
+        {
+            CreateBoardTaskResponseDto response = await _service.CreateTask(OwnerId, BoardId, new() { ColumnId = _columnId, TaskName = "New", TaskOwnerId = Guid.NewGuid() });
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateTask_ReturnsTheTaskClearsCacheAndNotifies_WhenCreated()
+        {
+            BoardTask created = new() { BoardId = BoardId, ColumnId = _columnId, TaskName = "New" };
+            _repository.Setup(r => r.InsertTask(It.IsAny<Guid>(), BoardId, OwnerId, It.IsAny<CreateBoardTaskRequestDto>())).ReturnsAsync(true);
+            _repository.Setup(r => r.GetTask(BoardId, It.Is<Guid>(id => id != _taskId))).ReturnsAsync(created);
+
+            CreateBoardTaskResponseDto response = await _service.CreateTask(OwnerId, BoardId, new() { ColumnId = _columnId, TaskName = "New" });
+
+            Assert.True(response.IsSuccess);
+            Assert.Same(created, response.Task);
+            CacheService.Verify(c => c.DeleteBoardDataCache(BoardId), Times.Once);
+            NotificationService.Verify(n => n.NotifyTaskCreated(OwnerId, created), Times.Once);
+        }
+        #endregion
+
         [Fact]
         public async Task UpdateTask_ReturnsForbidden_WhenUserIsNotMember()
         {

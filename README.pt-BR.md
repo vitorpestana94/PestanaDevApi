@@ -41,7 +41,7 @@ API REST por trás do meu site de portfólio e de outros projetos que desenvolvo
 - **Conta do usuário**: consultar, atualizar dados, trocar senha e excluir conta
 - **Scrum board**
   - Boards com 5 colunas padrão, tarefas e participantes
-  - Mover tarefas entre colunas e reordenar colunas
+  - Criar tarefas, movê-las entre colunas e reordenar colunas
   - Permissões de dono/participante
   - **Atualizações em tempo real** para todos os participantes via **SignalR**
   - Controle de concorrência (semaphore) e cache em memória
@@ -233,6 +233,7 @@ captchaSecret=seu-segredo-do-recaptcha-v3
 | GET | `/board/{id}` | Dados do board (colunas, tarefas, participantes) | — |
 | PATCH | `/board/{boardId}` | Atualiza nome/descrição | Dono |
 | DELETE | `/board/{boardId}` | Exclui o board | Dono |
+| POST | `/board/{boardId}/tasks` | Cria uma tarefa em uma coluna (retorna a tarefa criada) | Participante |
 | PATCH | `/board/{boardId}/tasks/{taskId}` | Atualiza ou move uma tarefa | Participante |
 | DELETE | `/board/{boardId}/tasks/{taskId}` | Exclui uma tarefa | Participante |
 | PATCH | `/board/{boardId}/columns/{columnId}` | Renomeia ou reordena uma coluna | Participante |
@@ -260,6 +261,7 @@ As alterações no board continuam sendo feitas pelos endpoints REST. O SignalR 
 |---|---|---|
 | `BoardUpdated` | board | `PATCH /board/{id}` |
 | `BoardDeleted` | `boardId` | `DELETE /board/{id}` |
+| `TaskCreated` | tarefa criada | `POST .../tasks` |
 | `TaskUpdated` | tarefa atualizada | `PATCH .../tasks/{taskId}` |
 | `TaskDeleted` | `taskId` | `DELETE .../tasks/{taskId}` |
 | `ColumnsUpdated` | todas as colunas | `PATCH .../columns/{columnId}` |

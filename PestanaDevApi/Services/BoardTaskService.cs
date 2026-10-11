@@ -37,6 +37,11 @@ namespace PestanaDevApi.Services
             _notificationService = notificationService;
         }
 
+        public async Task<CreateBoardTaskResponseDto> CreateTask(Guid userId, Guid boardId, CreateBoardTaskRequestDto dto)
+        {
+            return await _semaphoreService.Work(() => InsertBoardTask(userId, boardId, dto));
+        }
+
         public async Task<UpdateBoardTaskResponseDto> UpdateTask(Guid userId, Guid boardId, Guid taskId, UpdateBoardTaskRequestDto dto)
         {
             return await _semaphoreService.Work(() => UpdateBoardTask(userId, boardId, taskId, dto));
@@ -48,6 +53,43 @@ namespace PestanaDevApi.Services
         }
 
         #region Private Methods
+        /// <summary>
+        /// Validates and creates a task on a column of the board.
+        /// Runs inside the board semaphore so the owner can't be removed from the board
+        /// between the validation and the insert.
+        /// </summary>
+        private async Task<CreateBoardTaskResponseDto> InsertBoardTask(Guid userId, Guid boardId, CreateBoardTaskRequestDto dto)
+        {
+            if (!await _boardRepository.IsBoardMember(boardId, userId))
+                return new(HttpStatusCode.Forbidden, ErrorMessage.UserIsNotBoardMember);
+
+            IEnumerable<BoardColumn> columns = await _columnRepository.GetBoardColumns(boardId);
+
+            if (columns.GetColumn(dto.ColumnId) == null)
+                return new(HttpStatusCode.NotFound, ErrorMessage.ColumnNotFound);
+
+            Guid taskOwnerId = dto.GetTaskOwnerId(userId);
+
+            if (taskOwnerId != userId && !await _boardRepository.IsBoardMember(boardId, taskOwnerId))
+                return new(ErrorMessage.TaskOwnerIsNotBoardMember);
+
+            Guid taskId = Guid.NewGuid();
+
+            if (!await _repository.InsertTask(taskId, boardId, userId, dto))
+                return new(HttpStatusCode.InternalServerError, ErrorMessage.TaskNotCreated);
+
+            BoardTask? task = await _repository.GetTask(boardId, taskId);
+
+            if (task == null)
+                return new(HttpStatusCode.InternalServerError, ErrorMessage.TaskNotCreated);
+
+            _cacheService.DeleteBoardDataCache(boardId);
+
+            await _notificationService.NotifyTaskCreated(userId, task);
+
+            return new(task);
+        }
+
         /// <summary>
         /// Validates and updates (or moves) a task.
         /// Runs inside the board semaphore so the validations and the update can't be

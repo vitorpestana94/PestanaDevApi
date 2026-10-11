@@ -26,6 +26,13 @@ namespace PestanaDevApi.Repositories
             return await db.QueryFirstOrDefaultAsync<BoardTask?>(Sql.SelectTask, Params.ToBoardIdAndTaskId(boardId, taskId));
         }
 
+        public async Task<bool> InsertTask(Guid taskId, Guid boardId, Guid userId, CreateBoardTaskRequestDto dto)
+        {
+            using IDbConnection db = _factory.CreateConnection();
+
+            return await db.ExecuteAsync(Sql.InsertTask, dto.ToInsert(taskId, boardId, userId)) > 0;
+        }
+
         public async Task<bool> UpdateTask(Guid boardId, Guid taskId, UpdateBoardTaskRequestDto dto)
         {
             using IDbConnection db = _factory.CreateConnection();

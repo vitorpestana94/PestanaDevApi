@@ -32,6 +32,11 @@ namespace PestanaDevApi.Services
         #endregion
 
         #region Tasks
+        public async Task NotifyTaskCreated(Guid changedBy, BoardTask task)
+        {
+            await GetBoardGroup(task.BoardId).TaskCreated(new(task.BoardId, changedBy, task));
+        }
+
         public async Task NotifyTaskUpdated(Guid changedBy, BoardTask task)
         {
             await GetBoardGroup(task.BoardId).TaskUpdated(new(task.BoardId, changedBy, task));

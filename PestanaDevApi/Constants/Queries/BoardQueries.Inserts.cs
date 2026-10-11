@@ -35,6 +35,16 @@
 
         COMMIT;";
 
+        public const string InsertTask = @"
+        INSERT INTO BOARD_TASKS(
+            id, board_id, column_id, task_owner_id,
+            task_name, task_type, task_description
+        )
+        VALUES(
+            @TaskId, @BoardId, @ColumnId, @TaskOwnerId,
+            @TaskName, @TaskType, @TaskDescription
+        );";
+
         public const string InsertMember = @"
         INSERT INTO BOARD_USERS(board_id, user_id)
         VALUES(@BoardId, @UserId);";

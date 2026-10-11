@@ -13,6 +13,7 @@
         #region Board
         public const string BoardUpdated = "Board data updated!";
         public const string BoardDeleted = "Board was successfully deleted!";
+        public const string TaskCreated = "Task was successfully created!";
         public const string TaskUpdated = "Task was successfully updated!";
         public const string TaskDeleted = "Task was successfully deleted!";
         public const string ColumnUpdated = "Column was successfully updated!";
