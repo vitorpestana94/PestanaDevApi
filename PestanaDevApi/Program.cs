@@ -109,7 +109,7 @@ builder.Services.AddAuthentication(options =>
         {
             string? accessToken = context.Request.Query[SignalRConstants.AccessTokenQueryKey];
 
-            if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments(SignalRConstants.BoardHubPath))
+            if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments(SignalRConstants.HubsBasePath))
                 context.Token = accessToken;
 
             return Task.CompletedTask;
@@ -117,8 +117,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Setup SignalR
 builder.Services.AddSignalR();
+
+// The SignalR JS client sends credentials on negotiate, so origins must be explicit (no AllowAnyOrigin).
+string[] allowedOrigins = builder.Configuration.GetSection(CorsConstants.AllowedOriginsConfigKey).Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsConstants.FrontEndPolicy, policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -238,6 +251,10 @@ app.UseForwardedHeaders();
 
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors(CorsConstants.FrontEndPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
