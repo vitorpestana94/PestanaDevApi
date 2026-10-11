@@ -76,7 +76,10 @@ namespace PestanaDevApi.Tests.Extensions
         public void WasDataNotUpdated_ReturnsTrueOnlyWhenNothingIsSent()
         {
             Assert.True(new UpdateBoardTaskRequestDto().WasDataNotUpdated());
+            Assert.True(new UpdateBoardTaskRequestDto { ClearDeadline = false }.WasDataNotUpdated());
             Assert.False(new UpdateBoardTaskRequestDto { ColumnId = Guid.NewGuid() }.WasDataNotUpdated());
+            Assert.False(new UpdateBoardTaskRequestDto { Deadline = DateTime.UtcNow }.WasDataNotUpdated());
+            Assert.False(new UpdateBoardTaskRequestDto { ClearDeadline = true }.WasDataNotUpdated());
         }
 
         [Fact]

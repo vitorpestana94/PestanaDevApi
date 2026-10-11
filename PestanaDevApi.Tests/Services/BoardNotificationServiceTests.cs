@@ -38,6 +38,18 @@ namespace PestanaDevApi.Tests.Services
         }
 
         [Fact]
+        public async Task NotifyTaskDeadlineChanged_SendsOldAndNewDeadlineToTheBoardGroup()
+        {
+            DateTime oldDeadline = new(2026, 10, 20);
+            BoardTask task = new() { Id = Guid.NewGuid(), BoardId = _boardId, TaskName = "Task", Deadline = null };
+
+            await _service.NotifyTaskDeadlineChanged(_userId, task, oldDeadline);
+
+            _boardGroup.Verify(g => g.TaskDeadlineChanged(It.Is<BoardNotificationDto<TaskDeadlineChangedDto>>(n =>
+                n.Data.TaskId == task.Id && n.Data.OldDeadline == oldDeadline && n.Data.NewDeadline == null && n.ChangedBy == _userId)), Times.Once);
+        }
+
+        [Fact]
         public async Task NotifyMemberRemoved_NotifiesAndRemovesTheMemberConnectionsFromTheGroup()
         {
             Guid memberId = Guid.NewGuid();

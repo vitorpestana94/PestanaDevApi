@@ -240,6 +240,35 @@ namespace PestanaDevApi.Tests.Services
         }
         #endregion
 
+        #region Deadline
+        [Fact]
+        public async Task UpdateTask_NotifiesTheDeadlineChange_WhenDeadlineChanged()
+        {
+            DateTime oldDeadline = new(2026, 10, 20);
+            DateTime newDeadline = new(2026, 10, 30);
+            _repository.SetupSequence(r => r.GetTask(BoardId, _taskId))
+                .ReturnsAsync(new BoardTask { Id = _taskId, BoardId = BoardId, Deadline = oldDeadline })
+                .ReturnsAsync(new BoardTask { Id = _taskId, BoardId = BoardId, Deadline = newDeadline });
+            _repository.Setup(r => r.UpdateTask(BoardId, _taskId, It.IsAny<UpdateBoardTaskRequestDto>())).ReturnsAsync(true);
+
+            UpdateBoardTaskResponseDto response = await _service.UpdateTask(OwnerId, BoardId, _taskId, new() { Deadline = newDeadline });
+
+            Assert.True(response.IsSuccess);
+            NotificationService.Verify(n => n.NotifyTaskDeadlineChanged(OwnerId, It.Is<BoardTask>(t => t.Deadline == newDeadline), oldDeadline), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateTask_DoesNotNotifyTheDeadline_WhenDeadlineDidNotChange()
+        {
+            _repository.Setup(r => r.UpdateTask(BoardId, _taskId, It.IsAny<UpdateBoardTaskRequestDto>())).ReturnsAsync(true);
+
+            await _service.UpdateTask(OwnerId, BoardId, _taskId, new() { TaskName = "New" });
+
+            NotificationService.Verify(n => n.NotifyTaskUpdated(OwnerId, It.IsAny<BoardTask>()), Times.Once);
+            NotificationService.Verify(n => n.NotifyTaskDeadlineChanged(It.IsAny<Guid>(), It.IsAny<BoardTask>(), It.IsAny<DateTime?>()), Times.Never);
+        }
+        #endregion
+
         [Fact]
         public async Task UpdateTask_ReturnsForbidden_WhenUserIsNotMember()
         {
