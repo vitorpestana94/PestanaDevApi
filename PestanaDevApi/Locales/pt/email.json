@@ -23,6 +23,6 @@
     "title": "Você recebeu um convite para um Scrum Board!",
     "paragraph": "<strong>{{ownerEmail}}</strong> convidou você para participar de um Scrum Board.<br>Para aceitar o convite, primeiro você precisa criar sua conta.",
     "button": "Cadastre-se e entre no board",
-    "subcopyright": "Você recebeu este e-mail porque {{ownerEmail}} convidou você para um Scrum Board no meu site."
+    "subcopyright": "Você recebeu este e-mail porque foi convidado(a) para um Scrum Board."
   }
 }

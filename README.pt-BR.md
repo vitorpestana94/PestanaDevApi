@@ -174,7 +174,7 @@ email.address=seu-email@dominio.com
 email.apppassword=sua-senha-de-app-smtp
 email.smtp=smtp.seu-provedor.com
 nasa.endpoint=https://seu-endpoint-apod-da-nasa
-metropolitanMuseum.endpoint=https://collectionapi.metmuseum.org/public/collection/v1
+metropolitanMuseum.endpoint=https://collectionapi.metmuseum.org/public/collection
 ```
 
 **`config/app-secret`**

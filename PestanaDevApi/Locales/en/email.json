@@ -26,6 +26,6 @@
     "title": "You've been invited to a Scrum Board!",
     "paragraph": "<strong>{{ownerEmail}}</strong> invited you to join their Scrum Board.<br>To accept the invitation, you first need to create your account.",
     "button": "Sign up and join the board",
-    "subcopyright": "You received this email because {{ownerEmail}} invited you to a Scrum Board on my website."
+    "subcopyright": "You received this email because you were invited to a Scrum Board."
   }
 }
