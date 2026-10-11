@@ -26,11 +26,11 @@
 
         INSERT INTO BOARD_TASKS(
             id, board_id, column_id, task_owner_id,
-            task_name, task_type, task_description
+            task_name, task_type, task_description, deadline
         )
         VALUES(
             UUID(), @new_board_id, @first_column_id, @UserId,
-            @TaskName, @TaskType, @TaskDescription
+            @TaskName, @TaskType, @TaskDescription, @Deadline
         );
 
         COMMIT;";
@@ -38,11 +38,11 @@
         public const string InsertTask = @"
         INSERT INTO BOARD_TASKS(
             id, board_id, column_id, task_owner_id,
-            task_name, task_type, task_description
+            task_name, task_type, task_description, deadline
         )
         VALUES(
             @TaskId, @BoardId, @ColumnId, @TaskOwnerId,
-            @TaskName, @TaskType, @TaskDescription
+            @TaskName, @TaskType, @TaskDescription, @Deadline
         );";
 
         public const string InsertMember = @"

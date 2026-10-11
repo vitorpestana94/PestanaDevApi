@@ -54,6 +54,7 @@
             task_type AS TaskType,
             task_name AS TaskName,
             task_description AS TaskDescription,
+            deadline AS Deadline,
             created_at AS CreatedAt,
             updated_at AS UpdatedAt
         FROM
@@ -108,6 +109,7 @@
             task_type AS TaskType,
             task_name AS TaskName,
             task_description AS TaskDescription,
+            deadline AS Deadline,
             created_at AS CreatedAt,
             updated_at AS UpdatedAt
         FROM

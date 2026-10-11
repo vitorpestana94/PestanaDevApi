@@ -19,7 +19,8 @@
             task_owner_id = COALESCE(@TaskOwnerId, task_owner_id),
             task_type = COALESCE(@TaskType, task_type),
             task_name = COALESCE(@TaskName, task_name),
-            task_description = COALESCE(@TaskDescription, task_description)
+            task_description = COALESCE(@TaskDescription, task_description),
+            deadline = IF(@ClearDeadline, NULL, COALESCE(@Deadline, deadline))
         WHERE
             id = @TaskId
         AND
