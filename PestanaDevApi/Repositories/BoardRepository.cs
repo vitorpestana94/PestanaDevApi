@@ -27,7 +27,6 @@ namespace PestanaDevApi.Repositories
             await db.ExecuteAsync(Sql.Insert, dto.ToInsert(userId));
         }
 
-
         public async Task<IEnumerable<Board>?> GetUserBoardsIds(Guid userId)
         {
             using IDbConnection db = _factory.CreateConnection();

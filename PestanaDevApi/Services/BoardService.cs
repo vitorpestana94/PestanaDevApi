@@ -32,19 +32,19 @@ namespace PestanaDevApi.Services
 
         public async Task<GetBoardsResponseDto> GetUserBoardsIds(Guid userId)
         {
-            return _cacheService.GetUserBoardsCache(userId) ?? await RequestUserBoardsIds(userId);
+            return _cacheService.GetUserBoardsCache(userId) ?? await GetUserBoardsIdsFromDB(userId);
         }
 
         public async Task<GetBoardDataResponseDto> GetBoardData(Guid boardId)
         {
-            return _cacheService.GetBoardDataCache(boardId) ?? await RequestBoardData(boardId);
+            return _cacheService.GetBoardDataCache(boardId) ?? await GettBoardDataFromDB(boardId);
         }
 
         #region Private Methods
         /// <summary>
         /// Retrieves the boards owned by the user from the database and caches the response.
         /// </summary>
-        private async Task<GetBoardsResponseDto> RequestUserBoardsIds(Guid userId)
+        private async Task<GetBoardsResponseDto> GetUserBoardsIdsFromDB(Guid userId)
         {
             IEnumerable<Board>? boards = await _repository.GetUserBoardsIds(userId);
 
@@ -61,7 +61,7 @@ namespace PestanaDevApi.Services
         /// <summary>
         /// Retrieves the board data from the database and caches the response.
         /// </summary>
-        private async Task<GetBoardDataResponseDto> RequestBoardData(Guid boardId)
+        private async Task<GetBoardDataResponseDto> GettBoardDataFromDB(Guid boardId)
         {
             (Board Board, IEnumerable<BoardTask>? Tasks, IEnumerable<User> BoardUsers, IEnumerable<BoardColumn> BoardColumns)? board = await _repository.GetBoardData(boardId);
 
