@@ -13,7 +13,9 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             dto.TaskOwnerId,
             TaskName = string.IsNullOrEmpty(dto.TaskName) ? null : dto.TaskName,
             dto.TaskType,
-            dto.TaskDescription
+            dto.TaskDescription,
+            dto.Deadline,
+            ClearDeadline = dto.ClearDeadline ?? false
         };
 
         public static bool WasDataNotUpdated(this UpdateBoardTaskRequestDto dto) =>
@@ -21,7 +23,9 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             dto.TaskOwnerId == null &&
             string.IsNullOrEmpty(dto.TaskName) &&
             dto.TaskType == null &&
-            dto.TaskDescription == null;
+            dto.TaskDescription == null &&
+            dto.Deadline == null &&
+            dto.ClearDeadline != true;
 
         public static bool IsMovingTask(this UpdateBoardTaskRequestDto dto) => dto.ColumnId != null;
 

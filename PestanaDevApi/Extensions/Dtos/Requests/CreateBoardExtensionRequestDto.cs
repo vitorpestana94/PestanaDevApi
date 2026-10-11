@@ -17,7 +17,8 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             dto.ColumnsNames.ColumnNameFive,
             dto.BoardTask.TaskName,
             dto.BoardTask.TaskType,
-            dto.BoardTask.TaskDescription
+            dto.BoardTask.TaskDescription,
+            dto.BoardTask.Deadline
         };
 
         public static bool HasDuplicatedNames(this CreateColumnNames columnsNames)

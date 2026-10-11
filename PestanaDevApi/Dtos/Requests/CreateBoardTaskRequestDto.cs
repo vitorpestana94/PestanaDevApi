@@ -20,5 +20,7 @@ namespace PestanaDevApi.Dtos.Requests
         public string? TaskType { get; set; }
 
         public string? TaskDescription { get; set; }
+
+        public DateTime? Deadline { get; set; }
     }
 }

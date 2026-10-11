@@ -13,7 +13,8 @@ namespace PestanaDevApi.Extensions.Dtos.Requests
             TaskOwnerId = dto.GetTaskOwnerId(userId),
             dto.TaskName,
             dto.TaskType,
-            dto.TaskDescription
+            dto.TaskDescription,
+            dto.Deadline
         };
 
         public static Guid GetTaskOwnerId(this CreateBoardTaskRequestDto dto, Guid userId) => dto.TaskOwnerId ?? userId;
