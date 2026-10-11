@@ -126,8 +126,14 @@ namespace PestanaDevApi.Services
 
             BoardTask? updatedTask = await _repository.GetTask(boardId, taskId);
 
-            if (updatedTask != null)
-                await _notificationService.NotifyTaskUpdated(userId, updatedTask);
+            if (updatedTask == null)
+                return new();
+
+            await _notificationService.NotifyTaskUpdated(userId, updatedTask);
+
+            // Every deadline change (set, changed or removed) has its own event, so the members can be warned about it.
+            if (task.Deadline != updatedTask.Deadline)
+                await _notificationService.NotifyTaskDeadlineChanged(userId, updatedTask, oldDeadline: task.Deadline);
 
             return new();
         }

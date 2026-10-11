@@ -7,7 +7,7 @@ namespace PestanaDevApi.Interfaces
     {
         /// <summary>
         /// Creates a task on a column of the board. Only board members can do it, and the task owner (if sent)
-        /// must also be a board member; when it's not sent, the user creating the task becomes its owner.
+        /// must also be a board member; when it's not sent, the user creating the task becomes its owner. The deadline is optional.
         /// Runs inside the board semaphore to avoid concurrent changes. After the insert, the board cache
         /// is cleared and the board members are notified through SignalR (TaskCreated).
         /// </summary>
@@ -28,8 +28,10 @@ namespace PestanaDevApi.Interfaces
         /// <summary>
         /// Updates the data of a task and/or moves it to another column of the same board.
         /// Only board members can do it, and the new task owner (if sent) must also be a board member.
+        /// The deadline can be set/changed (Deadline) or removed (ClearDeadline = true).
         /// Runs inside the board semaphore to avoid concurrent changes. After the update, the board cache
-        /// is cleared and the board members are notified through SignalR (TaskUpdated).
+        /// is cleared and the board members are notified through SignalR (TaskUpdated, plus TaskDeadlineChanged
+        /// when the deadline changed).
         /// </summary>
         /// <param name="userId">
         /// Identifier of the user making the request.

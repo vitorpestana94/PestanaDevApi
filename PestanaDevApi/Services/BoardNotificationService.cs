@@ -42,6 +42,13 @@ namespace PestanaDevApi.Services
             await GetBoardGroup(task.BoardId).TaskUpdated(new(task.BoardId, changedBy, task));
         }
 
+        public async Task NotifyTaskDeadlineChanged(Guid changedBy, BoardTask task, DateTime? oldDeadline)
+        {
+            TaskDeadlineChangedDto deadlineChange = new(task.Id, task.TaskName, oldDeadline, task.Deadline);
+
+            await GetBoardGroup(task.BoardId).TaskDeadlineChanged(new(task.BoardId, changedBy, deadlineChange));
+        }
+
         public async Task NotifyTaskDeleted(Guid changedBy, Guid boardId, Guid taskId)
         {
             await GetBoardGroup(boardId).TaskDeleted(new(boardId, changedBy, taskId));

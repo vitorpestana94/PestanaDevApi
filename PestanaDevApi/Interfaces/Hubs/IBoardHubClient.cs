@@ -10,6 +10,7 @@ namespace PestanaDevApi.Interfaces.Hubs
         Task BoardDeleted(BoardNotificationDto<Guid> notification);
         Task TaskCreated(BoardNotificationDto<BoardTask> notification);
         Task TaskUpdated(BoardNotificationDto<BoardTask> notification);
+        Task TaskDeadlineChanged(BoardNotificationDto<TaskDeadlineChangedDto> notification);
         Task TaskDeleted(BoardNotificationDto<Guid> notification);
         Task ColumnsUpdated(BoardNotificationDto<IEnumerable<BoardColumn>> notification);
         Task MemberAdded(BoardNotificationDto<BoardMember> notification);
