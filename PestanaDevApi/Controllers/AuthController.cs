@@ -10,7 +10,6 @@ namespace PestanaDevApi.Controllers
 {
     [Route("auth")]
     [ApiController]
-    [AllowAnonymous]
 
     public class AuthController: Controller
     {
@@ -31,6 +30,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             AuthResponseDto response = await _loginService.Login(request);
@@ -42,6 +42,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("oauth")]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginOrSignUpWithProvider([FromBody] LoginOrSignUpWithPlatformRequestDto request)
         {
             AuthResponseDto response = await _platformService.LoginOrSignUpWithProvider(request);
@@ -53,6 +54,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("signup")]
+        [AllowAnonymous]
         public async Task<IActionResult> SignUp([FromBody] SignUpRequestDto request)
         {
             SignUpResponseDto response = await _signUpService.SignUp(request);
@@ -64,6 +66,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpGet("isEmailRegistered/{email}")]
+        [AllowAnonymous]
         public async Task<IActionResult> IsEmailRegistered([FromRoute] string email)
         {
             IsEmailAlreadyRegisteredResponseDto response = await _signUpService.IsEmailAlreadyRegistered(email);
@@ -75,6 +78,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto requestDto)
         {
             ForgotPasswordResponseDto response = await _forgotPasswordService.ForgotPassword(requestDto);
@@ -86,6 +90,7 @@ namespace PestanaDevApi.Controllers
         }
 
         [HttpPost("refresh-token")]
+        [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
         {
             AuthResponseDto? response = await _refreshTokenService.RefreshToken(request);
@@ -94,6 +99,18 @@ namespace PestanaDevApi.Controllers
                 return response.HandleFailure();
 
             return Ok(response.ApiTokens);
+        }
+
+        [HttpPost("hub-token")]
+        [Authorize]
+        public IActionResult GetHubToken()
+        {
+            HubTokenResponseDto response = _loginService.GenerateHubToken(User.GetUserId());
+
+            if (!response.IsSuccess)
+                return response.HandleFailure();
+
+            return Ok(response);
         }
 
         [HttpDelete]

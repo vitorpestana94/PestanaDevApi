@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 using PestanaDevApi.Dtos.Requests;
+using PestanaDevApi.Constants;
 
 namespace PestanaDevApi.Services
 {
@@ -51,6 +52,11 @@ namespace PestanaDevApi.Services
 
         public string GetDeviceId() => Guid.NewGuid().ToString();
 
+        public string GenerateHubToken(Guid userId)
+        {
+            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetHubTokenClaims(userId), TokenConstants.HubAudience, DateTime.UtcNow.AddMinutes(TokenConstants.HubTokenExpirationMinutes)));
+        }
+
         #region Private Methods
         /// <summary>
         /// It returns a base64-encoded string after persisting it in the database.
@@ -87,7 +93,23 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
         private string CreateJwtToken(User user, string deviceId)
         {
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user, deviceId)));
+            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user, deviceId), TokenConstants.ApiAudience));
+        }
+
+        /// <summary>
+        /// Generates the hub token claims. It only carries the user id (sub), needed by the hub and by the
+        /// events' changedBy; no other user data is added, since the token is sent on the query string.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user.</param>
+        /// <returns>The hub token claims.</returns>
+        private List<Claim> GetHubTokenClaims(Guid userId)
+        {
+            return
+            [
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iss, _config["jwt.issuer"]!),
+                new(JwtRegisteredClaimNames.Sub, userId.ToString())
+            ];
         }
 
         /// <summary>
@@ -113,14 +135,16 @@ namespace PestanaDevApi.Services
         /// Generates Token description.
         /// </summary>
         /// <param name="claims">The list of JWT'S claims.</param>
+        /// <param name="audience">The token audience (main API or hub), which defines where the token can be used.</param>
         /// <returns>A JWT token descriptor.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the JWT Key is not configured.</exception>
-        private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims, DateTime? expires = null)
+        private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims, string audience, DateTime? expires = null)
         {
             return new()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = expires.HasValue ? expires : DateTime.UtcNow.AddMinutes(60),
+                Audience = audience,
+                Expires = expires.HasValue ? expires : DateTime.UtcNow.AddMinutes(TokenConstants.ApiTokenExpirationMinutes),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Convert.FromBase64String(_config["jwt.key"]!)), SecurityAlgorithms.HmacSha256),
             };
         }
