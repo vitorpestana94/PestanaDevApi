@@ -26,7 +26,8 @@
         AND
             board_id = @BoardId;";
 
-        // This update is more thoroughly documented because it is more complex, and I felt the additional documentation was necessary.
+        /// This update is more thoroughly documented because it is more complex, and I felt the additional documentation was necessary.
+        /// 
         /// Renames and/or moves a column to a new position, shifting the columns in between.
         /// 
         /// Parameters: @BoardId, @ColumnId, @Name (null keeps the current name),
