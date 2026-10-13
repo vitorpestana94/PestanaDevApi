@@ -35,6 +35,7 @@ REST API behind my portfolio website and other projects I build. It handles auth
   - Sign up and login with email and password (BCrypt hashes)
   - Login / sign up with **Google**, **GitHub** and **LinkedIn**
   - **JWT** access tokens + **refresh tokens** per device
+  - Separate short-lived **hub token** for SignalR (its own audience, rejected by the other endpoints)
   - **Google reCAPTCHA v3** on public forms
 - **Email confirmation**: 4-character codes, stored as HMAC-SHA256 hashes, with expiration and resend
 - **Contact form**: sends an email to the site owner and a confirmation email to the visitor, in **English or Portuguese** (JSON translations, next-i18next style)
@@ -203,6 +204,7 @@ captchaSecret=your-recaptcha-v3-secret
 | GET | `/auth/isEmailRegistered/{email}` | Check whether an email is already registered | |
 | POST | `/auth/forgot-password` | Reset the password (requires a confirmed email) | |
 | POST | `/auth/refresh-token` | Get a new token from a refresh token | |
+| POST | `/auth/hub-token` | Get a short-lived token (10 min) to connect to the SignalR hubs | 🔒 |
 | DELETE | `/auth` | Logout (deletes the device's refresh token) | 🔒 |
 
 ### Email and confirmation — `/email`, `/confirmation`
@@ -253,7 +255,7 @@ captchaSecret=your-recaptcha-v3-secret
 
 Changes to the board are still made through the REST endpoints. SignalR only **pushes** those changes to the other members.
 
-- **Hub:** `/hubs/board` (requires the JWT, sent as `access_token` in the query string)
+- **Hub:** `/hubs/board`. It requires a **hub token**, not the main JWT (see below).
 - **Methods the client calls:** `JoinBoard(boardId)` (members only) and `LeaveBoard(boardId)`
 - **Payload of every event:** `{ boardId, changedBy, data }`
 
@@ -269,13 +271,39 @@ Changes to the board are still made through the REST endpoints. SignalR only **p
 | `MemberAdded` | `{ id, name, email, isOwner }` | `POST .../members` |
 | `MemberRemoved` | `memberId` | `DELETE .../members/{userId}` |
 
+### Hub authentication (hub token)
+
+Browsers send the hub token in the WebSocket URL (`?access_token=`), where URLs can end up in logs. To keep the main JWT out of URLs, the hub only accepts a separate **hub token**:
+
+- `POST /auth/hub-token` (with `Authorization: Bearer <main JWT>`) returns `{ "token": "<hub token>", "message": "Ok" }`.
+- **The hub token:**
+  - lasts **10 minutes**;
+  - has its own audience (`PestanaDevApi.Hub`), so **every other endpoint rejects it**;
+  - only carries the user id (`sub`), the same as the main JWT, which is used by the hub and by the events' `changedBy`.
+- **The main JWT** has the `PestanaDevApi` audience and is **rejected by the hub**.
+- **On every connection and reconnection**, request a new hub token (`accessTokenFactory` does this automatically).
+- **An open connection stays open** when its hub token expires: the token is only checked when connecting.
+
+Two authentication schemes are configured in `AppConfig/JwtConfig.cs`:
+- **the default one** (main JWT) validates the API audience;
+- **`HubToken`** only accepts hub tokens and reads them from the `access_token` query string on `/hubs` requests.
+
 TypeScript client example:
 
 ```ts
 import * as signalR from "@microsoft/signalr";
 
+// Called on every connection and reconnection, so each one gets a fresh hub token.
+const getHubToken = async () => {
+  const res = await fetch(`${API_URL}/auth/hub-token`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${getAccessToken()}` }, // main JWT
+  });
+  return (await res.json()).token as string;
+};
+
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl(`${API_URL}/hubs/board`, { accessTokenFactory: () => getAccessToken() })
+  .withUrl(`${API_URL}/hubs/board`, { accessTokenFactory: getHubToken })
   .withAutomaticReconnect()
   .build();
 

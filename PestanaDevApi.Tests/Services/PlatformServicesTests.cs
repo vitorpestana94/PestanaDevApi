@@ -2,7 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
+using PestanaDevApi.AppConfig;
+using PestanaDevApi.Constants;
 using PestanaDevApi.Dtos.Responses;
 using PestanaDevApi.Interfaces.Repositories;
 using PestanaDevApi.Interfaces.Services;
@@ -118,7 +122,75 @@ namespace PestanaDevApi.Tests.Services
             JwtSecurityToken jwt = new JwtSecurityTokenHandler().ReadJwtToken(tokens.Token);
             Assert.Equal(user.Id.ToString(), jwt.Subject);
             Assert.Equal("user@email.com", jwt.Claims.First(c => c.Type == "email").Value);
+            Assert.Equal([TokenConstants.ApiAudience], jwt.Audiences);
             _repository.Verify(r => r.InsertRefreshToken(user.Id, It.IsAny<string>(), tokens.RefreshToken), Times.Once);
+        }
+
+        #region Hub Token
+        private static readonly string Key = Convert.ToBase64String(new byte[32]);
+
+        private static TokenValidationParameters ValidationParameters(string audience) => new()
+        {
+            ValidIssuer = "PestanaDevApi",
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Key))
+        };
+
+        [Fact]
+        public void GenerateHubToken_HasHubAudienceSameSubShortLifeAndNoUserData()
+        {
+            Guid userId = Guid.NewGuid();
+
+            string token = new TokenService(_repository.Object, Config(key: Key)).GenerateHubToken(userId);
+
+            JwtSecurityToken jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            Assert.Equal([TokenConstants.HubAudience], jwt.Audiences);
+            Assert.Equal(userId.ToString(), jwt.Subject);
+            Assert.True(jwt.ValidTo <= DateTime.UtcNow.AddMinutes(TokenConstants.HubTokenExpirationMinutes).AddSeconds(5));
+            Assert.True(jwt.ValidTo > DateTime.UtcNow.AddMinutes(TokenConstants.HubTokenExpirationMinutes - 1));
+            Assert.DoesNotContain(jwt.Claims, c => c.Type is "email" or "name" or "sid");
+        }
+
+        [Fact]
+        public async Task HubToken_IsOnlyValidForTheHubAudience()
+        {
+            TokenService service = new(_repository.Object, Config(key: Key));
+            JsonWebTokenHandler handler = new();
+
+            string hubToken = service.GenerateHubToken(Guid.NewGuid());
+            string mainToken = (await service.GenerateApiTokens(new User { Id = Guid.NewGuid() })).Token;
+
+            Assert.True((await handler.ValidateTokenAsync(hubToken, ValidationParameters(TokenConstants.HubAudience))).IsValid);
+            Assert.False((await handler.ValidateTokenAsync(mainToken, ValidationParameters(TokenConstants.HubAudience))).IsValid);
+            Assert.False((await handler.ValidateTokenAsync(hubToken, ValidationParameters(TokenConstants.ApiAudience))).IsValid);
+        }
+
+        [Fact]
+        public void IsApiAudience_RejectsHubTokens()
+        {
+            Assert.True(JwtConfig.IsApiAudience([TokenConstants.ApiAudience]));
+            Assert.True(JwtConfig.IsApiAudience([]));   // main tokens issued before the audience existed
+            Assert.False(JwtConfig.IsApiAudience([TokenConstants.HubAudience]));
+            Assert.False(JwtConfig.IsApiAudience([TokenConstants.ApiAudience, TokenConstants.HubAudience]));
+        }
+        #endregion
+    }
+
+    public class LoginServiceHubTokenTests
+    {
+        [Fact]
+        public void GenerateHubToken_ReturnsTheTokenWithTheApiResponsePattern()
+        {
+            Guid userId = Guid.NewGuid();
+            Mock<ITokenService> tokenService = new();
+            tokenService.Setup(t => t.GenerateHubToken(userId)).Returns("hub-token");
+            LoginService service = new(new Mock<ILoginRepository>().Object, tokenService.Object, new Mock<IPlatformAuthService>().Object, new Mock<ICaptchaService>().Object);
+
+            HubTokenResponseDto response = service.GenerateHubToken(userId);
+
+            Assert.True(response.IsSuccess);
+            Assert.Equal("hub-token", response.Token);
+            Assert.Equal("Ok", response.Message);
         }
     }
 }

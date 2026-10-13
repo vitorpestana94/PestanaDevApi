@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using PestanaDevApi.Constants;
 using PestanaDevApi.Extensions;
 using PestanaDevApi.Interfaces.Hubs;
 using PestanaDevApi.Interfaces.Repositories;
@@ -12,8 +13,9 @@ namespace PestanaDevApi.Hubs
     /// <summary>
     /// Real time channel of the boards. The client connects, calls JoinBoard(boardId)
     /// and starts receiving the events declared on <see cref="IBoardHubClient"/>.
+    /// Only accepts hub tokens (POST /auth/hub-token), never the main JWT.
     /// </summary>
-    [Authorize]
+    [Authorize(AuthenticationSchemes = TokenConstants.HubTokenScheme)]
     public class BoardHub: Hub<IBoardHubClient>
     {
         private readonly IBoardPanelRepository _boardRepository;

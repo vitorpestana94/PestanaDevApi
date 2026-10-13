@@ -74,6 +74,11 @@ namespace PestanaDevApi.Services
             await _loginRepository.DeleteRefreshToken(userId, deviceId);
         }
 
+        public HubTokenResponseDto GenerateHubToken(Guid userId)
+        {
+            return new(_tokenService.GenerateHubToken(userId));
+        }
+
         #region Private Methods
         /// <summary>
         /// Get a user profile properties if exists.
