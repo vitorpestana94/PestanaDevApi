@@ -9,7 +9,7 @@ namespace PestanaDevApi.Controllers
 {
     [Route("metropolitan-museum")]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize]
 
     public class MetropolitanMuseumController : Controller
     {
