@@ -80,42 +80,8 @@ DbConfig.Setup(builder.Configuration, builder.Services);
 // Setup Quartz
 DbConfig.SetupQuartz(builder.Configuration, builder.Services);
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-
-        ValidIssuer = builder.Configuration["jwt.issuer"],
-
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Convert.FromBase64String(builder.Configuration["jwt.key"]!)
-        )
-    };
-
-    // Browsers can't send the Authorization header on WebSocket connections,
-    // so the SignalR client sends the JWT on the "access_token" query string instead.
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            string? accessToken = context.Request.Query[SignalRConstants.AccessTokenQueryKey];
-
-            if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments(SignalRConstants.HubsBasePath))
-                context.Token = accessToken;
-
-            return Task.CompletedTask;
-        }
-    };
-});
+// Setup JWT authentication (main token + hub token schemes)
+JwtConfig.Setup(builder.Configuration, builder.Services);
 
 builder.Services.AddSignalR();
 
@@ -260,6 +226,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<BoardHub>(SignalRConstants.BoardHubPath);
+// An already open connection is kept when its hub token expires: the token is only checked when connecting.
+app.MapHub<BoardHub>(SignalRConstants.BoardHubPath, options => options.CloseOnAuthenticationExpiration = false);
 
 app.Run();
