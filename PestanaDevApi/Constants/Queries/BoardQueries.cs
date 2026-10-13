@@ -2,7 +2,6 @@
 {
     public static partial class BoardQueries
     {
-        // Boards where the user is a member (the owner is always a member too).
         public const string Select = @"
         SELECT
             b.id AS Id,

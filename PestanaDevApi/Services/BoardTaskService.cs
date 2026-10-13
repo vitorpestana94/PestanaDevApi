@@ -21,13 +21,7 @@ namespace PestanaDevApi.Services
         private readonly IBoardCacheService _cacheService;
         private readonly IBoardNotificationService _notificationService;
 
-        public BoardTaskService(
-            IBoardTaskRepository repository,
-            IBoardPanelRepository boardRepository,
-            IBoardColumnRepository columnRepository,
-            [FromKeyedServices(SemaphoreConstants.BoardSemaphoreKey)] ISemaphoreService semaphoreService,
-            IBoardCacheService cacheService,
-            IBoardNotificationService notificationService)
+        public BoardTaskService(IBoardTaskRepository repository, IBoardPanelRepository boardRepository, IBoardColumnRepository columnRepository, [FromKeyedServices(SemaphoreConstants.BoardSemaphoreKey)] ISemaphoreService semaphoreService, IBoardCacheService cacheService, IBoardNotificationService notificationService)
         {
             _repository = repository;
             _boardRepository = boardRepository;
