@@ -54,7 +54,7 @@ namespace PestanaDevApi.Services
 
         public string GenerateHubToken(Guid userId)
         {
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetHubTokenClaims(userId), TokenConstants.HubAudience, DateTime.UtcNow.AddMinutes(TokenConstants.HubTokenExpirationMinutes)));
+            return CreateHubToken(userId);
         }
 
         #region Private Methods
@@ -93,7 +93,19 @@ namespace PestanaDevApi.Services
         /// <exception cref="InvalidOperationException">Thrown if the JWT signing key is not configured.</exception>
         private string CreateJwtToken(User user, string deviceId)
         {
-            return new JsonWebTokenHandler().CreateToken(GetTokenDescriptor(GetTokenClaims(user, deviceId), TokenConstants.ApiAudience));
+            return new JsonWebTokenHandler().CreateToken(
+                GetTokenDescriptor(
+                    GetTokenClaims(user, deviceId), 
+                    TokenConstants.ApiAudience));
+        }
+
+        private string CreateHubToken(Guid userId)
+        {
+            return new JsonWebTokenHandler().CreateToken(
+                GetTokenDescriptor(
+                    GetHubTokenClaims(userId), 
+                    TokenConstants.HubAudience, 
+                    DateTime.UtcNow.AddMinutes(TokenConstants.HubTokenExpirationMinutes)));
         }
 
         /// <summary>
