@@ -129,7 +129,8 @@ namespace PestanaDevApi.Tests.Services
             {
                 ["email.address"] = "site@email.com",
                 ["email.apppassword"] = "password",
-                ["email.smtp"] = "smtp.email.com"
+                ["email.smtp"] = "smtp.email.com",
+                ["clientSideSystemUrl"] = "http://localhost:3000/"
             }).Build();
 
             _captchaService.Setup(c => c.ValidateCaptchaV3(It.IsAny<string>())).ReturnsAsync(true);
@@ -184,11 +185,18 @@ namespace PestanaDevApi.Tests.Services
         }
 
         [Fact]
-        public async Task SendBoardInvitationEmail_Throws_WhenClientSideSystemUrlIsNotConfigured()
+        public void Constructor_Throws_WhenClientSideSystemUrlIsNotConfigured()
         {
-            ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _service.SendBoardInvitationEmail(new(Guid.NewGuid(), "invited@email.com", "owner@email.com", "en")));
+            IConfiguration config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["email.address"] = "site@email.com",
+                ["email.apppassword"] = "password",
+                ["email.smtp"] = "smtp.email.com"
+            }).Build();
 
-            Assert.Equal(500, exception.StatusCode);
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => new EmailService(config, _templateService.Object, _codeService.Object, _captchaService.Object, _signUpService.Object, _userService.Object));
+
+            Assert.StartsWith("7A4E", exception.Message);
         }
 
         [Fact]
