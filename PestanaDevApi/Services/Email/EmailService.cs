@@ -26,9 +26,10 @@ namespace PestanaDevApi.Services.Email
         private readonly string _emailAddress;
         private readonly string _appPassword;
         private readonly string _smtp;
+        private readonly string _clientSideSystemUrl;
 
-        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService,
-            ICaptchaService captchaService, ISignUpService signUpService, IUserService userService)
+
+        public EmailService(IConfiguration configuration, IEmailTemplateService emailTemplateService, IConfirmationCodeService codeGenerationService, ICaptchaService captchaService, ISignUpService signUpService, IUserService userService)
         {
             _config = configuration;
             _emailTemplateService = emailTemplateService;   
@@ -46,9 +47,13 @@ namespace PestanaDevApi.Services.Email
             if (string.IsNullOrEmpty(_config["email.smtp"]))
                 throw new InvalidOperationException(ErrorMessages.EmailSmtp);
 
+            if (string.IsNullOrEmpty(_config["clientSideSystemUrl"]))
+                throw new InvalidOperationException(ErrorMessages.ClientSideSystemUrlNotConfigured);
+
             _emailAddress = _config["email.address"]!;
             _appPassword = _config["email.apppassword"]!;
             _smtp = _config["email.smtp"]!;
+            _clientSideSystemUrl = _config["clientSideSystemUrl"]!;
         }
 
         public async Task<EmailResponseDto> SendContactEmail(ContactEmailRequestDto request)
@@ -122,13 +127,7 @@ namespace PestanaDevApi.Services.Email
 
         public async Task SendBoardInvitationEmail(BoardInvitationEmailDto request)
         {
-            // Read here (and not on the constructor) so the other emails keep working while it isn't configured.
-            string? clientSideSystemUrl = _config[ClientSideConstants.ClientSideSystemUrlConfigKey];
-
-            if (string.IsNullOrEmpty(clientSideSystemUrl))
-                throw new ApiException(ErrorMessages.ClientSideSystemUrlNotConfigured, 500);
-
-            string signUpUrl = ClientSideUrlBuilder.GetBoardInvitationSignUpUrl(clientSideSystemUrl, request.ClientLocale, request.BoardId);
+            string signUpUrl = ClientSideUrlBuilder.GetBoardInvitationSignUpUrl(_clientSideSystemUrl, request.ClientLocale, request.BoardId);
 
             using MailMessage mail = new ApiEmailMessage(request, _emailAddress, _emailTemplateService.GetBoardInvitationSubject(request), await _emailTemplateService.GetEmailTemplate(request, signUpUrl));
 

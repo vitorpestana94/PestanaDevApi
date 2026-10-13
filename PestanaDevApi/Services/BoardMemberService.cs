@@ -45,7 +45,6 @@ namespace PestanaDevApi.Services
         {
             (AddBoardMemberResponseDto response, BoardInvitationEmailDto? invitation) = await _semaphoreService.Work(() => InsertBoardMember(userId, boardId, dto));
 
-            // The email is sent outside the semaphore so the SMTP request doesn't block the other board changes.
             if (invitation != null)
                 await _emailService.SendBoardInvitationEmail(invitation);
 

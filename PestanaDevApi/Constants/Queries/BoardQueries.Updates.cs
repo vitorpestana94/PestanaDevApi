@@ -41,13 +41,9 @@
         /// step 1 → A, B, C go to 10001, 10002, 10003;
         /// step 2 → D goes to 1;
         /// step 3 → A, B, C come back as 2, 3, 4.
-        /// 
+  
         public const string UpdateColumn = @"
         START TRANSACTION;
-
-        -- Step 1: moves the columns between the old and the new position (except the moving one)
-        -- to a temporary range (+10000), freeing their positions without breaking the unique constraint.
-        -- LEAST and GREATEST make the range work in both directions (moving left or right).
 
         UPDATE
             BOARD_COLUMNS
@@ -60,9 +56,6 @@
         AND
             position BETWEEN LEAST(@OldPosition, @NewPosition) AND GREATEST(@OldPosition, @NewPosition);
 
-        -- Step 2: updates the moving column. COALESCE keeps the current name when no new name is sent.
-        -- The target position is free now because its previous owner was moved in step 1.
-
         UPDATE
             BOARD_COLUMNS
         SET
@@ -72,9 +65,6 @@
             id = @ColumnId
         AND
             board_id = @BoardId;
-
-        -- Step 3: brings the temporary columns back, shifted by one position.
-        -- Moved left (new less than old): they shift +1. Moved right (new greater than old): they shift -1.
 
         UPDATE
             BOARD_COLUMNS
