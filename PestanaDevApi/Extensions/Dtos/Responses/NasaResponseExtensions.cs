@@ -8,11 +8,14 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
     {
         public static NasaResponse ParseNasaResponse(this NasaResponse response)
         {
-            response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation));
-            response.Copyright = ParseHtmlToText(response.Copyright);
+            response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation)); // This was done because due the currently nasa's response intability, they are adding HTML tags to response. And I dont wanna that to be received by the frontend.
+            response.Copyright = ParseHtmlToText(response.Copyright); // Same here, nasa is returning unnecessary HTML tags.
+            response.HdUrl = IsVideoThatNeedsParse(response) ? GetVideoFromBasicHtml(response.BasicHtml) : response.HdUrl; // Nasa is not currently returning the video directly on Hdurl, it's returning an empty string instead. So, until deal with it, i'm diging the video inside basichtml response.
+            response.BasicHtml = string.Empty;
 
             return response;
         }
+
 
         public static IEnumerable<NasaResponse> ParseNasaResponse(this IEnumerable<NasaResponse> response)
         {
@@ -22,6 +25,15 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             }
 
             return response.OrderByDescending(response => response.Date);
+        }
+
+        private static bool IsVideoThatNeedsParse(NasaResponse response) => response.MediaType == "video" && response.HdUrl == "";
+
+        private static string GetVideoFromBasicHtml(string basicHtml)
+        {
+            Match match = Regex.Match(basicHtml, @"<source[^>]+src=""([^""]+)""");
+
+            return match.Success ? match.Groups[1].Value : string.Empty;
         }
 
         private static string ParseHtmlToText(string htmlText)
@@ -34,7 +46,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
 
         private static string RemoveUndesiredExplanationContent(string explanation)
         {
-            return Regex.Replace(explanation, @"^Explanation:\s*|Tomorrow's picture:[\s\S]*$","",RegexOptions.IgnoreCase);
+            return Regex.Replace(explanation, @"^Explanation:\s*|Tomorrow's picture:[\s\S]*$","",RegexOptions.IgnoreCase); // I dont want this in my respose
         }
     }
 }
