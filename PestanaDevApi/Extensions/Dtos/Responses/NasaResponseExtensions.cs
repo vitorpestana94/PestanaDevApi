@@ -1,7 +1,6 @@
 ﻿using PestanaDevApi.Dtos.Responses;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
-using System.Reflection.Metadata;
 
 namespace PestanaDevApi.Extensions.Dtos.Responses
 {
@@ -9,9 +8,9 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
     {
         public static NasaResponse ParseNasaResponse(this NasaResponse response)
         {
-            response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation));
-            response.Copyright = ParseHtmlToText(response.Copyright);
-            response.HdUrl = IsVideoThatNeedsParse(response) ? GetVideoFromBasicHtml(response.BasicHtml) : response.HdUrl;
+            response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation)); // This was done because due the currently nasa's response intability, they are adding HTML tags to response. And I dont wanna that to be received by the frontend.
+            response.Copyright = ParseHtmlToText(response.Copyright); // Same here, nasa is returning unnecessary HTML tags.
+            response.HdUrl = IsVideoThatNeedsParse(response) ? GetVideoFromBasicHtml(response.BasicHtml) : response.HdUrl; // Nasa is not currently returning the video directly on Hdurl, it's returning an empty string instead. So, until deal with it, i'm diging the video inside basichtml response.
             response.BasicHtml = string.Empty;
 
             return response;
@@ -47,7 +46,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
 
         private static string RemoveUndesiredExplanationContent(string explanation)
         {
-            return Regex.Replace(explanation, @"^Explanation:\s*|Tomorrow's picture:[\s\S]*$","",RegexOptions.IgnoreCase);
+            return Regex.Replace(explanation, @"^Explanation:\s*|Tomorrow's picture:[\s\S]*$","",RegexOptions.IgnoreCase); // I dont want this in my respose
         }
     }
 }
