@@ -13,5 +13,8 @@ namespace PestanaDevApi.Dtos.Responses
 
         [JsonPropertyName("media_type")]
         public string MediaType { get; set; } = string.Empty;
+
+        [JsonPropertyName("basic_html")]
+        public string BasicHtml { get; set; } = string.Empty;
     }
 }
