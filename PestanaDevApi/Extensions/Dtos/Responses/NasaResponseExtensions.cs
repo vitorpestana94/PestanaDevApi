@@ -1,6 +1,7 @@
 ﻿using PestanaDevApi.Dtos.Responses;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Reflection.Metadata;
 
 namespace PestanaDevApi.Extensions.Dtos.Responses
 {
@@ -11,6 +12,7 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation));
             response.Copyright = ParseHtmlToText(response.Copyright);
             response.HdUrl = IsVideoThatNeedsParse(response) ? GetVideoFromBasicHtml(response.BasicHtml) : response.HdUrl;
+            response.BasicHtml = string.Empty;
 
             return response;
         }
