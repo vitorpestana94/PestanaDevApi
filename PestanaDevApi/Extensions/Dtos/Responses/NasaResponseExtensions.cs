@@ -10,9 +10,11 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
         {
             response.Explanation = RemoveUndesiredExplanationContent(ParseHtmlToText(response.Explanation));
             response.Copyright = ParseHtmlToText(response.Copyright);
+            response.HdUrl = IsVideoThatNeedsParse(response) ? GetVideoFromBasicHtml(response.BasicHtml) : response.HdUrl;
 
             return response;
         }
+
 
         public static IEnumerable<NasaResponse> ParseNasaResponse(this IEnumerable<NasaResponse> response)
         {
@@ -22,6 +24,15 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             }
 
             return response.OrderByDescending(response => response.Date);
+        }
+
+        private static bool IsVideoThatNeedsParse(NasaResponse response) => response.MediaType == "video" && response.HdUrl == "";
+
+        private static string GetVideoFromBasicHtml(string basicHtml)
+        {
+            Match match = Regex.Match(basicHtml, @"<source[^>]+src=""([^""]+)""");
+
+            return match.Success ? match.Groups[1].Value : string.Empty;
         }
 
         private static string ParseHtmlToText(string htmlText)
