@@ -32,11 +32,11 @@ namespace PestanaDevApi.Extensions.Dtos.Responses
             response.MediaType == "video" && 
             (response.HdUrl == "" || 
             !response.HdUrl.Contains("mp4") || 
-            !response.HdUrl.Contains("youtube")); // Sadly, NASA'S response ins unstable. So, sometime the response does not contain a video to be shown.
+            !response.HdUrl.Contains("youtube")); // Sadly, NASA'S response is unstable. So, sometimes the response does not contain a video to be shown.
 
         private static string GetVideoFromBasicHtml(string basicHtml)
         {
-            Match match = Regex.Match(basicHtml, @"<source[^>]+src=""([^""]+)""");
+            Match match = Regex.Match(basicHtml, @"<(?:source|iframe)\b[^>]*\bsrc=""([^""]+)""");
 
             return match.Success ? match.Groups[1].Value : string.Empty;
         }
